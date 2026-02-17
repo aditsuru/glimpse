@@ -1,11 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { KeyRound, Loader, User } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import { Controller, useForm } from "react-hook-form";
+import { KeyRound, User } from "lucide-react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -14,14 +12,10 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import {
-	Field,
 	FieldDescription,
-	FieldError,
 	FieldGroup,
-	FieldLabel,
 	FieldSeparator,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 
 const loginSchema = z.object({
 	username: z.string().min(6, "Enter a valid length username"),
@@ -29,6 +23,8 @@ const loginSchema = z.object({
 });
 
 import Link from "next/link";
+import ControllerInput from "@/components/form/ControllerInput";
+import FormButton from "@/components/form/FormButton";
 
 type LoginSchema = z.infer<typeof loginSchema>;
 
@@ -58,116 +54,33 @@ function Login() {
 						<form onSubmit={form.handleSubmit(handleOnSubmit)}>
 							<FieldGroup>
 								<FieldGroup className="gap-3">
-									<Controller
+									<ControllerInput
+										control={form.control}
 										name="username"
-										control={form.control}
-										render={({ field, fieldState }) => (
-											<Field data-invalid={fieldState.invalid}>
-												<FieldLabel htmlFor={field.name}>Username</FieldLabel>
-												<div className="flex items-center relative">
-													<User
-														className={`absolute w-10 h-6 ${form.formState.isSubmitting ? "opacity-50" : ""}`}
-													/>
-													<Input
-														{...field}
-														id={field.name}
-														aria-invalid={fieldState.invalid}
-														disabled={form.formState.isSubmitting}
-														type="text"
-														className="pl-10"
-													/>
-												</div>
-												<div className="flex flex-col">
-													<AnimatePresence mode="wait">
-														{fieldState.invalid && (
-															<motion.div
-																initial={{
-																	opacity: 0,
-																	height: 0,
-																}}
-																animate={{ opacity: 1, height: "auto" }}
-																exit={{
-																	opacity: 0,
-																	height: 0,
-																}}
-																transition={{ duration: 0.2 }}
-															>
-																<FieldError errors={[fieldState.error]} />
-															</motion.div>
-														)}
-													</AnimatePresence>
-												</div>
-											</Field>
-										)}
+										label="Username"
+										Icon={User}
 									/>
-									<Controller
-										name="password"
-										control={form.control}
-										render={({ field, fieldState }) => (
-											<Field data-invalid={fieldState.invalid}>
-												<div className="flex items-center justify-between">
-													<FieldLabel htmlFor={field.name}>Password</FieldLabel>
-													<Link href="/reset-password">
-														<FieldDescription className="text">
-															Forgot password?
-														</FieldDescription>
+									<div>
+										<ControllerInput
+											control={form.control}
+											name="password"
+											label="Password"
+											Icon={KeyRound}
+											type="password"
+											labelRight={
+												<FieldDescription>
+													<Link href="/reset-password" className="text-sm">
+														Forgot password?
 													</Link>
-												</div>
-												<div className="flex items-center relative">
-													<KeyRound
-														className={`absolute w-10 h-6 ${form.formState.isSubmitting ? "opacity-50" : ""}`}
-													/>
-													<Input
-														{...field}
-														id={field.name}
-														aria-invalid={fieldState.invalid}
-														disabled={form.formState.isSubmitting}
-														type="password"
-														className="pl-10"
-													/>
-												</div>
-												<div className="flex flex-col">
-													<AnimatePresence mode="wait">
-														{fieldState.invalid && (
-															<motion.div
-																initial={{
-																	opacity: 0,
-																	height: 0,
-																}}
-																animate={{ opacity: 1, height: "auto" }}
-																exit={{
-																	opacity: 0,
-																	height: 0,
-																}}
-																transition={{ duration: 0.2 }}
-															>
-																<FieldError errors={[fieldState.error]} />
-															</motion.div>
-														)}
-													</AnimatePresence>
-												</div>
-											</Field>
-										)}
+												</FieldDescription>
+											}
+										/>
+									</div>
+									<FormButton
+										form={form}
+										idleText="Login"
+										submittingText="Logging in"
 									/>
-									<motion.div
-										whileTap={{ scale: form.formState.isSubmitting ? 1 : 0.95 }}
-										transition={{ type: "spring", stiffness: 400, damping: 20 }}
-										className="w-full"
-										animate={{
-											opacity: form.formState.isSubmitting ? 0.7 : 1,
-										}}
-									>
-										<Button
-											type="submit"
-											disabled={form.formState.isSubmitting}
-											className="font-bold w-full hover:opacity-90"
-										>
-											{form.formState.isSubmitting && (
-												<Loader className="h-4 w-4 animate-spin" />
-											)}
-											{form.formState.isSubmitting ? "Logging in" : "Login"}
-										</Button>
-									</motion.div>
 								</FieldGroup>
 								<FieldSeparator>Or continue with</FieldSeparator>
 							</FieldGroup>
