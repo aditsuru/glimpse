@@ -1,9 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { KeyRound, User } from "lucide-react";
+import { KeyRound, Loader, User } from "lucide-react";
+import { motion } from "motion/react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import InputController from "@/components/form/InputController";
+import { type LoginSchemaType, loginSchema } from "@/components/form/schemas";
+import { GitHub, Google } from "@/components/icons/Index";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -17,77 +22,110 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 
-const loginSchema = z.object({
-	username: z.string().min(6, "Enter a valid length username"),
-	password: z.string().nonempty("Password is required"),
-});
-
-import Link from "next/link";
-import ControllerInput from "@/components/form/ControllerInput";
-import FormButton from "@/components/form/FormButton";
-
-type LoginSchema = z.infer<typeof loginSchema>;
-
 function Login() {
-	const form = useForm<LoginSchema>({
+	const form = useForm<LoginSchemaType>({
 		resolver: zodResolver(loginSchema),
 		mode: "onBlur",
+		reValidateMode: "onChange",
 	});
 
+	const {
+		formState: { isSubmitting },
+	} = form;
+
 	const handleOnSubmit = async () => {
-		await new Promise((res) => {
-			setTimeout(res, 2000);
-		});
+		await new Promise((res) => setTimeout(res, 2000));
 	};
 
 	return (
-		<div className="w-full min-h-screen transition-all">
-			<div className="flex justify-center items-center h-screen">
-				<Card className="w-full max-w-md">
-					<CardHeader className="text-center mb-4">
+		<div className="flex justify-center items-center w-full h-screen">
+			<Card className="w-sm md:w-full max-w-lg p-4 py-6">
+				<FieldGroup>
+					<CardHeader className="text-center m-2">
 						<CardTitle className="text-2xl">Welcome Back!</CardTitle>
-						<CardDescription>
-							Enter your credentials to login to your Glimpse account.
+						<CardDescription className="">
+							Enter your credentials to login to your{" "}
+							<span className="text-primary">Glimpse</span> account.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<form onSubmit={form.handleSubmit(handleOnSubmit)}>
-							<FieldGroup>
-								<FieldGroup className="gap-3">
-									<ControllerInput
-										control={form.control}
-										name="username"
-										label="Username"
-										Icon={User}
-									/>
-									<div>
-										<ControllerInput
-											control={form.control}
-											name="password"
-											label="Password"
-											Icon={KeyRound}
-											type="password"
-											labelRight={
-												<FieldDescription>
-													<Link href="/reset-password" className="text-sm">
-														Forgot password?
-													</Link>
-												</FieldDescription>
-											}
-										/>
-									</div>
-									<FormButton
-										form={form}
-										idleText="Login"
-										submittingText="Logging in"
-									/>
-								</FieldGroup>
-								<FieldSeparator>Or continue with</FieldSeparator>
+							<FieldGroup className="gap-4">
+								<InputController
+									control={form.control}
+									name="username"
+									type="text"
+									formState={form.formState}
+									label="Username"
+									InputIcon={User}
+								/>
+
+								<InputController
+									control={form.control}
+									name="password"
+									type="password"
+									formState={form.formState}
+									label="Password"
+									InputIcon={KeyRound}
+									labelSideElement={
+										<FieldDescription>
+											<Link href="/reset-password" className="no-underline">
+												Forgot password?
+											</Link>
+										</FieldDescription>
+									}
+								/>
+
+								<motion.div
+									whileTap={{ scale: isSubmitting ? 1 : 0.95 }}
+									transition={{ type: "spring", stiffness: 400, damping: 20 }}
+									className="w-full"
+									animate={{ opacity: isSubmitting ? 0.7 : 1 }}
+								>
+									<Button
+										className="w-full hover:opacity-90 font-bold cursor-pointer"
+										type="submit"
+										disabled={isSubmitting}
+									>
+										{isSubmitting ? (
+											<div className="flex justify-center items-center gap-2">
+												<Loader className="animate-spin" />
+												<p>Logging in</p>
+											</div>
+										) : (
+											"Login"
+										)}
+									</Button>
+								</motion.div>
 							</FieldGroup>
 						</form>
+						<FieldSeparator className="m-4">Or continue with</FieldSeparator>
+						<FieldGroup className="gap-4">
+							<FieldGroup className="w-full flex md:flex-row gap-y-3">
+								<Button
+									variant="outline"
+									className="flex-1 transition-all hover:scale-110 duration-125"
+									disabled={isSubmitting}
+								>
+									<GitHub />
+									GitHub
+								</Button>
+								<Button
+									variant="outline"
+									className="flex-1 transition-all hover:scale-110 duration-125"
+									disabled={isSubmitting}
+								>
+									<Google />
+									<p>Google</p>
+								</Button>
+							</FieldGroup>
+							<FieldDescription>
+								Don't have an account? <Link href="/signup"> Sign up here</Link>
+							</FieldDescription>
+						</FieldGroup>
 					</CardContent>
-				</Card>
-			</div>
+				</FieldGroup>
+			</Card>
 		</div>
 	);
 }
