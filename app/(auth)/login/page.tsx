@@ -25,6 +25,10 @@ import {
 function Login() {
 	const form = useForm<LoginSchemaType>({
 		resolver: zodResolver(loginSchema),
+		defaultValues: {
+			username: "",
+			password: "",
+		},
 		mode: "onBlur",
 		reValidateMode: "onChange",
 	});
@@ -42,7 +46,7 @@ function Login() {
 			<Card className="w-sm md:w-full max-w-lg p-4 py-6">
 				<FieldGroup>
 					<CardHeader className="text-center m-2">
-						<CardTitle className="text-2xl">Welcome Back!</CardTitle>
+						<CardTitle className="text-2xl">Welcome Back</CardTitle>
 						<CardDescription className="">
 							Enter your credentials to login to your{" "}
 							<span className="text-primary">Glimpse</span> account.
@@ -50,7 +54,7 @@ function Login() {
 					</CardHeader>
 					<CardContent>
 						<form onSubmit={form.handleSubmit(handleOnSubmit)}>
-							<FieldGroup className="gap-4">
+							<FieldGroup>
 								<InputController
 									control={form.control}
 									name="username"
@@ -69,7 +73,7 @@ function Login() {
 									InputIcon={KeyRound}
 									labelSideElement={
 										<FieldDescription>
-											<Link href="/reset-password" className="no-underline">
+											<Link href="/reset-password" className="cursor-none">
 												Forgot password?
 											</Link>
 										</FieldDescription>
@@ -83,7 +87,7 @@ function Login() {
 									animate={{ opacity: isSubmitting ? 0.7 : 1 }}
 								>
 									<Button
-										className="w-full hover:opacity-90 font-bold cursor-pointer"
+										className="w-full hover:opacity-90 font-bold cursor-none"
 										type="submit"
 										disabled={isSubmitting}
 									>
@@ -104,7 +108,7 @@ function Login() {
 							<FieldGroup className="w-full flex md:flex-row gap-y-3">
 								<Button
 									variant="outline"
-									className="flex-1 transition-all hover:scale-110 duration-125"
+									className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
 									disabled={isSubmitting}
 								>
 									<GitHub />
@@ -112,15 +116,18 @@ function Login() {
 								</Button>
 								<Button
 									variant="outline"
-									className="flex-1 transition-all hover:scale-110 duration-125"
+									className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
 									disabled={isSubmitting}
 								>
 									<Google />
 									<p>Google</p>
 								</Button>
 							</FieldGroup>
-							<FieldDescription>
-								Don't have an account? <Link href="/signup"> Sign up here</Link>
+							<FieldDescription className="flex justify-center gap-1">
+								Don't have an account?{" "}
+								<Link href="/signup" className="cursor-none">
+									Sign up here
+								</Link>
 							</FieldDescription>
 						</FieldGroup>
 					</CardContent>

@@ -40,7 +40,9 @@ function InputController<T extends FieldValues>({
 			render={({ field, fieldState }) => (
 				<Field data-invalid={fieldState.invalid}>
 					<div className="w-full flex justify-between">
-						<FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+						<FieldLabel htmlFor={field.name} className="cursor-none">
+							{label}
+						</FieldLabel>
 						{labelSideElement}
 					</div>
 					{description && <FieldDescription>{description}</FieldDescription>}
@@ -57,26 +59,27 @@ function InputController<T extends FieldValues>({
 							aria-invalid={fieldState.invalid}
 							type={type}
 							disabled={formState.isSubmitting}
-							className={`${InputIcon ? "pl-10" : ""}`}
+							className={`cursor-none ${InputIcon ? "pl-10" : ""}`}
 						/>
 					</div>
-					<div className="min-h-[20px]">
-						<AnimatePresence mode="wait">
-							{fieldState.invalid && (
-								<motion.div
-									initial={{ opacity: 0, y: -10 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: -10 }}
-									transition={{
-										duration: 0.25,
-										ease: "easeIn",
-									}}
-								>
+					<AnimatePresence mode="wait">
+						{fieldState.invalid && (
+							<motion.div
+								initial={{ opacity: 0, height: 0, y: -5 }}
+								animate={{ opacity: 1, height: "auto", y: 0 }}
+								exit={{ opacity: 0, height: 0, y: -5 }}
+								transition={{
+									duration: 0.25,
+									ease: "easeInOut",
+								}}
+								className="overflow-hidden"
+							>
+								<div>
 									<FieldError errors={[fieldState.error]} />
-								</motion.div>
-							)}
-						</AnimatePresence>
-					</div>
+								</div>
+							</motion.div>
+						)}
+					</AnimatePresence>
 				</Field>
 			)}
 		/>
