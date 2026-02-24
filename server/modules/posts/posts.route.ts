@@ -1,35 +1,54 @@
 import * as z from "zod";
 import { protectedProcedure } from "@/server/os";
+import { postSchemas } from "./posts.schema";
+import { PostService } from "./posts.service";
+
+const postsProcedure = protectedProcedure.use(({ context, next }) => {
+	const postsService = new PostService(context.db);
+	return next({
+		context: {
+			...context,
+			postsService,
+		},
+	});
+});
 
 export const postsRouter = {
-	list: protectedProcedure
-		.input(z.object({}))
-		.output(z.object({}))
-		.handler(() => {
-			return {};
+	list: postsProcedure
+		.input(postSchemas.listInput)
+		.output(postSchemas.listOutput)
+		.handler(async ({ input, context }) => {
+			return await context.postsService.listPosts({ page: input.page });
 		}),
-	get: protectedProcedure
-		.input(z.object({}))
-		.output(z.object({}))
-		.handler(() => {
-			return {};
+	get: postsProcedure
+		.input(postSchemas.getInput)
+		.output(postSchemas.getOutput)
+		.handler(async ({ input, context }) => {
+			return await context.postsService.getPost({ postId: input.postId });
 		}),
-	create: protectedProcedure
-		.input(z.object({}))
-		.output(z.object({}))
-		.handler(() => {
-			return {};
+	create: postsProcedure
+		.input(postSchemas.createInput)
+		.output(postSchemas.createOutput)
+		.handler(async ({ input, context }) => {
+			const { title, body, authorId, fileUrl, mimeType } = input;
+			return await context.postsService.createPost({
+				authorId,
+				title,
+				body,
+				fileUrl,
+				mimeType,
+			});
 		}),
-	delete: protectedProcedure
-		.input(z.object({}))
-		.output(z.object({}))
-		.handler(() => {
-			return {};
+	delete: postsProcedure
+		.input(postSchemas.deleteInput)
+		.output(postSchemas.deleteOutput)
+		.handler(async ({ input, context }) => {
+			return await context.postsService.deletePost({});
 		}),
-	update: protectedProcedure
+	update: postsProcedure
 		.input(z.object({}))
 		.output(z.object({}))
-		.handler(() => {
-			return {};
+		.handler(async ({ input, context }) => {
+			return await context.postsService.updatePost({});
 		}),
 };

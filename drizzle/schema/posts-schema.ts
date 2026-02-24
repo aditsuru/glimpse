@@ -1,3 +1,4 @@
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
 	index,
 	pgTable,
@@ -32,3 +33,6 @@ export const posts = pgTable(
 		index("post_created_idx").on(table.createdAt),
 	]
 );
+
+export type Post = InferSelectModel<typeof posts>;
+export type NewPost = InferInsertModel<typeof posts>;
