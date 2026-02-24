@@ -1,10 +1,10 @@
 import * as z from "zod";
 
-export const loginSchema = z.object({
-	username: z
-		.string({ required_error: "Username is required" })
-		.nonempty("Username is required")
-		.min(6, "Enter a valid username length"),
+export const SignInSchema = z.object({
+	email: z
+		.string({ required_error: "Email is required" })
+		.min(1, "Email is required")
+		.email("Email must be valid"),
 	password: z
 		.string({ required_error: "Password is required" })
 		.nonempty("Password is required"),
@@ -14,12 +14,24 @@ export const signupSchema = z
 	.object({
 		name: z
 			.string({ required_error: "Name is required" })
-			.min(2, "Name is too short")
-			.max(32, "Name is too long"),
+			.min(1, "Name is required")
+			.min(3, "Name is too short")
+			.max(32, "Name is too long")
+			.regex(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces"),
 		username: z
 			.string({ required_error: "Username is required" })
+			.min(1, "Username is required")
 			.min(6, "Username is too short")
-			.max(32, "Username is too long"),
+			.max(32, "Username is too long")
+			.regex(/^[a-zA-Z]/, "Username must start with a letter")
+			.regex(
+				/^[a-zA-Z0-9_.]+$/,
+				"Username can only contain letters, numbers, underscores, and periods"
+			),
+		email: z
+			.string({ required_error: "Email is required" })
+			.min(1, "Email is required")
+			.email("Email must be valid"),
 		password: z
 			.string({ required_error: "Password is required" })
 			.min(8, "Password must be 8 characters long")
@@ -27,7 +39,7 @@ export const signupSchema = z
 			.regex(/[0-9]/, "Password must contain at least one number"),
 		confirmPassword: z
 			.string({ required_error: "Confirm password is required" })
-			.nonempty("Confirm password is required"),
+			.min(1, "Confirm password is required"),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "Passwords don't match",
@@ -35,4 +47,4 @@ export const signupSchema = z
 	});
 
 export type SignupSchemaType = z.infer<typeof signupSchema>;
-export type LoginSchemaType = z.infer<typeof loginSchema>;
+export type SignInSchemaType = z.infer<typeof SignInSchema>;
