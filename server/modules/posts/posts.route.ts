@@ -1,4 +1,3 @@
-import * as z from "zod";
 import { protectedProcedure } from "@/server/os";
 import { postSchemas } from "./posts.schema";
 import { PostService } from "./posts.service";
@@ -30,7 +29,8 @@ export const postsRouter = {
 		.input(postSchemas.createInput)
 		.output(postSchemas.createOutput)
 		.handler(async ({ input, context }) => {
-			const { title, body, authorId, fileUrl, mimeType } = input;
+			const { title, body, fileUrl, mimeType } = input;
+			const authorId = context.session.user.id;
 			return await context.postsService.createPost({
 				authorId,
 				title,
@@ -39,16 +39,18 @@ export const postsRouter = {
 				mimeType,
 			});
 		}),
+	update: postsProcedure
+		.input(postSchemas.updateInput)
+		.output(postSchemas.updateOutput)
+		.handler(async ({ input, context }) => {
+			const authorId = context.session.user.id;
+			return await context.postsService.updatePost({ ...input, authorId });
+		}),
 	delete: postsProcedure
 		.input(postSchemas.deleteInput)
 		.output(postSchemas.deleteOutput)
 		.handler(async ({ input, context }) => {
-			return await context.postsService.deletePost({});
-		}),
-	update: postsProcedure
-		.input(z.object({}))
-		.output(z.object({}))
-		.handler(async ({ input, context }) => {
-			return await context.postsService.updatePost({});
+			const authorId = context.session.user.id;
+			return await context.postsService.deletePost({ ...input, authorId });
 		}),
 };

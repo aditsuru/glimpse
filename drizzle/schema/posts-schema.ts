@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
 	index,
 	pgTable,
@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 
-export const posts = pgTable(
+export const postsTable = pgTable(
 	"posts",
 	{
 		id: uuid().defaultRandom().primaryKey(),
@@ -34,5 +34,5 @@ export const posts = pgTable(
 	]
 );
 
-export type Post = InferSelectModel<typeof posts>;
-export type NewPost = InferInsertModel<typeof posts>;
+export type Post = InferSelectModel<typeof postsTable>;
+export type NewPost = InferInsertModel<typeof postsTable>;
