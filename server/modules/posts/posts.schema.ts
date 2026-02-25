@@ -11,7 +11,7 @@ const postSchema = z.object({
 	updatedAt: z.date(),
 });
 
-const createBodySchema = z.object({
+const createPostSchema = z.object({
 	title: z.string().max(256),
 	body: z.string().optional(),
 	mimeType: z.string().max(50).optional(),
@@ -43,11 +43,11 @@ export const postSchemas = {
 	getOutput: postSchema,
 
 	// Create
-	createInput: createBodySchema,
+	createInput: createPostSchema,
 	createOutput: postSchema,
 
 	// Update
-	updateInput: createBodySchema.partial().extend({
+	updateInput: createPostSchema.partial().extend({
 		id: z.string().uuid(),
 	}),
 	updateOutput: postSchema,

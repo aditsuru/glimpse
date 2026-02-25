@@ -21,7 +21,7 @@ export const commentsTable = pgTable(
 		postId: uuid("post_id")
 			.notNull()
 			.references(() => postsTable.id, { onDelete: "cascade" }),
-		parentCommentId: uuid("parent_comment_id").notNull(),
+		parentCommentId: uuid("parent_comment_id"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),
