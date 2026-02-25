@@ -9,18 +9,18 @@ export const auth = betterAuth({
 		additionalFields: {
 			avatarUrl: {
 				type: "string",
-				required: false,
-				defaultValue: null,
 			},
 			bio: {
 				type: "string",
-				required: false,
-				defaultValue: null,
 			},
 			username: {
 				type: "string",
-				required: false,
-				defaultValue: null,
+				required: true,
+				unique: true,
+			},
+			isGlimpseVerified: {
+				type: "boolean",
+				defaultValue: false,
 			},
 		},
 	},
