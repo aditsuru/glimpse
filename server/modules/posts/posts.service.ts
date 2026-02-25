@@ -53,7 +53,7 @@ export class PostService {
 					totalPages,
 					currentPage: page,
 					nextPage: totalPages === page ? undefined : page + 1,
-					hasNextPage: totalPages < page,
+					hasNextPage: page < totalPages,
 					hasPreviousPage: page > 1,
 				},
 			};
