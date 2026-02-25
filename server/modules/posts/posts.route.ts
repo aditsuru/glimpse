@@ -17,26 +17,22 @@ export const postsRouter = {
 		.input(postSchemas.listInput)
 		.output(postSchemas.listOutput)
 		.handler(async ({ input, context }) => {
-			return await context.postsService.listPosts({ page: input.page });
+			return await context.postsService.listPosts({ ...input });
 		}),
 	get: postsProcedure
 		.input(postSchemas.getInput)
 		.output(postSchemas.getOutput)
 		.handler(async ({ input, context }) => {
-			return await context.postsService.getPost({ postId: input.postId });
+			return await context.postsService.getPost({ ...input });
 		}),
 	create: postsProcedure
 		.input(postSchemas.createInput)
 		.output(postSchemas.createOutput)
 		.handler(async ({ input, context }) => {
-			const { title, body, fileUrl, mimeType } = input;
 			const authorId = context.session.user.id;
 			return await context.postsService.createPost({
+				...input,
 				authorId,
-				title,
-				body,
-				fileUrl,
-				mimeType,
 			});
 		}),
 	update: postsProcedure
