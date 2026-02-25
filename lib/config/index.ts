@@ -12,7 +12,7 @@ export const config = createEnv({
 		DATABASE_URL: z.string().url(),
 
 		// Better auth config
-		COOKIE_CACHE_AGE: z.number().nonnegative(),
+		COOKIE_CACHE_AGE: z.coerce.number().nonnegative().default(300),
 	},
 	client: {},
 	experimental__runtimeEnv: {},

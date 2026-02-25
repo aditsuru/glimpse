@@ -22,7 +22,7 @@ export const postSchemas = {
 	// List
 	listInput: z.object({
 		page: z.number().positive().default(1),
-		authorId: z.string().uuid().optional(),
+		authorId: z.string().optional(),
 	}),
 	listOutput: z.object({
 		data: z.array(postSchema),

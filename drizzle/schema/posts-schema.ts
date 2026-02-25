@@ -17,7 +17,7 @@ export const postsTable = pgTable(
 		body: text("body"),
 		mimeType: varchar("mime_type", { length: 50 }),
 		fileUrl: text("file_url"),
-		authorId: uuid("author_id")
+		authorId: text("author_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		createdAt: timestamp("created_at", { withTimezone: true })
