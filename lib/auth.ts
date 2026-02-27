@@ -7,9 +7,6 @@ import { config } from "@/lib/config";
 export const auth = betterAuth({
 	user: {
 		additionalFields: {
-			avatarUrl: {
-				type: "string",
-			},
 			bio: {
 				type: "string",
 			},
@@ -26,6 +23,7 @@ export const auth = betterAuth({
 	},
 	emailAndPassword: {
 		enabled: true,
+		requireEmailVerification: true,
 	},
 	socialProviders: {
 		github: {
