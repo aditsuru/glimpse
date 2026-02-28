@@ -9,6 +9,7 @@ export const auth = betterAuth({
 		additionalFields: {
 			bio: {
 				type: "string",
+				required: false,
 			},
 			username: {
 				type: "string",

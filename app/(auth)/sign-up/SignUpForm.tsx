@@ -5,7 +5,7 @@ import { AtSign, CaseSensitive, User } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { type SignupSchemaType, signupSchema } from "@/app/(auth)/schemas";
+import { type SignupSchemaType, signupSchema } from "@/app/(auth)/schema";
 import InputController from "@/components/form/InputController";
 import { GitHub, Google } from "@/components/icons/Index";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ function SignUpForm() {
 			password: "",
 			confirmPassword: "",
 		},
-		mode: "onBlur",
+		mode: "onTouched",
 		reValidateMode: "onChange",
 	});
 

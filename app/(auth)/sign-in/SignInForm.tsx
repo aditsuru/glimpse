@@ -5,7 +5,7 @@ import { AtSign, KeyRound } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { SignInSchema, type SignInSchemaType } from "@/app/(auth)/schemas";
+import { SignInSchema, type SignInSchemaType } from "@/app/(auth)/schema";
 import InputController from "@/components/form/InputController";
 import { GitHub, Google } from "@/components/icons/Index";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ function SignInForm() {
 			email: "",
 			password: "",
 		},
-		mode: "onBlur",
+		mode: "onTouched",
 		reValidateMode: "onChange",
 	});
 
