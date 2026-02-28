@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AtSign, CaseSensitive, Loader, User } from "lucide-react";
+import { AtSign, CaseSensitive, User } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -22,6 +22,7 @@ import {
 	FieldGroup,
 	FieldSeparator,
 } from "@/components/ui/field";
+import { Spinner } from "@/components/ui/spinner";
 
 function SignUpForm() {
 	const form = useForm<SignupSchemaType>({
@@ -131,8 +132,7 @@ function SignUpForm() {
 								>
 									{isSubmitting ? (
 										<div className="flex justify-center items-center gap-2">
-											<Loader className="animate-spin" />
-											<p>Signing up</p>
+											<Spinner className="size-5" />
 										</div>
 									) : (
 										"Sign up"
@@ -141,7 +141,9 @@ function SignUpForm() {
 							</motion.div>
 						</FieldGroup>
 					</form>
-					<FieldSeparator className="m-4">Or continue with</FieldSeparator>
+					<FieldSeparator className={`m-4 ${isSubmitting ? "opacity-50" : ""}`}>
+						Or continue with
+					</FieldSeparator>
 					<FieldGroup className="gap-4">
 						<FieldGroup className="w-full flex md:flex-row gap-y-3">
 							<Button
@@ -161,12 +163,11 @@ function SignUpForm() {
 								<p>Google</p>
 							</Button>
 						</FieldGroup>
-						<FieldDescription className="flex justify-center gap-1">
+						<FieldDescription
+							className={`flex justify-center gap-1  ${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
+						>
 							Already have an account?{" "}
-							<Link
-								href="/sign-in"
-								className={`cursor-none ${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
-							>
+							<Link href="/sign-in" className="cursor-none">
 								Sign In here
 							</Link>
 						</FieldDescription>
