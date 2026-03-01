@@ -1,3 +1,4 @@
+import { HugeiconsIcon, type HugeiconsIconProps } from "@hugeicons/react";
 import type { LucideProps } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
@@ -19,7 +20,11 @@ interface InputControllerProps<T extends FieldValues>
 	formState: FormState<T>;
 	type: string;
 	labelSideElement?: React.ReactNode;
-	InputIcon?: LucideIcon;
+	InputIcon?:
+		| LucideIcon
+		| (HugeiconsIconProps & {
+				className?: string;
+		  });
 }
 
 function InputController<T extends FieldValues>({
@@ -33,6 +38,23 @@ function InputController<T extends FieldValues>({
 	InputIcon,
 	...props
 }: InputControllerProps<T>) {
+	const renderIcon = () => {
+		if (!InputIcon) return null;
+
+		const baseIconClass = `absolute left-2 ${formState.isSubmitting ? "opacity-50" : ""}`;
+
+		if (isLucideIcon(InputIcon)) {
+			return <InputIcon className={baseIconClass} />;
+		}
+
+		const { className: extraClass, ...hugeProps } = InputIcon;
+		return (
+			<HugeiconsIcon
+				className={`${baseIconClass} ${extraClass ?? ""}`}
+				{...hugeProps}
+			/>
+		);
+	};
 	return (
 		<Controller
 			name={name}
@@ -40,18 +62,17 @@ function InputController<T extends FieldValues>({
 			render={({ field, fieldState }) => (
 				<Field data-invalid={fieldState.invalid}>
 					<div className="w-full flex justify-between">
-						<FieldLabel htmlFor={field.name} className="cursor-none">
+						<FieldLabel
+							htmlFor={field.name}
+							className={`cursor-none ${formState.isSubmitting && "opacity-50"}`}
+						>
 							{label}
 						</FieldLabel>
 						{labelSideElement}
 					</div>
 					{description && <FieldDescription>{description}</FieldDescription>}
 					<div className="flex w-full relative items-center">
-						{InputIcon && (
-							<InputIcon
-								className={`absolute left-2 ${formState.isSubmitting ? "opacity-50" : ""}`}
-							/>
-						)}
+						{renderIcon()}
 						<Input
 							{...field}
 							{...props}
@@ -85,5 +106,10 @@ function InputController<T extends FieldValues>({
 		/>
 	);
 }
+
+// Helper method
+const isLucideIcon = (icon: unknown): icon is LucideIcon => {
+	return typeof icon === "function";
+};
 
 export default InputController;

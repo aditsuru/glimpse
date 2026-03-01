@@ -1,13 +1,20 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AtSign, CaseSensitive, User } from "lucide-react";
+import {
+	AtIcon,
+	GithubIcon,
+	GoogleIcon,
+	Mail02Icon,
+	UserIcon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { type SignupSchemaType, signupSchema } from "@/app/(auth)/schema";
 import InputController from "@/components/form/InputController";
-import { GitHub, Google } from "@/components/icons/Index";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -49,8 +56,9 @@ function SignUpForm() {
 		<Card className="w-sm md:w-full max-w-lg p-4 py-6">
 			<FieldGroup>
 				<CardHeader className="text-center m-2">
-					<CardTitle className="text-2xl">
+					<CardTitle className="flex items-center justify-center gap-2 text-2xl">
 						Create Your <span className="text-primary">Glimpse</span> Account
+						<ThemeToggle />
 					</CardTitle>
 					<CardDescription className="">
 						Enter your credentials to get started.
@@ -65,7 +73,10 @@ function SignUpForm() {
 								type="text"
 								formState={form.formState}
 								label="Your Name"
-								InputIcon={CaseSensitive}
+								InputIcon={{
+									icon: UserIcon,
+									className: "size-6!",
+								}}
 							/>
 							<InputController
 								control={form.control}
@@ -73,7 +84,10 @@ function SignUpForm() {
 								type="text"
 								formState={form.formState}
 								label="Username"
-								InputIcon={User}
+								InputIcon={{
+									icon: AtIcon,
+									className: "size-6!",
+								}}
 							/>
 							<InputController
 								control={form.control}
@@ -81,7 +95,10 @@ function SignUpForm() {
 								type="email"
 								formState={form.formState}
 								label="Email"
-								InputIcon={AtSign}
+								InputIcon={{
+									icon: Mail02Icon,
+									className: "size-6!",
+								}}
 							/>
 							<FieldGroup className="flex-row">
 								<InputController
@@ -151,7 +168,7 @@ function SignUpForm() {
 								className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
 								disabled={isSubmitting}
 							>
-								<GitHub />
+								<HugeiconsIcon icon={GithubIcon} className="size-5!" />
 								GitHub
 							</Button>
 							<Button
@@ -159,7 +176,7 @@ function SignUpForm() {
 								className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
 								disabled={isSubmitting}
 							>
-								<Google />
+								<HugeiconsIcon icon={GoogleIcon} className="size-5!" />
 								<p>Google</p>
 							</Button>
 						</FieldGroup>

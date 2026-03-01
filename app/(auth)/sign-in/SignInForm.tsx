@@ -1,13 +1,19 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AtSign, KeyRound } from "lucide-react";
+import {
+	GithubIcon,
+	GoogleIcon,
+	Key01Icon,
+	Mail02Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { SignInSchema, type SignInSchemaType } from "@/app/(auth)/schema";
 import InputController from "@/components/form/InputController";
-import { GitHub, Google } from "@/components/icons/Index";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -46,7 +52,10 @@ function SignInForm() {
 		<Card className="w-sm md:w-full max-w-lg p-4 py-6">
 			<FieldGroup>
 				<CardHeader className="text-center m-2">
-					<CardTitle className="text-2xl">Welcome Back</CardTitle>
+					<CardTitle className="flex items-center justify-center gap-2 text-2xl">
+						Welcome Back
+						<ThemeToggle />
+					</CardTitle>
 					<CardDescription className="">
 						Enter your credentials to Sign In to your{" "}
 						<span className="text-primary">Glimpse</span> account.
@@ -61,7 +70,10 @@ function SignInForm() {
 								type="email"
 								formState={form.formState}
 								label="Email"
-								InputIcon={AtSign}
+								InputIcon={{
+									icon: Mail02Icon,
+									className: "size-6!",
+								}}
 							/>
 
 							<InputController
@@ -70,7 +82,10 @@ function SignInForm() {
 								type="password"
 								formState={form.formState}
 								label="Password"
-								InputIcon={KeyRound}
+								InputIcon={{
+									icon: Key01Icon,
+									className: "size-6!",
+								}}
 								labelSideElement={
 									<FieldDescription>
 										<Link
@@ -134,7 +149,7 @@ function SignInForm() {
 								className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
 								disabled={isSubmitting}
 							>
-								<GitHub />
+								<HugeiconsIcon icon={GithubIcon} className="size-5!" />
 								GitHub
 							</Button>
 							<Button
@@ -142,7 +157,7 @@ function SignInForm() {
 								className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
 								disabled={isSubmitting}
 							>
-								<Google />
+								<HugeiconsIcon icon={GoogleIcon} className="size-5!" />
 								<p>Google</p>
 							</Button>
 						</FieldGroup>
