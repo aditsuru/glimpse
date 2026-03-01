@@ -1,4 +1,4 @@
-import { protectedProcedure } from "@/server/os";
+import { baseOs, protectedProcedure } from "@/server/os";
 import { commentSchemas } from "./comments.schema";
 import { CommentService } from "./comments.service";
 
@@ -12,7 +12,7 @@ const commentsProcedure = protectedProcedure.use(({ context, next }) => {
 	});
 });
 
-export const commentsRouter = {
+export const commentsRouter = baseOs.router({
 	list: commentsProcedure
 		.input(commentSchemas.listInput)
 		.output(commentSchemas.listOutput)
@@ -33,4 +33,4 @@ export const commentsRouter = {
 			const userId = context.session.user.id;
 			return await context.commentsService.deleteComment({ ...input, userId });
 		}),
-};
+});

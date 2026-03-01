@@ -1,4 +1,4 @@
-import { protectedProcedure } from "@/server/os";
+import { baseOs, protectedProcedure } from "@/server/os";
 import { likesSchema } from "./likes.schema";
 import { LikeService } from "./likes.service";
 
@@ -12,7 +12,7 @@ const likesProcedure = protectedProcedure.use(({ context, next }) => {
 	});
 });
 
-export const likesRouter = {
+export const likesRouter = baseOs.router({
 	post: {
 		count: likesProcedure
 			.input(likesSchema.getPostLikesCount.input)
@@ -75,4 +75,4 @@ export const likesRouter = {
 				});
 			}),
 	},
-};
+});

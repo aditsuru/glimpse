@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import { commentsTable } from "@/drizzle/schema";
@@ -26,9 +26,11 @@ export class CommentService {
 							eq(commentsTable.postId, postId),
 							parentCommentId
 								? eq(commentsTable.parentCommentId, parentCommentId)
-								: undefined
+								: isNull(commentsTable.parentCommentId)
 						)
-					),
+					)
+					.offset((page - 1) * 10)
+					.limit(10),
 				Number(
 					(
 						await this.db
@@ -39,7 +41,7 @@ export class CommentService {
 									eq(commentsTable.postId, postId),
 									parentCommentId
 										? eq(commentsTable.parentCommentId, parentCommentId)
-										: undefined
+										: isNull(commentsTable.parentCommentId)
 								)
 							)
 					)[0].count
@@ -85,6 +87,12 @@ export class CommentService {
 					.select()
 					.from(commentsTable)
 					.where(eq(commentsTable.id, parentCommentId));
+
+				if (!parentComment[0])
+					throw new ORPCError("NOT_FOUND", {
+						message: "Parent comment not found.",
+					});
+
 				if (parentComment[0].parentCommentId !== null)
 					throw new ORPCError("NOT_ACCEPTABLE", {
 						message: "More than one level of nesting is not allowed.",

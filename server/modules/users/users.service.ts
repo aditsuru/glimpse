@@ -17,7 +17,7 @@ export class UserService {
 		userId: string;
 	}): Promise<z.infer<typeof usersSchema.profile.output>> {
 		try {
-			this.db.update(user).set(input).where(eq(user.id, userId));
+			await this.db.update(user).set(input).where(eq(user.id, userId));
 			return { success: true };
 		} catch (e: unknown) {
 			if (e instanceof ORPCError) throw e;

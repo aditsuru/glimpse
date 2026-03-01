@@ -14,6 +14,10 @@ export const config = createEnv({
 		// Better auth config
 		COOKIE_CACHE_AGE: z.coerce.number().nonnegative().default(300),
 	},
-	client: {},
-	experimental__runtimeEnv: {},
+	client: {
+		NEXT_PUBLIC_APP_URL: z.string().url(),
+	},
+	experimental__runtimeEnv: {
+		NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+	},
 });

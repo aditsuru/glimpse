@@ -1,7 +1,8 @@
 import { ORPCError, os } from "@orpc/server";
 import type { AppContext } from "./context";
 
-export const publicProcedure = os.$context<AppContext>();
+export const baseOs = os.$context<AppContext>();
+export const publicProcedure = baseOs;
 
 export const protectedProcedure = publicProcedure.use(({ context, next }) => {
 	if (!context.session?.user) throw new ORPCError("UNAUTHORIZED");

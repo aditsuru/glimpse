@@ -20,7 +20,7 @@ export const commentSchemas = {
 	// List
 	listInput: z.object({
 		postId: z.string().uuid(),
-		parentCommentId: z.string().uuid().nullable(),
+		parentCommentId: z.string().uuid().nullable().default(null),
 		page: z.number().positive().default(1),
 	}),
 	listOutput: z.object({

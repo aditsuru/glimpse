@@ -1,4 +1,4 @@
-import { protectedProcedure } from "@/server/os";
+import { baseOs, protectedProcedure } from "@/server/os";
 import { postSchemas } from "./posts.schema";
 import { PostService } from "./posts.service";
 
@@ -12,7 +12,7 @@ const postsProcedure = protectedProcedure.use(({ context, next }) => {
 	});
 });
 
-export const postsRouter = {
+export const postsRouter = baseOs.router({
 	list: postsProcedure
 		.input(postSchemas.listInput)
 		.output(postSchemas.listOutput)
@@ -49,4 +49,4 @@ export const postsRouter = {
 			const authorId = context.session.user.id;
 			return await context.postsService.deletePost({ ...input, authorId });
 		}),
-};
+});
