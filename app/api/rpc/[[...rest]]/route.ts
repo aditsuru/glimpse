@@ -6,7 +6,7 @@ import { logger } from "@/lib/logger";
 import type { AppContext } from "@/server/context";
 import { router } from "@/server/router";
 
-const handler = new RPCHandler(router, {
+const handler = new RPCHandler<AppContext>(router, {
 	interceptors: [
 		onError((error: unknown) => {
 			logger.error({ err: error }, "[oRPC Error] Uncaught procedure failure");
@@ -23,7 +23,7 @@ async function handleRequest(req: Request): Promise<Response> {
 	};
 
 	const { response } = await handler.handle(req, {
-		prefix: "/rpc",
+		prefix: "/api/rpc",
 		context,
 	});
 
