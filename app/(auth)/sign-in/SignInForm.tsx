@@ -9,7 +9,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ORPCError } from "@orpc/client";
-import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,7 +31,8 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
-import { client, orpc } from "@/lib/clients/orpc-client";
+import { client } from "@/lib/clients/orpc-client";
+import { useMutation } from "@/lib/core/hooks/useMutation";
 
 function SignInForm() {
 	const pageRouter = useRouter();
@@ -51,14 +51,7 @@ function SignInForm() {
 		formState: { isSubmitting },
 	} = form;
 
-	// Mutation query
-	const { mutateAsync } = useMutation({
-		...orpc.user.signIn.mutationOptions(),
-
-		mutationFn: async (data: Parameters<typeof client.user.signIn>[0]) => {
-			return await client.user.signIn(data);
-		},
-
+	const { mutateAsync } = useMutation(client.user.signIn, {
 		onSuccess: () => {
 			pageRouter.push("/");
 		},
