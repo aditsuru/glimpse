@@ -1,4 +1,5 @@
 import { ORPCError } from "@orpc/server";
+import { APIError } from "better-auth";
 import { eq } from "drizzle-orm";
 import type { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import type * as z from "zod";
@@ -22,8 +23,15 @@ export class UserService {
 		} catch (e: unknown) {
 			if (e instanceof ORPCError) throw e;
 
+			if (e instanceof APIError) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: e.message,
+					cause: e,
+				});
+			}
+
 			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Fail to update profile.",
+				message: "An unexpected error occurred. Please try again.",
 				cause: e,
 			});
 		}
@@ -41,8 +49,15 @@ export class UserService {
 		} catch (e: unknown) {
 			if (e instanceof ORPCError) throw e;
 
+			if (e instanceof APIError) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: e.message,
+					cause: e,
+				});
+			}
+
 			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to sign in, please try again.",
+				message: "An unexpected error occurred. Please try again.",
 				cause: e,
 			});
 		}
@@ -59,9 +74,15 @@ export class UserService {
 			return { success: true };
 		} catch (e: unknown) {
 			if (e instanceof ORPCError) throw e;
+			if (e instanceof APIError) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: e.message,
+					cause: e,
+				});
+			}
 
 			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to sign up, please try again.",
+				message: "An unexpected error occurred. Please try again.",
 				cause: e,
 			});
 		}
@@ -77,9 +98,15 @@ export class UserService {
 			return { success: true };
 		} catch (e: unknown) {
 			if (e instanceof ORPCError) throw e;
+			if (e instanceof APIError) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: e.message,
+					cause: e,
+				});
+			}
 
 			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to sign out user, please try again.",
+				message: "An unexpected error occurred. Please try again.",
 				cause: e,
 			});
 		}

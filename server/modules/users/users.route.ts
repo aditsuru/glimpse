@@ -7,7 +7,6 @@ const usersProtectedProcedure = protectedProcedure.use(({ context, next }) => {
 	const userService = new UserService(context.db);
 	return next({
 		context: {
-			...context,
 			userService,
 		},
 	});
@@ -18,7 +17,6 @@ const usersPublicProcedure = publicProcedure.use(async ({ context, next }) => {
 	const headers = await getHeaders();
 	return next({
 		context: {
-			...context,
 			userService,
 			headers,
 		},

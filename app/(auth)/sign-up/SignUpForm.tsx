@@ -9,6 +9,7 @@ import {
 	UserIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { ORPCError } from "@orpc/client";
 import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
@@ -32,7 +33,7 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
-import { orpc } from "@/lib/clients/orpc-client";
+import { client, orpc } from "@/lib/clients/orpc-client";
 
 function SignUpForm() {
 	// Page router for redirect
@@ -57,22 +58,39 @@ function SignUpForm() {
 	} = form;
 
 	// Mutation query
-	const { mutate } = useMutation({
+	const { mutateAsync } = useMutation({
 		...orpc.user.signUp.mutationOptions(),
+
+		mutationFn: async (data: Parameters<typeof client.user.signUp>[0]) => {
+			return await client.user.signUp(data);
+		},
+
 		onSuccess: () => {
 			pageRouter.push("/");
-		},
-		onError: (error) => {
-			form.setError("root", {
-				message: error.message ?? "Something went wrong. Please try again.",
-			});
 		},
 	});
 
 	// Submit function
 	const handleOnSubmit = async (data: SignupSchemaType) => {
 		const { confirmPassword, ...rest } = data;
-		mutate(rest);
+		try {
+			await mutateAsync(rest);
+		} catch (error) {
+			console.log(error);
+			if (error instanceof ORPCError) {
+				form.setError("root", {
+					message: error.message ?? "Something went wrong. Please try again.",
+				});
+			} else if (error instanceof Error) {
+				form.setError("root", {
+					message: error.message ?? "Something went wrong. Please try again.",
+				});
+			} else {
+				form.setError("root", {
+					message: "Something went wrong. Please try again.",
+				});
+			}
+		}
 	};
 
 	return (

@@ -6,7 +6,6 @@ const commentsProcedure = protectedProcedure.use(({ context, next }) => {
 	const commentsService = new CommentService(context.db);
 	return next({
 		context: {
-			...context,
 			commentsService,
 		},
 	});

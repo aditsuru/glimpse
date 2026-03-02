@@ -6,7 +6,6 @@ const postsProcedure = protectedProcedure.use(({ context, next }) => {
 	const postsService = new PostService(context.db);
 	return next({
 		context: {
-			...context,
 			postsService,
 		},
 	});

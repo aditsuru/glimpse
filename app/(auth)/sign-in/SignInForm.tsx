@@ -8,8 +8,11 @@ import {
 	Mail02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { ORPCError } from "@orpc/client";
+import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { SignInSchema, type SignInSchemaType } from "@/app/(auth)/schema";
 import InputController from "@/components/form/InputController";
@@ -29,8 +32,11 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import { client, orpc } from "@/lib/clients/orpc-client";
 
 function SignInForm() {
+	const pageRouter = useRouter();
+
 	const form = useForm<SignInSchemaType>({
 		resolver: zodResolver(SignInSchema),
 		defaultValues: {
@@ -45,9 +51,41 @@ function SignInForm() {
 		formState: { isSubmitting },
 	} = form;
 
-	const handleOnSubmit = async () => {
-		await new Promise((res) => setTimeout(res, 2000));
+	// Mutation query
+	const { mutateAsync } = useMutation({
+		...orpc.user.signIn.mutationOptions(),
+
+		mutationFn: async (data: Parameters<typeof client.user.signIn>[0]) => {
+			return await client.user.signIn(data);
+		},
+
+		onSuccess: () => {
+			pageRouter.push("/");
+		},
+	});
+
+	// Submit function
+	const handleOnSubmit = async (data: SignInSchemaType) => {
+		try {
+			await mutateAsync(data);
+		} catch (error) {
+			console.log(error);
+			if (error instanceof ORPCError) {
+				form.setError("root", {
+					message: error.message ?? "Something went wrong. Please try again.",
+				});
+			} else if (error instanceof Error) {
+				form.setError("root", {
+					message: error.message ?? "Something went wrong. Please try again.",
+				});
+			} else {
+				form.setError("root", {
+					message: "Something went wrong. Please try again.",
+				});
+			}
+		}
 	};
+
 	return (
 		<Card className="w-sm md:w-full max-w-lg p-4 py-6">
 			<FieldGroup>

@@ -6,7 +6,6 @@ const likesProcedure = protectedProcedure.use(({ context, next }) => {
 	const likeService = new LikeService(context.db);
 	return next({
 		context: {
-			...context,
 			likeService,
 		},
 	});
