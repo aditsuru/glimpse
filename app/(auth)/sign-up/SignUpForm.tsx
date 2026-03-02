@@ -9,7 +9,6 @@ import {
 	UserIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ORPCError } from "@orpc/client";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,8 +31,8 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import { authClient } from "@/lib/clients/auth-client";
 import { client } from "@/lib/clients/orpc-client";
-import { useMutation } from "@/lib/core/hooks/useMutation";
 
 function SignUpForm() {
 	// Page router for redirect
@@ -57,31 +56,40 @@ function SignUpForm() {
 		formState: { isSubmitting },
 	} = form;
 
-	// Mutation query
-	const { mutateAsync } = useMutation(client.user.signUp, {
-		onSuccess: () => {
-			pageRouter.push("/");
-		},
-	});
-
 	// Submit function
 	const handleOnSubmit = async (data: SignupSchemaType) => {
 		const { confirmPassword, ...rest } = data;
-		try {
-			await mutateAsync(rest);
-		} catch (error) {
-			const isORPCError = error instanceof ORPCError;
-			const message = isORPCError
-				? error.message
-				: "Something went wrong. Please try again.";
 
-			if (isORPCError && error.code === "CONFLICT") {
-				const field = message.includes("Username") ? "username" : "email";
-				form.setError(field, { message });
-			} else {
-				form.setError("root", { message });
-			}
+		const { emailTaken, usernameTaken } = await client.user.checkAvailability({
+			email: rest.email,
+			username: rest.username,
+		});
+
+		if (emailTaken || usernameTaken) {
+			if (emailTaken)
+				form.setError("email", {
+					message: "An account with this email already exists.",
+				});
+			if (usernameTaken)
+				form.setError("username", { message: "Username is already taken." });
+			return;
 		}
+
+		const { error } = await authClient.signUp.email({
+			email: rest.email,
+			password: rest.password,
+			name: rest.name,
+			username: rest.username,
+		});
+
+		if (error) {
+			form.setError("root", {
+				message: error.message ?? "Something went wrong. Please try again.",
+			});
+			return;
+		}
+
+		pageRouter.push("/verify-email");
 	};
 
 	return (

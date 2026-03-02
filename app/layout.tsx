@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import { Providers } from "./providers";
 
 const geistSans = Geist({
@@ -26,9 +27,12 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased hide-native-cursor`}
 			>
-				<Providers>{children}</Providers>
+				<Providers>
+					{children}
+					<SmoothCursor />
+				</Providers>
 			</body>
 		</html>
 	);

@@ -8,7 +8,6 @@ import {
 	Mail02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ORPCError } from "@orpc/client";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -31,8 +30,7 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
-import { client } from "@/lib/clients/orpc-client";
-import { useMutation } from "@/lib/core/hooks/useMutation";
+import { authClient } from "@/lib/clients/auth-client";
 
 function SignInForm() {
 	const pageRouter = useRouter();
@@ -51,27 +49,21 @@ function SignInForm() {
 		formState: { isSubmitting },
 	} = form;
 
-	const { mutateAsync } = useMutation(client.user.signIn, {
-		onSuccess: () => {
-			pageRouter.push("/");
-		},
-	});
-
 	// Submit function
-	const handleOnSubmit = async (data: SignInSchemaType) => {
-		try {
-			await mutateAsync(data);
-		} catch (error) {
-			if (error instanceof ORPCError) {
-				form.setError("root", {
-					message: error.message ?? "Something went wrong. Please try again.",
-				});
-			} else {
-				form.setError("root", {
-					message: "Something went wrong. Please try again.",
-				});
-			}
+	const handleOnSubmit = async (formData: SignInSchemaType) => {
+		const { error, data } = await authClient.signIn.email({
+			email: formData.email,
+			password: formData.password,
+		});
+
+		if (error) {
+			form.setError("root", {
+				message: error.message ?? "Something went wrong. Please try again.",
+			});
+			return;
 		}
+		if (!data.user.emailVerified) pageRouter.push("/verify-email");
+		pageRouter.push("/");
 	};
 
 	return (
