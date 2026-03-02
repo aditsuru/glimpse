@@ -26,20 +26,20 @@ export const auth = betterAuth({
 		enabled: true,
 		requireEmailVerification: true,
 	},
-	socialProviders: {
-		github: {
-			enabled: true,
-			clientKey: "",
-			clientSecret: "",
-			clientId: "",
-		},
-		google: {
-			enabled: true,
-			clientKey: "",
-			clientSecret: "",
-			clientId: "",
-		},
-	},
+	// socialProviders: {
+	// 	github: {
+	// 		enabled: true,
+	// 		clientKey: "",
+	// 		clientSecret: "",
+	// 		clientId: "",
+	// 	},
+	// 	google: {
+	// 		enabled: true,
+	// 		clientKey: "",
+	// 		clientSecret: "",
+	// 		clientId: "",
+	// 	},
+	// },
 	session: {
 		cookieCache: {
 			enabled: true,
