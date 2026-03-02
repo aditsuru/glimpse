@@ -12,6 +12,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { type SignupSchemaType, signupSchema } from "@/app/(auth)/schema";
 import InputController from "@/components/form/InputController";
@@ -34,10 +35,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { orpc } from "@/lib/clients/orpc-client";
 
 function SignUpForm() {
-	// const {} = useMutation(
-	// 	orpc.users.
-	// );
+	// Page router for redirect
+	const pageRouter = useRouter();
 
+	// React form handling
 	const form = useForm<SignupSchemaType>({
 		resolver: zodResolver(signupSchema),
 		defaultValues: {
@@ -55,9 +56,21 @@ function SignUpForm() {
 		formState: { isSubmitting },
 	} = form;
 
-	const handleOnSubmit = async () => {
-		await new Promise((res) => setTimeout(res, 2000));
+	// Mutation query
+	const { mutate } = useMutation(
+		orpc.user.signUp.mutationOptions({
+			onSuccess: () => {
+				pageRouter.push("/");
+			},
+		})
+	);
+
+	// Submit function
+	const handleOnSubmit = async (data: SignupSchemaType) => {
+		const { confirmPassword, ...rest } = data;
+		mutate(rest);
 	};
+
 	return (
 		<Card className="w-sm md:w-full max-w-lg p-4 py-6">
 			<FieldGroup>
