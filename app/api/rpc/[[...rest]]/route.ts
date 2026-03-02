@@ -1,5 +1,6 @@
-import { onError } from "@orpc/server";
+import { ORPCError, onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
+import { APIError } from "better-auth";
 import { db } from "@/drizzle/db";
 import { auth } from "@/lib/auth";
 import { logger } from "@/lib/logger";
@@ -9,7 +10,21 @@ import { router } from "@/server/router";
 const handler = new RPCHandler<AppContext>(router, {
 	interceptors: [
 		onError((error: unknown) => {
+			if (error instanceof ORPCError) return;
+
+			if (error instanceof APIError) {
+				throw new ORPCError("BAD_REQUEST", {
+					message:
+						error.body?.message || error.message || "Authentication failed",
+					cause: error,
+				});
+			}
+
 			logger.error({ err: error }, "[oRPC Error] Uncaught procedure failure");
+
+			throw new ORPCError("INTERNAL_SERVER_ERROR", {
+				message: "Something went wrong. We are working on it.",
+			});
 		}),
 	],
 });

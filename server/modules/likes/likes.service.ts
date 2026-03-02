@@ -13,21 +13,12 @@ export class LikeService {
 	}: z.infer<typeof likesSchema.getPostLikesCount.input>): Promise<
 		z.infer<typeof likesSchema.getPostLikesCount.output>
 	> {
-		try {
-			const [result] = await this.db
-				.select({ count: count() })
-				.from(postLikesTable)
-				.where(eq(postLikesTable.postId, postId));
+		const [result] = await this.db
+			.select({ count: count() })
+			.from(postLikesTable)
+			.where(eq(postLikesTable.postId, postId));
 
-			return Number(result?.count ?? 0);
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to get post likes count.",
-				cause: e,
-			});
-		}
+		return Number(result?.count ?? 0);
 	}
 
 	async getCommentLikesCount({
@@ -35,21 +26,12 @@ export class LikeService {
 	}: z.infer<typeof likesSchema.getCommentLikesCount.input>): Promise<
 		z.infer<typeof likesSchema.getCommentLikesCount.output>
 	> {
-		try {
-			const [result] = await this.db
-				.select({ count: count() })
-				.from(commentLikesTable)
-				.where(eq(commentLikesTable.commentId, commentId));
+		const [result] = await this.db
+			.select({ count: count() })
+			.from(commentLikesTable)
+			.where(eq(commentLikesTable.commentId, commentId));
 
-			return Number(result?.count ?? 0);
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to get comment likes count.",
-				cause: e,
-			});
-		}
+		return Number(result?.count ?? 0);
 	}
 
 	async likePost({
@@ -68,18 +50,13 @@ export class LikeService {
 				success: true,
 			};
 		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
 			if (e && typeof e === "object" && "code" in e) {
 				if (e.code === "23503") {
 					throw new ORPCError("NOT_FOUND", { message: "Post not found." });
 				}
 			}
 
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to like the post.",
-				cause: e,
-			});
+			throw e;
 		}
 	}
 
@@ -89,27 +66,18 @@ export class LikeService {
 	}: z.infer<typeof likesSchema.unlikePost.input> & {
 		userId: string;
 	}): Promise<z.infer<typeof likesSchema.unlikePost.output>> {
-		try {
-			await this.db
-				.delete(postLikesTable)
-				.where(
-					and(
-						eq(postLikesTable.postId, postId),
-						eq(postLikesTable.userId, userId)
-					)
-				);
+		await this.db
+			.delete(postLikesTable)
+			.where(
+				and(
+					eq(postLikesTable.postId, postId),
+					eq(postLikesTable.userId, userId)
+				)
+			);
 
-			return {
-				success: true,
-			};
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to unlike the post.",
-				cause: e,
-			});
-		}
+		return {
+			success: true,
+		};
 	}
 
 	async likeComment({
@@ -128,18 +96,13 @@ export class LikeService {
 				success: true,
 			};
 		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
 			if (e && typeof e === "object" && "code" in e) {
 				if (e.code === "23503") {
 					throw new ORPCError("NOT_FOUND", { message: "Comment not found." });
 				}
 			}
 
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to like the comment.",
-				cause: e,
-			});
+			throw e;
 		}
 	}
 
@@ -149,26 +112,17 @@ export class LikeService {
 	}: z.infer<typeof likesSchema.unlikeComment.input> & {
 		userId: string;
 	}): Promise<z.infer<typeof likesSchema.unlikeComment.output>> {
-		try {
-			await this.db
-				.delete(commentLikesTable)
-				.where(
-					and(
-						eq(commentLikesTable.commentId, commentId),
-						eq(commentLikesTable.userId, userId)
-					)
-				);
+		await this.db
+			.delete(commentLikesTable)
+			.where(
+				and(
+					eq(commentLikesTable.commentId, commentId),
+					eq(commentLikesTable.userId, userId)
+				)
+			);
 
-			return {
-				success: true,
-			};
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to unlike the comment.",
-				cause: e,
-			});
-		}
+		return {
+			success: true,
+		};
 	}
 }

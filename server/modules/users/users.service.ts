@@ -1,5 +1,3 @@
-import { ORPCError } from "@orpc/server";
-import { APIError } from "better-auth";
 import { eq } from "drizzle-orm";
 import type { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import type * as z from "zod";
@@ -17,24 +15,8 @@ export class UserService {
 	}: z.infer<typeof usersSchema.updateProfile.input> & {
 		userId: string;
 	}): Promise<z.infer<typeof usersSchema.updateProfile.output>> {
-		try {
-			await this.db.update(user).set(input).where(eq(user.id, userId));
-			return { success: true };
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			if (e instanceof APIError) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: e.message,
-					cause: e,
-				});
-			}
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "An unexpected error occurred. Please try again.",
-				cause: e,
-			});
-		}
+		await this.db.update(user).set(input).where(eq(user.id, userId));
+		return { success: true };
 	}
 
 	async signIn({
@@ -43,24 +25,8 @@ export class UserService {
 	}: z.infer<typeof usersSchema.signIn.input> & {
 		headers: ReadonlyHeaders;
 	}): Promise<z.infer<typeof usersSchema.signIn.output>> {
-		try {
-			await auth.api.signInEmail({ body: { ...input }, headers });
-			return { success: true };
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			if (e instanceof APIError) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: e.message,
-					cause: e,
-				});
-			}
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "An unexpected error occurred. Please try again.",
-				cause: e,
-			});
-		}
+		await auth.api.signInEmail({ body: { ...input }, headers });
+		return { success: true };
 	}
 
 	async signUp({
@@ -69,23 +35,8 @@ export class UserService {
 	}: z.infer<typeof usersSchema.signUp.input> & {
 		headers: ReadonlyHeaders;
 	}): Promise<z.infer<typeof usersSchema.signUp.output>> {
-		try {
-			await auth.api.signUpEmail({ body: { ...input }, headers });
-			return { success: true };
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-			if (e instanceof APIError) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: e.message,
-					cause: e,
-				});
-			}
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "An unexpected error occurred. Please try again.",
-				cause: e,
-			});
-		}
+		await auth.api.signUpEmail({ body: { ...input }, headers });
+		return { success: true };
 	}
 
 	async signOut({
@@ -93,22 +44,7 @@ export class UserService {
 	}: {
 		headers: ReadonlyHeaders;
 	}): Promise<z.infer<typeof usersSchema.signOut.output>> {
-		try {
-			await auth.api.signOut({ headers });
-			return { success: true };
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-			if (e instanceof APIError) {
-				throw new ORPCError("BAD_REQUEST", {
-					message: e.message,
-					cause: e,
-				});
-			}
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "An unexpected error occurred. Please try again.",
-				cause: e,
-			});
-		}
+		await auth.api.signOut({ headers });
+		return { success: true };
 	}
 }

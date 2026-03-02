@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useState } from "react";
-import { config } from "@/lib/config";
+import { config } from "@/lib/config/config";
 export function Providers({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(
 		() =>

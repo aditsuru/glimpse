@@ -69,12 +69,7 @@ function SignInForm() {
 		try {
 			await mutateAsync(data);
 		} catch (error) {
-			console.log(error);
 			if (error instanceof ORPCError) {
-				form.setError("root", {
-					message: error.message ?? "Something went wrong. Please try again.",
-				});
-			} else if (error instanceof Error) {
 				form.setError("root", {
 					message: error.message ?? "Something went wrong. Please try again.",
 				});

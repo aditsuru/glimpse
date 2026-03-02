@@ -14,58 +14,48 @@ export class PostService {
 	}: z.infer<typeof postSchemas.listInput>): Promise<
 		z.infer<typeof postSchemas.listOutput>
 	> {
-		// Implementation
-		try {
-			const [postsList, totalPosts] = await Promise.all([
-				this.db
-					.select({
-						id: postsTable.id,
-						title: postsTable.title,
-						body: postsTable.body,
-						mimeType: postsTable.mimeType,
-						fileUrl: postsTable.fileUrl,
-						authorId: postsTable.authorId,
-						createdAt: postsTable.createdAt,
-						updatedAt: postsTable.updatedAt,
-					})
-					.from(postsTable)
-					.where(authorId ? eq(postsTable.authorId, authorId) : undefined)
-					.offset((page - 1) * 10)
-					.limit(10)
-					.orderBy(postsTable.createdAt),
-				Number(
-					(
-						await this.db
-							.select({
-								count: count(),
-							})
-							.from(postsTable)
-							.where(authorId ? eq(postsTable.authorId, authorId) : undefined)
-					)[0].count
-				),
-			]);
+		const [postsList, totalPosts] = await Promise.all([
+			this.db
+				.select({
+					id: postsTable.id,
+					title: postsTable.title,
+					body: postsTable.body,
+					mimeType: postsTable.mimeType,
+					fileUrl: postsTable.fileUrl,
+					authorId: postsTable.authorId,
+					createdAt: postsTable.createdAt,
+					updatedAt: postsTable.updatedAt,
+				})
+				.from(postsTable)
+				.where(authorId ? eq(postsTable.authorId, authorId) : undefined)
+				.offset((page - 1) * 10)
+				.limit(10)
+				.orderBy(postsTable.createdAt),
+			Number(
+				(
+					await this.db
+						.select({
+							count: count(),
+						})
+						.from(postsTable)
+						.where(authorId ? eq(postsTable.authorId, authorId) : undefined)
+				)[0].count
+			),
+		]);
 
-			const totalPages = Math.ceil(totalPosts / 10);
-			const response = {
-				data: postsList,
-				meta: {
-					totalPosts,
-					totalPages,
-					currentPage: page,
-					nextPage: totalPages === page ? undefined : page + 1,
-					hasNextPage: page < totalPages,
-					hasPreviousPage: page > 1,
-				},
-			};
-			return response;
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Fail to get posts.",
-				cause: e,
-			});
-		}
+		const totalPages = Math.ceil(totalPosts / 10);
+		const response = {
+			data: postsList,
+			meta: {
+				totalPosts,
+				totalPages,
+				currentPage: page,
+				nextPage: totalPages === page ? undefined : page + 1,
+				hasNextPage: page < totalPages,
+				hasPreviousPage: page > 1,
+			},
+		};
+		return response;
 	}
 
 	async getPost({
@@ -73,25 +63,15 @@ export class PostService {
 	}: z.infer<typeof postSchemas.getInput>): Promise<
 		z.infer<typeof postSchemas.getOutput>
 	> {
-		// Implementation
-		try {
-			const post = await this.db
-				.select()
-				.from(postsTable)
-				.where(eq(postsTable.id, postId));
-			if (post.length === 0)
-				throw new ORPCError("NOT_FOUND", {
-					message: "Requested post doesn't exists.",
-				});
-			return post[0];
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to get post.",
-				cause: e,
+		const post = await this.db
+			.select()
+			.from(postsTable)
+			.where(eq(postsTable.id, postId));
+		if (post.length === 0)
+			throw new ORPCError("NOT_FOUND", {
+				message: "Requested post doesn't exists.",
 			});
-		}
+		return post[0];
 	}
 
 	async createPost(
@@ -99,18 +79,8 @@ export class PostService {
 			authorId: string;
 		}
 	): Promise<z.infer<typeof postSchemas.createOutput>> {
-		// Implementation
-		try {
-			const newPost = await this.db.insert(postsTable).values(post).returning();
-			return newPost[0];
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Failed to create post.",
-				cause: e,
-			});
-		}
+		const newPost = await this.db.insert(postsTable).values(post).returning();
+		return newPost[0];
 	}
 
 	async updatePost({
@@ -120,28 +90,18 @@ export class PostService {
 	}: z.infer<typeof postSchemas.updateInput> & {
 		authorId: string;
 	}): Promise<z.infer<typeof postSchemas.updateOutput>> {
-		// Implementation
-		try {
-			const updatedPost = await this.db
-				.update(postsTable)
-				.set(newPost)
-				.where(and(eq(postsTable.id, id), eq(postsTable.authorId, authorId)))
-				.returning();
-			if (updatedPost.length === 0) {
-				throw new ORPCError("NOT_FOUND", {
-					message:
-						"Requested post doesn't exist or you do not have permission to modify it.",
-				});
-			}
-			return updatedPost[0];
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Fail to update post.",
-				cause: e,
+		const updatedPost = await this.db
+			.update(postsTable)
+			.set(newPost)
+			.where(and(eq(postsTable.id, id), eq(postsTable.authorId, authorId)))
+			.returning();
+		if (updatedPost.length === 0) {
+			throw new ORPCError("NOT_FOUND", {
+				message:
+					"Requested post doesn't exist or you do not have permission to modify it.",
 			});
 		}
+		return updatedPost[0];
 	}
 
 	async deletePost({
@@ -150,26 +110,16 @@ export class PostService {
 	}: z.infer<typeof postSchemas.deleteInput> & {
 		authorId: string;
 	}): Promise<z.infer<typeof postSchemas.deleteOutput>> {
-		// Implementation
-		try {
-			const deletedPost = await this.db
-				.delete(postsTable)
-				.where(and(eq(postsTable.id, id), eq(postsTable.authorId, authorId)))
-				.returning();
-			if (deletedPost.length === 0) {
-				throw new ORPCError("NOT_FOUND", {
-					message:
-						"Requested post doesn't exist or you do not have permission to modify it.",
-				});
-			}
-			return deletedPost[0];
-		} catch (e: unknown) {
-			if (e instanceof ORPCError) throw e;
-
-			throw new ORPCError("INTERNAL_SERVER_ERROR", {
-				message: "Fail to delete post.",
-				cause: e,
+		const deletedPost = await this.db
+			.delete(postsTable)
+			.where(and(eq(postsTable.id, id), eq(postsTable.authorId, authorId)))
+			.returning();
+		if (deletedPost.length === 0) {
+			throw new ORPCError("NOT_FOUND", {
+				message:
+					"Requested post doesn't exist or you do not have permission to modify it.",
 			});
 		}
+		return deletedPost[0];
 	}
 }
