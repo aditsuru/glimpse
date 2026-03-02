@@ -1,13 +1,13 @@
-import { pgTable, primaryKey, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 
 export const followersTable = pgTable(
 	"followers",
 	{
-		follower_id: uuid("follower_id")
+		follower_id: text("follower_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		following_id: uuid("following_id")
+		following_id: text("following_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
