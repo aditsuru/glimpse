@@ -1,4 +1,5 @@
 import { createEnv } from "@t3-oss/env-nextjs";
+import ms, { type StringValue } from "ms";
 import { z } from "zod";
 
 export const config = createEnv({
@@ -12,12 +13,32 @@ export const config = createEnv({
 		DATABASE_URL: z.string().url(),
 
 		// Better auth config
-		COOKIE_CACHE_AGE: z.coerce.number().nonnegative().default(300),
+		COOKIE_CACHE_AGE: z
+			.string()
+			.transform((val) => ms(val as StringValue) / 1000) // Converts ms to s
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default("5m"),
 	},
 	client: {
+		// General
 		NEXT_PUBLIC_APP_URL: z.string().url(),
+
+		// React Query
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME: z
+			.string()
+			.transform((val) => ms(val as StringValue)) // Converts "2h" to 7200000
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default("5m"),
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT: z.coerce
+			.number()
+			.nonnegative()
+			.default(1),
 	},
 	experimental__runtimeEnv: {
 		NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME:
+			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME,
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT:
+			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
 	},
 });

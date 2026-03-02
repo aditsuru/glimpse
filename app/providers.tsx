@@ -1,15 +1,31 @@
 "use client";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { useState } from "react";
+import { config } from "@/lib/config";
 export function Providers({ children }: { children: React.ReactNode }) {
+	const [queryClient] = useState(
+		() =>
+			new QueryClient({
+				defaultOptions: {
+					queries: {
+						staleTime: config.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME,
+						retry: config.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
+					},
+				},
+			})
+	);
 	return (
-		<NextThemesProvider
-			attribute="class"
-			defaultTheme="system"
-			enableSystem
-			disableTransitionOnChange
-		>
-			{children}
-		</NextThemesProvider>
+		<QueryClientProvider client={queryClient}>
+			<NextThemesProvider
+				attribute="class"
+				defaultTheme="system"
+				enableSystem
+				disableTransitionOnChange
+			>
+				{children}
+			</NextThemesProvider>
+		</QueryClientProvider>
 	);
 }
