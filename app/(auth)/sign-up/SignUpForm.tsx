@@ -57,24 +57,22 @@ function SignUpForm() {
 	} = form;
 
 	// Mutation query
-	const { mutate } = useMutation(
-		orpc.user.signUp.mutationOptions({
-			onSuccess: () => {
-				pageRouter.push("/");
-			},
-			onError: (error) => {
-				form.setError("root", {
-					message: error.message ?? "Something went wrong. Please try again.",
-				});
-				console.log(error);
-			},
-		})
-	);
+	const { mutate } = useMutation({
+		...orpc.user.signUp.mutationOptions(),
+		onSuccess: () => {
+			pageRouter.push("/");
+		},
+		onError: (error) => {
+			form.setError("root", {
+				message: error.message ?? "Something went wrong. Please try again.",
+			});
+		},
+	});
 
 	// Submit function
 	const handleOnSubmit = async (data: SignupSchemaType) => {
 		const { confirmPassword, ...rest } = data;
-		mutate.call(rest);
+		mutate(rest);
 	};
 
 	return (
