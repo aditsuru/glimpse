@@ -70,14 +70,16 @@ function SignUpForm() {
 		try {
 			await mutateAsync(rest);
 		} catch (error) {
-			if (error instanceof ORPCError) {
-				form.setError("root", {
-					message: error.message ?? "Something went wrong. Please try again.",
-				});
+			const isORPCError = error instanceof ORPCError;
+			const message = isORPCError
+				? error.message
+				: "Something went wrong. Please try again.";
+
+			if (isORPCError && error.code === "CONFLICT") {
+				const field = message.includes("Username") ? "username" : "email";
+				form.setError(field, { message });
 			} else {
-				form.setError("root", {
-					message: "Something went wrong. Please try again.",
-				});
+				form.setError("root", { message });
 			}
 		}
 	};

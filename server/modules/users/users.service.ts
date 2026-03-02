@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/server";
 import { eq } from "drizzle-orm";
 import type { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import type * as z from "zod";
@@ -35,6 +36,30 @@ export class UserService {
 	}: z.infer<typeof usersSchema.signUp.input> & {
 		headers: ReadonlyHeaders;
 	}): Promise<z.infer<typeof usersSchema.signUp.output>> {
+		const [existingEmail, existingUsername] = await Promise.all([
+			this.db
+				.select({ id: user.id })
+				.from(user)
+				.where(eq(user.email, input.email))
+				.limit(1),
+
+			this.db
+				.select({ id: user.id })
+				.from(user)
+				.where(eq(user.username, input.username))
+				.limit(1),
+		]);
+
+		if (existingEmail.length > 0) {
+			throw new ORPCError("CONFLICT", {
+				message: "An account with this email already exists.",
+			});
+		}
+		if (existingUsername.length > 0) {
+			throw new ORPCError("CONFLICT", {
+				message: "Username is already taken.",
+			});
+		}
 		await auth.api.signUpEmail({ body: { ...input }, headers });
 		return { success: true };
 	}
