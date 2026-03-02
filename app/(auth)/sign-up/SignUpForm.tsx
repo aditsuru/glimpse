@@ -9,6 +9,7 @@ import {
 	UserIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -30,8 +31,13 @@ import {
 	FieldSeparator,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import { orpc } from "@/lib/clients/orpc-client";
 
 function SignUpForm() {
+	// const {} = useMutation(
+	// 	orpc.users.
+	// );
+
 	const form = useForm<SignupSchemaType>({
 		resolver: zodResolver(signupSchema),
 		defaultValues: {
@@ -57,7 +63,9 @@ function SignUpForm() {
 			<FieldGroup>
 				<CardHeader className="text-center m-2">
 					<CardTitle className="flex items-center justify-center gap-2 text-2xl">
-						Create Your <span className="text-primary">Glimpse</span> Account
+						Create Your
+						<span className="text-primary">Glimpse</span>
+						Account
 						<ThemeToggle />
 					</CardTitle>
 					<CardDescription className="">

@@ -29,6 +29,11 @@ export const config = createEnv({
 			.transform((val) => ms(val as StringValue)) // Converts "2h" to 7200000
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
 			.default("5m"),
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME: z
+			.string()
+			.transform((val) => ms(val as StringValue))
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default("5m"),
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT: z.coerce
 			.number()
 			.nonnegative()
@@ -38,6 +43,8 @@ export const config = createEnv({
 		NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME:
 			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME,
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME:
+			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME,
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT:
 			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
 	},

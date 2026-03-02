@@ -26,9 +26,9 @@ const usersPublicProcedure = publicProcedure.use(async ({ context, next }) => {
 });
 
 export const usersRouter = baseOs.router({
-	profile: usersProtectedProcedure
-		.input(usersSchema.profile.input)
-		.output(usersSchema.profile.output)
+	updateProfile: usersProtectedProcedure
+		.input(usersSchema.updateProfile.input)
+		.output(usersSchema.updateProfile.output)
 		.handler(async ({ input, context }) => {
 			const userId = context.session.user.id;
 			return await context.userService.updateProfile({ userId, ...input });

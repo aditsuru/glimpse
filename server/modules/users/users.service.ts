@@ -13,9 +13,9 @@ export class UserService {
 	async updateProfile({
 		userId,
 		...input
-	}: z.infer<typeof usersSchema.profile.input> & {
+	}: z.infer<typeof usersSchema.updateProfile.input> & {
 		userId: string;
-	}): Promise<z.infer<typeof usersSchema.profile.output>> {
+	}): Promise<z.infer<typeof usersSchema.updateProfile.output>> {
 		try {
 			await this.db.update(user).set(input).where(eq(user.id, userId));
 			return { success: true };

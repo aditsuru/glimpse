@@ -12,6 +12,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 					queries: {
 						staleTime: config.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME,
 						retry: config.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
+						gcTime: config.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME,
+						refetchOnWindowFocus: true,
+						refetchOnReconnect: true,
+					},
+					mutations: {
+						retry: 0,
 					},
 				},
 			})

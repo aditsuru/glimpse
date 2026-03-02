@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const usersSchema = {
-	profile: {
+	updateProfile: {
 		input: z.object({
 			bio: z.string().max(160).optional(),
 			image: z.string().url().optional(),

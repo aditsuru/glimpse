@@ -5,10 +5,10 @@ import { usersRouter } from "./modules/users/users.route";
 import { baseOs } from "./os";
 
 export const router = baseOs.router({
-	posts: postsRouter,
-	comments: commentsRouter,
-	likes: likesRouter,
-	users: usersRouter,
+	post: postsRouter,
+	comment: commentsRouter,
+	like: likesRouter,
+	user: usersRouter,
 });
 
 export type Router = typeof router;
