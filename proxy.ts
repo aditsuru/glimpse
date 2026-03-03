@@ -4,7 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 const protectedRoutes = ["/post", "/profile", "/settings"];
 const authRoutes = ["/sign-in", "/sign-up"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	// 1. Get the cookie
