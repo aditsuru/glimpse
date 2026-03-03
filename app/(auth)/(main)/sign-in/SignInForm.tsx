@@ -12,7 +12,10 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { SignInSchema, type SignInSchemaType } from "@/app/(auth)/schema";
+import {
+	SignInSchema,
+	type SignInSchemaType,
+} from "@/app/(auth)/(main)/schema";
 import InputController from "@/components/form/InputController";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -62,6 +65,7 @@ function SignInForm() {
 			});
 			return;
 		}
+
 		if (!data.user.emailVerified) pageRouter.push("/verify-email");
 		pageRouter.push("/");
 	};

@@ -1,4 +1,4 @@
-import SignInForm from "@/app/(auth)/sign-in/SignInForm";
+import SignInForm from "@/app/(auth)/(main)/sign-in/SignInForm";
 
 function SignIn() {
 	return (

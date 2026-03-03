@@ -24,7 +24,16 @@ export const auth = betterAuth({
 	},
 	emailAndPassword: {
 		enabled: true,
-		// requireEmailVerification: true,
+	},
+	emailVerification: {
+		sendOnSignUp: true,
+		autoSignInAfterVerification: true,
+		sendVerificationEmail: async ({ user, url }) => {
+			console.log("--------------------------------");
+			console.log(`Verify email for ${user.email}:`);
+			console.log(url);
+			console.log("--------------------------------");
+		},
 	},
 	// socialProviders: {
 	// 	github: {

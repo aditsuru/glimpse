@@ -13,7 +13,10 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { type SignupSchemaType, signupSchema } from "@/app/(auth)/schema";
+import {
+	type SignupSchemaType,
+	signupSchema,
+} from "@/app/(auth)/(main)/schema";
 import InputController from "@/components/form/InputController";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
