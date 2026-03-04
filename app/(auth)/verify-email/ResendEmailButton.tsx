@@ -1,20 +1,21 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/clients/auth-client";
+import { config } from "@/lib/config";
 
 const COOLDOWN_KEY = "resend_email_cooldown";
-const COOLDOWN_TIME = 60;
+const COOLDOWN_TIME = config.NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT;
 
-function ResendEmailButton({
-	className,
-	fn,
-}: {
-	className: string;
-	fn: () => void;
-}) {
+function ResendEmailButton({ className }: { className: string }) {
+	const router = useRouter();
 	const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
 
+	const { data: session, error } = authClient.useSession();
+	console.log(error);
 	useEffect(() => {
 		const stored = localStorage.getItem(COOLDOWN_KEY);
 		if (!stored) {
@@ -25,6 +26,7 @@ function ResendEmailButton({
 
 		if (remaining <= 0) {
 			localStorage.removeItem(COOLDOWN_KEY);
+			setSecondsLeft(0);
 			return;
 		}
 
@@ -41,13 +43,27 @@ function ResendEmailButton({
 		return () => clearTimeout(timeout);
 	}, [secondsLeft]);
 
-	const handleOnClick = () => {
-		fn();
+	const handleOnClick = async () => {
+		if (!session) {
+			toast.error("Something went wrong.", { position: "top-center" });
+			router.push("/sign-in");
+			return;
+		}
+
+		authClient.sendVerificationEmail({
+			email: session.user.email,
+			callbackURL: "/",
+		});
+
 		localStorage.setItem(
 			COOLDOWN_KEY,
 			(Date.now() + COOLDOWN_TIME * 1000).toString()
 		);
 		setSecondsLeft(COOLDOWN_TIME);
+
+		toast.info("Verification email sent successfully!", {
+			position: "top-center",
+		});
 	};
 
 	if (secondsLeft === null)

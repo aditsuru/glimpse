@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "@/drizzle/db";
+import { sendVerificationEmail } from "@/emails/email-service";
 import { config } from "@/lib/config";
 
 export const auth = betterAuth({
@@ -29,10 +30,11 @@ export const auth = betterAuth({
 		sendOnSignUp: true,
 		autoSignInAfterVerification: true,
 		sendVerificationEmail: async ({ user, url }) => {
-			console.log("--------------------------------");
-			console.log(`Verify email for ${user.email}:`);
-			console.log(url);
-			console.log("--------------------------------");
+			sendVerificationEmail({
+				name: user.name,
+				to: user.email,
+				url,
+			});
 		},
 	},
 	// socialProviders: {

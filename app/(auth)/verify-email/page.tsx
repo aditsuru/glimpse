@@ -12,6 +12,7 @@ import {
 import { FieldGroup } from "@/components/ui/field";
 import { auth } from "@/lib/auth";
 import ResendEmailButton from "./ResendEmailButton";
+import SignOutButton from "./SignOutButton";
 
 async function VerifyEmail() {
 	const session = await auth.api.getSession({ headers: await headers() });
@@ -39,8 +40,9 @@ async function VerifyEmail() {
 									Click the link in the email to verify your account
 								</CardDescription>
 							</div>
-							<div className="w-full px-4 md:px-14">
-								<ResendEmailButton />
+							<div className="w-full px-4 md:px-14 flex flex-col gap-2">
+								<ResendEmailButton className="w-full px-8 md:px-4 cursor-none" />
+								<SignOutButton />
 							</div>
 						</FieldGroup>
 					</CardContent>

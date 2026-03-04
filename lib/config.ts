@@ -18,6 +18,9 @@ export const config = createEnv({
 			.transform((val) => ms(val as StringValue) / 1000) // Converts ms to s
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
 			.default(300000),
+
+		// Resend
+		RESEND_API_KEY: z.string().nonempty(),
 	},
 	client: {
 		// General
