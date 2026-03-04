@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import { config } from "@/lib/config";
 export function Providers({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(
@@ -31,6 +32,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 				disableTransitionOnChange
 			>
 				{children}
+				<Toaster />
 			</NextThemesProvider>
 		</QueryClientProvider>
 	);

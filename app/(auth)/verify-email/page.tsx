@@ -2,7 +2,6 @@ import { Mail01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -12,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { auth } from "@/lib/auth";
+import ResendEmailButton from "./ResendEmailButton";
 
 async function VerifyEmail() {
 	const session = await auth.api.getSession({ headers: await headers() });
@@ -40,9 +40,7 @@ async function VerifyEmail() {
 								</CardDescription>
 							</div>
 							<div className="w-full px-4 md:px-14">
-								<Button className="hover:opacity-90 w-full cursor-none font-bold">
-									Resent Verification Email
-								</Button>
+								<ResendEmailButton />
 							</div>
 						</FieldGroup>
 					</CardContent>

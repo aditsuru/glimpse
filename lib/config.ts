@@ -10,30 +10,35 @@ export const config = createEnv({
 			.default("development"),
 
 		// Database
-		DATABASE_URL: z.string().url(),
+		DATABASE_URL: z.url(),
 
 		// Better auth config
 		COOKIE_CACHE_AGE: z
 			.string()
 			.transform((val) => ms(val as StringValue) / 1000) // Converts ms to s
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
-			.default("5m"),
+			.default(300000),
 	},
 	client: {
 		// General
-		NEXT_PUBLIC_APP_URL: z.string().url(),
+		NEXT_PUBLIC_APP_URL: z.url(),
+		NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT: z
+			.string()
+			.transform((val) => ms(val as StringValue)) // Converts "2h" to 7200000
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default(60),
 
 		// React Query
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME: z
 			.string()
-			.transform((val) => ms(val as StringValue)) // Converts "2h" to 7200000
+			.transform((val) => ms(val as StringValue))
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
-			.default("5m"),
+			.default(300000),
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME: z
 			.string()
 			.transform((val) => ms(val as StringValue))
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
-			.default("5m"),
+			.default(300000),
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT: z.coerce
 			.number()
 			.nonnegative()
@@ -47,5 +52,7 @@ export const config = createEnv({
 			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME,
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT:
 			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
+		NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT:
+			process.env.VERIFICATION_EMAIL_RESEND_TIMEOUT,
 	},
 });
