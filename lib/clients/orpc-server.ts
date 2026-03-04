@@ -12,4 +12,6 @@ export async function getServerCaller() {
 	return createRouterClient(router, {
 		context: { db, session },
 	});
+
+	// Object literal may only specify known properties, and 'db' does not exist in type 'Value<PromiseLike<never>, [clientContext: ClientContext]>'.
 }

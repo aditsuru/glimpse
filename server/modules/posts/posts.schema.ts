@@ -1,12 +1,12 @@
 import * as z from "zod";
 
 const postSchema = z.object({
-	id: z.string().uuid(),
+	id: z.uuid(),
 	title: z.string().max(256),
 	body: z.string().nullable().optional(),
 	mimeType: z.string().max(50).nullable().optional(),
 	fileUrl: z.string().nullable().optional(),
-	authorId: z.string().uuid(),
+	authorId: z.uuid(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 });
@@ -38,7 +38,7 @@ export const postSchemas = {
 
 	// Get
 	getInput: z.object({
-		postId: z.string().uuid(),
+		postId: z.uuid(),
 	}),
 	getOutput: postSchema,
 
@@ -48,13 +48,13 @@ export const postSchemas = {
 
 	// Update
 	updateInput: createPostSchema.partial().extend({
-		id: z.string().uuid(),
+		id: z.uuid(),
 	}),
 	updateOutput: postSchema,
 
 	// Delete
 	deleteInput: z.object({
-		id: z.string().uuid(),
+		id: z.uuid(),
 	}),
 	deleteOutput: postSchema,
 };

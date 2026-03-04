@@ -9,6 +9,7 @@ import {
 	UserIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,9 +36,15 @@ import {
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/clients/auth-client";
-import { client } from "@/lib/clients/orpc-client";
+import { client, orpc } from "@/lib/clients/orpc-client";
 
 function SignUpForm() {
+	const { mutate } = useMutation(orpc.post.create.mutationOptions());
+
+	// Variable type void
+	mutate({});
+	// Argument of type '{}' is not assignable to parameter of type 'void'.
+
 	// Page router for redirect
 	const pageRouter = useRouter();
 

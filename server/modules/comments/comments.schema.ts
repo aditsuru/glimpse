@@ -1,26 +1,26 @@
 import * as z from "zod";
 
 const commentSchema = z.object({
-	id: z.string().uuid(),
+	id: z.uuid(),
 	body: z.string().nonempty(),
-	authorId: z.string().uuid(),
-	postId: z.string().uuid(),
-	parentCommentId: z.string().uuid().nullable(),
+	authorId: z.uuid(),
+	postId: z.uuid(),
+	parentCommentId: z.uuid().nullable(),
 	createdAt: z.date(),
 	updatedAt: z.date(),
 });
 
 const createCommentSchema = z.object({
 	body: z.string().nonempty(),
-	postId: z.string().uuid(),
-	parentCommentId: z.string().uuid().nullable(),
+	postId: z.uuid(),
+	parentCommentId: z.uuid().nullable(),
 });
 
 export const commentSchemas = {
 	// List
 	listInput: z.object({
-		postId: z.string().uuid(),
-		parentCommentId: z.string().uuid().nullable().default(null),
+		postId: z.uuid(),
+		parentCommentId: z.uuid().nullable().default(null),
 		page: z.number().positive().default(1),
 	}),
 	listOutput: z.object({
@@ -41,7 +41,7 @@ export const commentSchemas = {
 
 	// Delete
 	deleteInput: z.object({
-		id: z.string().uuid(),
+		id: z.uuid(),
 	}),
 	deleteOutput: commentSchema,
 };

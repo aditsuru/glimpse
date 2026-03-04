@@ -3,20 +3,20 @@ import * as z from "zod";
 export const likesSchema = {
 	getPostLikesCount: {
 		input: z.object({
-			postId: z.string().uuid(),
+			postId: z.uuid(),
 		}),
 		output: z.number().nonnegative(),
 	},
 	getCommentLikesCount: {
 		input: z.object({
-			commentId: z.string().uuid(),
+			commentId: z.uuid(),
 		}),
 		output: z.number().nonnegative(),
 	},
 
 	likePost: {
 		input: z.object({
-			postId: z.string().uuid(),
+			postId: z.uuid(),
 		}),
 		output: z.object({
 			success: z.boolean(),
@@ -25,7 +25,7 @@ export const likesSchema = {
 
 	unlikePost: {
 		input: z.object({
-			postId: z.string().uuid(),
+			postId: z.uuid(),
 		}),
 		output: z.object({
 			success: z.boolean(),
@@ -34,7 +34,7 @@ export const likesSchema = {
 
 	likeComment: {
 		input: z.object({
-			commentId: z.string().uuid(),
+			commentId: z.uuid(),
 		}),
 		output: z.object({
 			success: z.boolean(),
@@ -43,7 +43,7 @@ export const likesSchema = {
 
 	unlikeComment: {
 		input: z.object({
-			commentId: z.string().uuid(),
+			commentId: z.uuid(),
 		}),
 		output: z.object({
 			success: z.boolean(),
