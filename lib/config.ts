@@ -19,6 +19,11 @@ export const config = createEnv({
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
 			.default(300000),
 
+		GOOGLE_CLIENT_ID: z.string().nonempty(),
+		GOOGLE_CLIENT_SECRET: z.string().nonempty(),
+		GITHUB_CLIENT_ID: z.string().nonempty(),
+		GITHUB_CLIENT_SECRET: z.string().nonempty(),
+
 		// Resend
 		RESEND_API_KEY: z.string().nonempty(),
 	},

@@ -37,20 +37,16 @@ export const auth = betterAuth({
 			});
 		},
 	},
-	// socialProviders: {
-	// 	github: {
-	// 		enabled: true,
-	// 		clientKey: "",
-	// 		clientSecret: "",
-	// 		clientId: "",
-	// 	},
-	// 	google: {
-	// 		enabled: true,
-	// 		clientKey: "",
-	// 		clientSecret: "",
-	// 		clientId: "",
-	// 	},
-	// },
+	socialProviders: {
+		github: {
+			clientId: config.GITHUB_CLIENT_ID,
+			clientSecret: config.GITHUB_CLIENT_SECRET,
+		},
+		google: {
+			clientId: config.GOOGLE_CLIENT_ID,
+			clientSecret: config.GOOGLE_CLIENT_SECRET,
+		},
+	},
 	session: {
 		cookieCache: {
 			enabled: true,

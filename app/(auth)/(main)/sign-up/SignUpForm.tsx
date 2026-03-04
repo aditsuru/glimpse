@@ -212,6 +212,12 @@ function SignUpForm() {
 								variant="outline"
 								className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
 								disabled={isSubmitting}
+								onClick={async () => {
+									await authClient.signIn.social({
+										provider: "github",
+										callbackURL: "/",
+									});
+								}}
 							>
 								<HugeiconsIcon icon={GithubIcon} className="size-5!" />
 								GitHub
@@ -220,6 +226,12 @@ function SignUpForm() {
 								variant="outline"
 								className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
 								disabled={isSubmitting}
+								onClick={async () => {
+									await authClient.signIn.social({
+										provider: "google",
+										callbackURL: "/",
+									});
+								}}
 							>
 								<HugeiconsIcon icon={GoogleIcon} className="size-5!" />
 								<p>Google</p>
