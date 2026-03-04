@@ -29,7 +29,7 @@ export const config = createEnv({
 			.string()
 			.transform((val) => ms(val as StringValue)) // Converts "2h" to 7200000
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
-			.default(60),
+			.default(60000),
 
 		// React Query
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME: z
@@ -56,6 +56,6 @@ export const config = createEnv({
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT:
 			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
 		NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT:
-			process.env.VERIFICATION_EMAIL_RESEND_TIMEOUT,
+			process.env.NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT,
 	},
 });

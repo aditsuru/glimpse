@@ -8,7 +8,7 @@ import { authClient } from "@/lib/clients/auth-client";
 import { config } from "@/lib/config";
 
 const COOLDOWN_KEY = "resend_email_cooldown";
-const COOLDOWN_TIME = config.NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT;
+const COOLDOWN_TIME_MS = config.NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT;
 
 function ResendEmailButton({ className }: { className: string }) {
 	const router = useRouter();
@@ -57,9 +57,9 @@ function ResendEmailButton({ className }: { className: string }) {
 
 		localStorage.setItem(
 			COOLDOWN_KEY,
-			(Date.now() + COOLDOWN_TIME * 1000).toString()
+			(Date.now() + COOLDOWN_TIME_MS).toString()
 		);
-		setSecondsLeft(COOLDOWN_TIME);
+		setSecondsLeft(COOLDOWN_TIME_MS / 1000);
 
 		toast.info("Verification email sent successfully!", {
 			position: "top-center",
