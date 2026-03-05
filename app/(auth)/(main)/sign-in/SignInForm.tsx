@@ -80,7 +80,7 @@ function SignInForm() {
 					</CardTitle>
 					<CardDescription className="">
 						Enter your credentials to Sign In to your{" "}
-						<span className="text-primary">Glimpse</span> account.
+						<span className="text-primary font-bold">Glimpse</span> account.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>

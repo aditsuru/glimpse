@@ -101,7 +101,7 @@ function SignUpForm() {
 				<CardHeader className="text-center m-2">
 					<CardTitle className="flex items-center justify-center gap-2 text-2xl">
 						Create Your
-						<span className="text-primary">Glimpse</span>
+						<span className="text-primary font-bold">Glimpse</span>
 						Account
 						<ThemeToggle />
 					</CardTitle>
