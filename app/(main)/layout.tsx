@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import MobileNavbar from "@/components/MobileNavbar";
 import SidebarProfile from "@/components/SidebarProfile";
+import SidebarSearch from "@/components/SidebarSearch";
 import { auth } from "@/lib/auth";
 
 export default async function AuthGuard({
@@ -35,7 +36,7 @@ export default async function AuthGuard({
 				<MobileNavbar />
 
 				{/* Search Bar */}
-				<div className="hidden lg:flex flex-col col-span-1 h-full overflow-y-auto rounded-3xl px-4 bg-amber-200"></div>
+				<SidebarSearch />
 			</div>
 		</div>
 	);

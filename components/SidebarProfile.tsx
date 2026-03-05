@@ -37,21 +37,9 @@ function SidebarProfile() {
 					{/* Bio */}
 					<div>
 						<p className="w-full line-clamp-12">
-							Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maiores
-							cumque consectetur nobis odit ab, veniam dolorem omnis repellat
-							vel, accusantium amet asperiores voluptate. Lorem ipsum dolor sit
-							amet consectetur, adipisicing elit. Voluptatem exercitationem
-							debitis praesentium, dolorum ratione vitae ipsa, soluta blanditiis
-							modi totam quis? Consequatur similique vero quos quam perspiciatis
-							excepturi molestias, delectus, laborum numquam blanditiis,
-							accusamus hic? Eum nostrum perferendis blanditiis voluptatem?
-							Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda
-							placeat eligendi quo in, porro, sunt quibusdam veniam dignissimos
-							labore earum quae maxime consequatur sint! In magni iure, delectus
-							sint dolores nobis! Enim hic tenetur cum minus et aliquam eos
-							recusandae nemo, repellat aut ut deleniti quod expedita laudantium
-							dolorem error! Aut saepe totam nisi ipsum at nulla dolores, nobis
-							explicabo.
+							Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempore
+							neque amet perferendis excepturi laborum repudiandae quod in velit
+							praesentium placeat?.
 						</p>
 					</div>
 				</div>
