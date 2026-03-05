@@ -19,12 +19,12 @@ import {
 
 function SidebarSearch() {
 	return (
-		<div className="hidden lg:flex flex-col col-span-1 h-full overflow-y-auto rounded-3xl  bg-background ">
-			<div className="mt-12 flex flex-col items-center gap-4 h-full w-full">
+		<div className="flex flex-col col-span-1 overflow-y-auto rounded-3xl bg-background h-full w-full">
+			<div className="mt-12 flex flex-col items-center gap-4 w-full">
 				{/* Search */}
 				<InputGroup className="max-w-xs">
 					<InputGroupInput
-						placeholder="Search a user..."
+						placeholder="Search a user"
 						className="cursor-none"
 					/>
 					<InputGroupAddon>
@@ -48,7 +48,7 @@ function SidebarSearch() {
 							<ItemActions>
 								<Button
 									variant="ghost"
-									className="hover:bg-background cursor-none transition-all duration-150"
+									className="hover:bg-background hover:text-accent cursor-none transition-all duration-150 font-medium"
 								>
 									Follow
 								</Button>

@@ -36,7 +36,9 @@ export default async function AuthGuard({
 				<MobileNavbar />
 
 				{/* Search Bar */}
-				<SidebarSearch />
+				<div className="hidden lg:flex w-full h-full justify-center">
+					<SidebarSearch />
+				</div>
 			</div>
 		</div>
 	);
