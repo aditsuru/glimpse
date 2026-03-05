@@ -6,13 +6,14 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
 	return (
 		<div className="w-screen h-screen lg:p-4  text-foreground">
 			<div className="grid grid-cols-1 lg:grid-cols-4 w-full h-full gap-8 relative">
 				{/* sidebar */}
-				<div className="hidden lg:flex flex-col col-span-1 min-h-full bg-background rounded-4xl">
+				<div className="hidden lg:flex flex-col col-span-1 min-h-full bg-background rounded-4xl px-2">
 					{/* Profile */}
 					<div className="flex flex-col gap-4 justify-center items-center mt-12 w-full">
 						<Avatar className="w-48 h-48">
@@ -29,12 +30,12 @@ export default function Home() {
 									<p className="font-semibold">472</p>
 									<p>Posts</p>
 								</div>
-								<div className="h-8 bg-accent-foreground w-[2px] hidden lg:block"></div>
+								<Separator orientation="vertical" className="max-h-8" />
 								<div className="flex flex-col gap-2 text-lg text-center">
 									<p className="font-semibold">12.4K</p>
 									<p>Followers</p>
 								</div>
-								<div className="h-8 bg-accent-foreground w-[2px] hidden lg:block"></div>
+								<Separator orientation="vertical" className="max-h-8" />
 								<div className="flex flex-col gap-2 text-lg text-center">
 									<p className="font-semibold">228</p>
 									<p>Following</p>
