@@ -19,7 +19,7 @@ import {
 
 function SidebarSearch() {
 	return (
-		<div className="mt-12 flex flex-col items-center gap-4 w-full h-full">
+		<div className="mt-4 flex flex-col items-center gap-4 w-full flex-1 min-h-0">
 			{/* Search */}
 			<InputGroup className="max-w-xs">
 				<InputGroupInput placeholder="Search a user" className="cursor-none" />
@@ -29,7 +29,7 @@ function SidebarSearch() {
 			</InputGroup>
 			{/* Results */}
 			<div className="flex-1 w-full px-4 overflow-y-auto custom-scrollbar">
-				<ItemGroup className="w-full  transition-all duration-150 hover:scale-105">
+				<ItemGroup className="w-full transition-all duration-150 hover:scale-105 hover:grayscale">
 					<Item className="flex">
 						<ItemMedia className="flex items-center justify-center">
 							<Avatar className="w-10 h-10">

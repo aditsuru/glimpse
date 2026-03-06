@@ -26,17 +26,22 @@ export default async function AuthGuard({
 		<div className="w-full h-screen lg:p-4 overflow-hidden text-foreground">
 			<div className="grid grid-cols-1 lg:grid-cols-4 w-full h-full lg:gap-8">
 				{/* sidebar */}
-				<SidebarProfile />
+				<div className="hidden lg:flex flex-col col-span-1 min-h-full bg-background rounded-3xl px-6">
+					<SidebarProfile />
+				</div>
 
 				{/* Menu */}
-				<div className="col-span-1 lg:col-span-2 h-full overflow-y-auto w-full bg-background lg:brightness-95 lg:rounded-3xl">
+				<div className="col-span-1 lg:col-span-2 h-full overflow-y-auto w-full bg-background lg:brightness-95 lg:rounded-3xl pb-20 lg:pb-0">
 					{children}
 				</div>
+
 				{/* Options */}
-				<MobileNavbar />
+				<div className="lg:hidden fixed right-0 left-0 bottom-0 w-full bg-background flex justify-between items-center p-4 px-8 border-t-4 border-foreground z-50">
+					<MobileNavbar />
+				</div>
 
 				{/* Search Bar */}
-				<div className="hidden lg:flex flex-col col-span-1 rounded-3xl bg-background h-full w-full">
+				<div className="hidden lg:flex flex-col col-span-1 rounded-3xl bg-background h-full w-full overflow-hidden">
 					<SidebarSearch />
 				</div>
 			</div>

@@ -28,7 +28,7 @@ function SidebarOptions() {
 					<Link
 						key={href}
 						href={href}
-						className={`flex gap-2 items-center cursor-none ${isActive ? "text-muted-foreground" : "hover:scale-105"} transition-all duration-150`}
+						className={`flex gap-2 items-center cursor-none ${isActive ? "text-primary opacity-85 pointer-events-none" : "hover:scale-105"} transition-all duration-150`}
 					>
 						<HugeiconsIcon icon={icon} size={28} />
 						<p className="text-lg font-semibold">{label}</p>

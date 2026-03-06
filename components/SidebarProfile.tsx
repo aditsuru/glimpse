@@ -4,7 +4,7 @@ import SidebarOptions from "./SidebarOptions";
 
 function SidebarProfile() {
 	return (
-		<div className="hidden lg:flex flex-col col-span-1 min-h-full bg-background rounded-3xl px-6">
+		<>
 			{/* Profile */}
 			<div className="flex flex-col gap-4 justify-center items-center mt-12 w-full">
 				<Avatar className="w-48 h-48">
@@ -46,7 +46,7 @@ function SidebarProfile() {
 			</div>
 			{/* Options */}
 			<SidebarOptions />
-		</div>
+		</>
 	);
 }
 
