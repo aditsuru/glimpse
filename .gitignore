@@ -43,4 +43,5 @@ next-env.d.ts
 
 db-data
 
-README.md
+public/temp/*
+temp.md
