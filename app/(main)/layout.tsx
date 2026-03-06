@@ -31,7 +31,7 @@ export default async function AuthGuard({
 				</div>
 
 				{/* Menu */}
-				<div className="col-span-1 lg:col-span-2 h-full overflow-y-auto w-full bg-background lg:brightness-95 lg:rounded-3xl pb-20 lg:pb-0">
+				<div className="col-span-1 lg:col-span-2 h-full overflow-y-auto w-full bg-background lg:rounded-3xl pb-20 lg:pb-0">
 					{children}
 				</div>
 

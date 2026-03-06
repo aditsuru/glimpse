@@ -19,7 +19,7 @@ import {
 
 function SidebarSearch() {
 	return (
-		<div className="mt-4 flex flex-col items-center gap-4 w-full flex-1 min-h-0">
+		<div className="mt-8 flex flex-col items-center gap-4 w-full flex-1 min-h-0">
 			{/* Search */}
 			<InputGroup className="max-w-xs">
 				<InputGroupInput placeholder="Search a user" className="cursor-none" />
