@@ -43,7 +43,7 @@ function Search() {
 					<Item className="flex">
 						<ItemMedia className="flex items-center justify-center">
 							<Avatar className="w-10 h-10">
-								<AvatarImage src="https://github.com/shadcn.png" />
+								<AvatarImage src="https://github.com/aditsuru.png" />
 								<AvatarFallback>LM</AvatarFallback>
 							</Avatar>
 						</ItemMedia>

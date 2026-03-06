@@ -20,7 +20,7 @@ function SidebarOptions() {
 	const pathname = usePathname();
 
 	return (
-		<div className="flex flex-col items-start gap-4 w-full mb-4 mt-auto">
+		<div className="flex flex-col items-start gap-4 w-full mb-8 mt-auto">
 			{navItems.map(({ label, icon, href }) => {
 				const isActive = pathname === href;
 

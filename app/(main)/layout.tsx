@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import MobileNavbar from "@/components/MobileNavbar";
 import SidebarProfile from "@/components/SidebarProfile";
 import SidebarSearch from "@/components/SidebarSearch";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { auth } from "@/lib/auth";
 
 export default async function AuthGuard({
@@ -26,12 +27,12 @@ export default async function AuthGuard({
 		<div className="w-full h-screen lg:p-4 overflow-hidden text-foreground">
 			<div className="grid grid-cols-1 lg:grid-cols-4 w-full h-full lg:gap-8">
 				{/* sidebar */}
-				<div className="hidden lg:flex flex-col col-span-1 min-h-full bg-background rounded-3xl px-6">
+				<div className="hidden lg:flex flex-col col-span-1 min-h-full bg-background rounded-3xl px-6 mt-8">
 					<SidebarProfile />
 				</div>
 
 				{/* Menu */}
-				<div className="col-span-1 lg:col-span-2 h-full overflow-y-auto w-full bg-background lg:rounded-3xl pb-20 lg:pb-0">
+				<div className="col-span-1 lg:col-span-2 h-full overflow-y-auto w-full bg-background lg:rounded-3xl pb-20 lg:pb-0 mt-8">
 					{children}
 				</div>
 
@@ -41,9 +42,12 @@ export default async function AuthGuard({
 				</div>
 
 				{/* Search Bar */}
-				<div className="hidden lg:flex flex-col col-span-1 rounded-3xl bg-background h-full w-full overflow-hidden">
+				<div className="hidden lg:flex flex-col col-span-1 rounded-3xl bg-background h-full w-full overflow-hidden mt-8">
 					<SidebarSearch />
 				</div>
+			</div>
+			<div className="fixed bottom-0 right-0 px-10 pb-4">
+				<ThemeToggle />
 			</div>
 		</div>
 	);

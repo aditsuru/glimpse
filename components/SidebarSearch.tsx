@@ -1,4 +1,8 @@
-import { Search01Icon } from "@hugeicons/core-free-icons";
+import {
+	CheckmarkBadge02Icon,
+	Search01Icon,
+	UserIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -19,11 +23,11 @@ import {
 
 function SidebarSearch() {
 	return (
-		<div className="mt-8 flex flex-col items-center gap-4 w-full flex-1 min-h-0">
+		<div className="flex flex-col items-center gap-4 w-full flex-1 min-h-0 pt-2">
 			{/* Search */}
 			<InputGroup className="max-w-xs">
 				<InputGroupInput placeholder="Search a user" className="cursor-none" />
-				<InputGroupAddon>
+				<InputGroupAddon className="cursor-none">
 					<HugeiconsIcon icon={Search01Icon} />
 				</InputGroupAddon>
 			</InputGroup>
@@ -33,18 +37,27 @@ function SidebarSearch() {
 					<Item className="flex">
 						<ItemMedia className="flex items-center justify-center">
 							<Avatar className="w-10 h-10">
-								<AvatarImage src="https://github.com/shadcn.png" />
-								<AvatarFallback>LM</AvatarFallback>
+								<AvatarImage src="https://github.com/aditsuru.png" />
+								<AvatarFallback>
+									<HugeiconsIcon icon={UserIcon} />
+								</AvatarFallback>
 							</Avatar>
 						</ItemMedia>
 						<ItemContent className="flex flex-col gap-0 w-full">
-							<ItemTitle>Lorem, ipsum.</ItemTitle>
+							<div className="flex gap-1 items-start">
+								<ItemTitle>Lorem, ipsum.</ItemTitle>
+								<HugeiconsIcon
+									icon={CheckmarkBadge02Icon}
+									size={18}
+									className="text-primary shrink-0 translate-y-px"
+								/>
+							</div>
 							<ItemDescription>Lorem, ipsum.</ItemDescription>
 						</ItemContent>
 						<ItemActions>
 							<Button
 								variant="ghost"
-								className="hidden xl:block hover:bg-background hover:text-accent cursor-none transition-all duration-150 font-medium"
+								className="hidden xl:block hover:bg-none! hover:text-accent cursor-none transition-all duration-150 font-medium"
 							>
 								Follow
 							</Button>
