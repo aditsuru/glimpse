@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import MobileNavbar from "@/components/MobileNavbar";
 import SidebarProfile from "@/components/SidebarProfile";
 import SidebarSearch from "@/components/SidebarSearch";
+import SnowFall from "@/components/SnowFall";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { auth } from "@/lib/auth";
 
@@ -49,6 +50,7 @@ export default async function AuthGuard({
 			<div className="fixed bottom-0 right-0 px-10 pb-8">
 				<ThemeToggle />
 			</div>
+			<SnowFall />
 		</div>
 	);
 }
