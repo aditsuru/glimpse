@@ -4,6 +4,7 @@ import {
 	UserIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,37 +34,36 @@ function SidebarSearch() {
 			</InputGroup>
 			{/* Results */}
 			<div className="flex-1 w-full px-4 overflow-y-auto custom-scrollbar">
-				<ItemGroup className="w-full transition-all duration-150 hover:scale-105 hover:grayscale">
-					<Item className="flex">
-						<ItemMedia className="flex items-center justify-center">
-							<Avatar className="w-10 h-10">
-								<AvatarImage src="https://github.com/aditsuru.png" />
-								<AvatarFallback>
-									<HugeiconsIcon icon={UserIcon} />
-								</AvatarFallback>
-							</Avatar>
-						</ItemMedia>
-						<ItemContent className="flex flex-col gap-0 w-full">
-							<div className="flex gap-1 items-start">
-								<ItemTitle>Lorem, ipsum.</ItemTitle>
-								<HugeiconsIcon
-									icon={CheckmarkBadge02Icon}
-									size={18}
-									className="text-primary shrink-0 translate-y-px"
-								/>
-							</div>
-							<ItemDescription>Lorem, ipsum.</ItemDescription>
-						</ItemContent>
-						<ItemActions>
-							<Button
-								variant="ghost"
-								className="hidden xl:block hover:bg-none! hover:text-accent cursor-none transition-all duration-150 font-medium"
-							>
-								Follow
-							</Button>
-						</ItemActions>
-					</Item>
-				</ItemGroup>
+				<Link href="/profile/aditsuru" className="cursor-none">
+					<ItemGroup className="w-full transition-all duration-150 hover:scale-105 hover:grayscale">
+						<Item className="flex">
+							<ItemMedia className="flex items-center justify-center">
+								<Avatar className="w-10 h-10">
+									<AvatarImage src="https://github.com/aditsuru.png" />
+									<AvatarFallback>
+										<HugeiconsIcon icon={UserIcon} />
+									</AvatarFallback>
+								</Avatar>
+							</ItemMedia>
+							<ItemContent className="flex flex-col gap-0 w-full">
+								<div className="flex gap-1 items-start">
+									<ItemTitle>Lorem, ipsum.</ItemTitle>
+									<HugeiconsIcon
+										icon={CheckmarkBadge02Icon}
+										size={18}
+										className="text-primary shrink-0 translate-y-px"
+									/>
+								</div>
+								<ItemDescription>Lorem, ipsum.</ItemDescription>
+							</ItemContent>
+							<ItemActions>
+								<p className="hidden xl:block hover:brightness-110 cursor-none transition-all duration-150 font-medium">
+									Follow
+								</p>
+							</ItemActions>
+						</Item>
+					</ItemGroup>
+				</Link>
 			</div>
 		</div>
 	);

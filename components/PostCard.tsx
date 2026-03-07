@@ -47,7 +47,7 @@ function PostCard() {
 						</p>
 					</div>
 					<AspectRatio ratio={16 / 9} className="w-full h-full rounded">
-						<Image src="/image1.gif" alt="post" fill className="rounded" />
+						<Image src="/temp/image1.gif" alt="post" fill className="rounded" />
 					</AspectRatio>
 				</div>
 			</div>

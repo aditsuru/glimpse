@@ -8,6 +8,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { authClient } from "@/lib/clients/auth-client";
 
 const navItems = [
 	{ label: "Feed", icon: Home01Icon, href: "/" },
@@ -18,17 +19,20 @@ const navItems = [
 
 function SidebarOptions() {
 	const pathname = usePathname();
-
+	const { data: session } = authClient.useSession();
 	return (
-		<div className="flex flex-col items-start gap-4 w-full mb-8 mt-auto">
+		<div className="flex flex-col items-start gap-4 w-full mb-12 mt-auto">
 			{navItems.map(({ label, icon, href }) => {
-				const isActive = pathname === href;
-
+				let isActive = pathname === href;
+				if (href === "/profile")
+					isActive = pathname === `/profile/${session?.user.username}`;
 				return (
 					<Link
 						key={href}
-						href={href}
-						className={`flex gap-2 items-center cursor-none ${isActive ? "text-primary opacity-85 pointer-events-none" : "hover:scale-105"} transition-all duration-150`}
+						href={
+							href === "/profile" ? `/profile/${session?.user.username}` : href
+						}
+						className={`flex gap-2 items-center cursor-none ${isActive ? "text-primary pointer-events-none" : "hover:scale-105"} transition-all duration-150`}
 					>
 						<HugeiconsIcon icon={icon} size={28} />
 						<p className="text-lg font-semibold">{label}</p>

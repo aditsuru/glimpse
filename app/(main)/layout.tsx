@@ -46,7 +46,7 @@ export default async function AuthGuard({
 					<SidebarSearch />
 				</div>
 			</div>
-			<div className="fixed bottom-0 right-0 px-10 pb-4">
+			<div className="fixed bottom-0 right-0 px-10 pb-8">
 				<ThemeToggle />
 			</div>
 		</div>

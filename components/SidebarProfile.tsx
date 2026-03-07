@@ -34,12 +34,18 @@ function SidebarProfile() {
 							<p className="font-semibold">472</p>
 							<p className="text-muted-foreground">Posts</p>
 						</div>
-						<Separator orientation="vertical" className="h-8!" />
+						<Separator
+							orientation="vertical"
+							className="h-8! hidden lg:block"
+						/>
 						<div className="flex flex-col gap-2 text-lg text-center">
 							<p className="font-semibold">12.4K</p>
 							<p className="text-muted-foreground">Followers</p>
 						</div>
-						<Separator orientation="vertical" className="h-8!" />
+						<Separator
+							orientation="vertical"
+							className="h-8! hidden lg:block"
+						/>
 						<div className="flex flex-col gap-2 text-lg text-center">
 							<p className="font-semibold">228</p>
 							<p className="text-muted-foreground">Following</p>
