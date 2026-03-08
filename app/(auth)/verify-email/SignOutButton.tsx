@@ -31,7 +31,7 @@ function SignOutButton() {
 			<AlertDialogTrigger asChild>
 				<Button
 					variant="destructive"
-					className="w-full px-8 md:px-4 cursor-none hover:opacity-95"
+					className="w-full px-8 md:px-4  hover:opacity-95"
 				>
 					Sign Out
 				</Button>
@@ -43,11 +43,8 @@ function SignOutButton() {
 					</AlertDialogTitle>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel className="cursor-none">Cancel</AlertDialogCancel>
-					<AlertDialogAction
-						className="cursor-none"
-						onClick={handleSignOutOnClick}
-					>
+					<AlertDialogCancel className="">Cancel</AlertDialogCancel>
+					<AlertDialogAction className="" onClick={handleSignOutOnClick}>
 						Sign Out
 					</AlertDialogAction>
 				</AlertDialogFooter>

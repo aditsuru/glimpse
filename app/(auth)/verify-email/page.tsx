@@ -41,7 +41,7 @@ async function VerifyEmail() {
 								</CardDescription>
 							</div>
 							<div className="w-full px-4 md:px-14 flex flex-col gap-2">
-								<ResendEmailButton className="w-full px-8 md:px-4 cursor-none" />
+								<ResendEmailButton className="w-full px-8 md:px-4 " />
 								<SignOutButton />
 							</div>
 						</FieldGroup>

@@ -64,7 +64,7 @@ function InputController<T extends FieldValues>({
 					<div className="w-full flex justify-between">
 						<FieldLabel
 							htmlFor={field.name}
-							className={`cursor-none ${formState.isSubmitting && "opacity-50"}`}
+							className={` ${formState.isSubmitting && "opacity-50"}`}
 						>
 							{label}
 						</FieldLabel>
@@ -80,7 +80,7 @@ function InputController<T extends FieldValues>({
 							aria-invalid={fieldState.invalid}
 							type={type}
 							disabled={formState.isSubmitting}
-							className={`cursor-none ${InputIcon ? "pl-10" : ""}`}
+							className={` ${InputIcon ? "pl-10" : ""}`}
 						/>
 					</div>
 					<AnimatePresence mode="wait">

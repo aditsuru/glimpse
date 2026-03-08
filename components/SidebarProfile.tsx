@@ -1,7 +1,7 @@
-import { CheckmarkBadge02Icon, UserIcon } from "@hugeicons/core-free-icons";
+import { CheckmarkBadge02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import InteractiveSidebarPfp from "./InteractiveSidebarPfp";
 import SidebarOptions from "./SidebarOptions";
 
 function SidebarProfile() {
@@ -9,12 +9,8 @@ function SidebarProfile() {
 		<>
 			{/* Profile */}
 			<div className="flex flex-col gap-4 justify-center items-center w-full p-2">
-				<Avatar className="w-48 h-48">
-					<AvatarImage src="https://github.com/aditsuru.png" alt="@shadcn" />
-					<AvatarFallback>
-						<HugeiconsIcon icon={UserIcon} size={48} />
-					</AvatarFallback>
-				</Avatar>
+				<InteractiveSidebarPfp />
+
 				<div className="flex flex-col items-center justify-center w-full gap-4">
 					{/* Name */}
 					<div className="flex flex-col items-center justify-center ">

@@ -112,7 +112,7 @@ function SignInForm() {
 									<FieldDescription>
 										<Link
 											href="/reset-password"
-											className={`cursor-none ${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
+											className={` ${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
 										>
 											Forgot password?
 										</Link>
@@ -146,7 +146,7 @@ function SignInForm() {
 								animate={{ opacity: isSubmitting ? 0.7 : 1 }}
 							>
 								<Button
-									className="w-full hover:opacity-90 font-bold cursor-none"
+									className="w-full hover:opacity-90 font-bold "
 									type="submit"
 									disabled={isSubmitting}
 								>
@@ -168,7 +168,7 @@ function SignInForm() {
 						<FieldGroup className="w-full flex md:flex-row gap-y-3">
 							<Button
 								variant="outline"
-								className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
+								className="flex-1 transition-all hover:scale-110 duration-125 "
 								disabled={isSubmitting}
 								onClick={async () => {
 									await authClient.signIn.social({
@@ -182,7 +182,7 @@ function SignInForm() {
 							</Button>
 							<Button
 								variant="outline"
-								className="flex-1 transition-all hover:scale-110 duration-125 cursor-none"
+								className="flex-1 transition-all hover:scale-110 duration-125 "
 								disabled={isSubmitting}
 								onClick={async () => {
 									await authClient.signIn.social({
@@ -199,7 +199,7 @@ function SignInForm() {
 							className={`flex justify-center gap-1  ${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
 						>
 							Don't have an account?{" "}
-							<Link href="/sign-up" className={"cursor-none"}>
+							<Link href="/sign-up" className={""}>
 								Sign up here
 							</Link>
 						</FieldDescription>

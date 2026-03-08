@@ -35,7 +35,7 @@ function PostCard() {
 							<p className="text-lg font-semibold">Lorem, ipsum.</p>
 							<HugeiconsIcon
 								icon={CheckmarkBadge02Icon}
-								size={24}
+								size={22}
 								className="text-primary shrink-0 translate-y-px"
 							/>
 						</div>

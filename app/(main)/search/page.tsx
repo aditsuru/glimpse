@@ -32,7 +32,7 @@ function Search() {
 		<div className="mt-8 flex flex-col items-center gap-4 w-full flex-1 min-h-0">
 			{/* Search */}
 			<InputGroup className="max-w-sm">
-				<InputGroupInput placeholder="Search a user" className="cursor-none" />
+				<InputGroupInput placeholder="Search a user" className="" />
 				<InputGroupAddon>
 					<HugeiconsIcon icon={Search01Icon} />
 				</InputGroupAddon>
@@ -54,7 +54,7 @@ function Search() {
 						<ItemActions>
 							<Button
 								variant="ghost"
-								className="hover:bg-background hover:text-accent cursor-none transition-all duration-150 font-medium"
+								className="hover:bg-background hover:text-accent  transition-all duration-150 font-medium"
 							>
 								Follow
 							</Button>
