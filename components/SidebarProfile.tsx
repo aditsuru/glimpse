@@ -25,26 +25,31 @@ function SidebarProfile() {
 						<h2 className="text-base text-muted-foreground">@username</h2>
 					</div>
 					{/* Stats */}
-					<div className="flex justify-between w-full">
-						<div className="flex flex-col gap-2 text-lg text-center">
-							<p className="font-semibold">472</p>
-							<p className="text-muted-foreground">Posts</p>
+					<div className="flex items-center justify-center w-full py-4 border-y lg:border-none">
+						{/* Posts */}
+						<div className="flex flex-col items-center flex-1">
+							<span className="text-xl font-bold leading-none">472</span>
+							<span className="text-sm text-muted-foreground mt-1">Posts</span>
 						</div>
-						<Separator
-							orientation="vertical"
-							className="h-8! hidden lg:block"
-						/>
-						<div className="flex flex-col gap-2 text-lg text-center">
-							<p className="font-semibold">12.4K</p>
-							<p className="text-muted-foreground">Followers</p>
+
+						<Separator orientation="vertical" className="h-8" />
+
+						{/* Followers */}
+						<div className="flex flex-col items-center flex-1">
+							<span className="text-xl font-bold leading-none">12.4K</span>
+							<span className="text-sm text-muted-foreground mt-1">
+								Followers
+							</span>
 						</div>
-						<Separator
-							orientation="vertical"
-							className="h-8! hidden lg:block"
-						/>
-						<div className="flex flex-col gap-2 text-lg text-center">
-							<p className="font-semibold">228</p>
-							<p className="text-muted-foreground">Following</p>
+
+						<Separator orientation="vertical" className="h-8" />
+
+						{/* Following */}
+						<div className="flex flex-col items-center flex-1">
+							<span className="text-xl font-bold leading-none">228</span>
+							<span className="text-sm text-muted-foreground mt-1">
+								Following
+							</span>
 						</div>
 					</div>
 					{/* Bio */}

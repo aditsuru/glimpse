@@ -35,8 +35,8 @@ function SidebarSearch() {
 			{/* Results */}
 			<div className="flex-1 w-full px-4 overflow-y-auto custom-scrollbar">
 				<Link href="/profile/aditsuru" className="">
-					<ItemGroup className="w-full transition-all duration-150 hover:scale-105 hover:grayscale">
-						<Item className="flex">
+					<ItemGroup className="border w-sm transition-all duration-150 hover:scale-105 hover:grayscale">
+						<Item className="flex justify-between w-full">
 							<ItemMedia className="flex items-center justify-center">
 								<Avatar className="w-10 h-10">
 									<AvatarImage src="https://github.com/aditsuru.png" />
@@ -56,11 +56,6 @@ function SidebarSearch() {
 								</div>
 								<ItemDescription>Lorem, ipsum.</ItemDescription>
 							</ItemContent>
-							<ItemActions>
-								<p className="hidden xl:block hover:brightness-75  transition-all duration-150 font-medium">
-									Follow
-								</p>
-							</ItemActions>
 						</Item>
 					</ItemGroup>
 				</Link>
