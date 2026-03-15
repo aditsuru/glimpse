@@ -23,7 +23,17 @@ type Paginated<T> = {
 
 ## Endpoints
 
-### 1. Posts
+### 1. Feed
+
+#### Get Feed
+
+| Field            | Value                                                                                                                      |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Route**        | `os.feed`                                                                                                                  |
+| **Return Type**  | `Paginated<Post>` — includes views, likes, comments, and bookmark counts; `hasUserLiked` and `hasUserBookmarked` booleans. |
+| **Requirements** | Auth headers + `CursorMetaData` (optional) — see `feed.md` for full pagination spec                                        |
+
+### 2. Posts
 
 #### Get Post
 
@@ -63,7 +73,7 @@ attachments: Attachment[];
 
 ---
 
-### 2. Likes
+### 3. Likes
 
 #### Post Likes
 
@@ -89,7 +99,7 @@ _Requirements: `commentId` + auth headers_
 
 ---
 
-### 3. Comments
+### 4. Comments
 
 #### Get Post Comments
 
@@ -133,7 +143,7 @@ _Requirements: `commentId` + auth headers_
 
 ---
 
-### 4. Followers
+### 5. Followers
 
 | Operation      | Route                      | Returns                  |
 | -------------- | -------------------------- | ------------------------ |
@@ -147,7 +157,7 @@ _Follow / Unfollow — Requirements: `userId` + auth headers_
 
 ---
 
-### 5. Bookmarks
+### 65. Bookmarks
 
 | Operation             | Route                            | Returns           |
 | --------------------- | -------------------------------- | ----------------- |
@@ -161,7 +171,7 @@ _Get Bookmarks History — Requirements: auth headers + optional `cursor`_
 
 ---
 
-### 6. Profile
+### 7. Profile
 
 #### Get Profile
 
@@ -203,7 +213,7 @@ _Get Bookmarks History — Requirements: auth headers + optional `cursor`_
 | **Return Type**  | Boolean                 |
 | **Requirements** | `email`                 |
 
-### 7. Get Presigned Upload URL
+### 8. Get Presigned Upload URL
 
 | Field            | Value                                       |
 | ---------------- | ------------------------------------------- |
