@@ -3,7 +3,6 @@
 <div align="left">
 
 [![Stars](https://img.shields.io/github/stars/aditsuru/glimpse?style=flat)][stars-url]
-[![License](https://img.shields.io/github/license/aditsuru/glimpse?color=2b9348&style=flat)][license-url]
 [![Discord](https://img.shields.io/discord/1313767817996402698?style=flat&logo=discord&logoColor=white&label=Discord&color=5865F2)][discord-url]
 ![Visitors](https://visitor-badge.laobi.icu/badge?page_id=aditsuru.glimpse)
 
@@ -78,3 +77,6 @@ View tracking is batched — counts are written to Redis on scroll and flushed t
 - Presigned URL pattern for direct browser-to-S3 uploads
 - Managing auth route groups with custom middleware instead of relying on library defaults
 - Structuring a tRPC API with consistent return types and shared pagination contracts
+
+[stars-url]: https://github.com/aditsuru/glimpse/stargazers
+[discord-url]: https://discord.gg/YOUR_INVITE_CODE
