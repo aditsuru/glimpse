@@ -35,6 +35,7 @@ userId              foreign key
 avatarUrl           text
 bannerUrl           text
 bio                 text
+website             text
 isGlimpseVerified   boolean
 createdAt           datetime
 updatedAt           datetime
@@ -45,6 +46,7 @@ updatedAt           datetime
 ## Comments
 
 ```text
+id                  primary key
 postId              foreign key
 userId              foreign key
 parentCommentId     foreign key
@@ -65,6 +67,8 @@ userId              foreign key
 createdAt           datetime
 ```
 
+- both the foreign keys in a pair form the primary key, therefore are always unique.
+
 2. Comments
 
 ```text
@@ -83,6 +87,8 @@ followingId         foreign key
 createdAt           datetime
 ```
 
+- both the foreign keys in a pair form the primary key, therefore are always unique.
+
 ## Bookmarks
 
 ```text
@@ -90,3 +96,5 @@ postId              foreign key
 userId              foreign key
 createdAt           datetime
 ```
+
+- both the foreign keys in a pair form the primary key, therefore are always unique.
