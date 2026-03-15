@@ -140,3 +140,4 @@ _Requirements: `postId` + auth headers_
 - **Update Profile** — `os.profile.update` | Returns: success boolean | Requirements: profile fields + auth headers
 - **Check Username Availability** — `os.profile.checkUsername` | Returns: boolean | Requirements: `username`
 - **Check Email Availability** — `os.profile.checkEmail` | Returns: boolean | Requirements: `email`
+- **Search Users** - `os.profile.searchUsers` | Returns: array of profile objects | Requirements: `username`
