@@ -8,7 +8,9 @@
 		"start": "next start",
 		"lint": "biome check --write",
 		"format": "biome format --write",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate"
 	},
 	"dependencies": {
 		"@neondatabase/serverless": "^1.0.2",
