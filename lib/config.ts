@@ -18,6 +18,11 @@ export const config = createEnv({
 			.transform((val) => ms(val as StringValue) / 1000)
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
 			.default(300000), // Input ms value; Output seconds
+
+		GOOGLE_CLIENT_ID: z.string().nonempty(),
+		GOOGLE_CLIENT_SECRET: z.string().nonempty(),
+		GITHUB_CLIENT_ID: z.string().nonempty(),
+		GITHUB_CLIENT_SECRET: z.string().nonempty(),
 	},
 	client: {},
 	experimental__runtimeEnv: {},
