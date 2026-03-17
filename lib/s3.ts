@@ -10,3 +10,8 @@ export const s3 = new S3Client({
 		secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
 	},
 });
+
+export const StoragePrefix = {
+	UPLOADS: "uploads",
+	MEDIA: "media",
+} as const;

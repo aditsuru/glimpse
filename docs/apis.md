@@ -157,7 +157,7 @@ _Follow / Unfollow — Requirements: `userId` + auth headers_
 
 ---
 
-### 65. Bookmarks
+### 6. Bookmarks
 
 | Operation             | Route                            | Returns           |
 | --------------------- | -------------------------------- | ----------------- |
