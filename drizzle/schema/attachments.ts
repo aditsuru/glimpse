@@ -7,13 +7,10 @@ import {
 	timestamp,
 	uuid,
 } from "drizzle-orm/pg-core";
+import { ATTACHMENT_TYPES } from "@/lib/constants";
 import { postsTable } from "./posts";
 
-export const attachmentTypeEnum = pgEnum("attachment_type", [
-	"image",
-	"gif",
-	"video",
-]);
+export const attachmentTypeEnum = pgEnum("attachment_type", ATTACHMENT_TYPES);
 
 export const attachmentsTable = pgTable(
 	"attachments",

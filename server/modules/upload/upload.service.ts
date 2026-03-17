@@ -3,17 +3,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { ORPCError } from "@orpc/server";
 import { nanoid } from "nanoid";
 import type * as z from "zod";
-import { s3 } from "@/lib/s3";
+import { ALLOWED_FILES_TYPES } from "@/lib/constants";
+import { StoragePrefix, s3 } from "@/lib/s3";
 import type { uploadSchema } from "./upload.schema";
-
-const ALLOWED_TYPES = [
-	"image/jpeg",
-	"image/png",
-	"image/gif",
-	"image/webp",
-	"video/mp4",
-	"video/webm",
-];
 
 export class UploadService {
 	async getPresignedUrl({
@@ -22,14 +14,14 @@ export class UploadService {
 		z.infer<typeof uploadSchema.getPresignedUrl.output>
 	> {
 		// FileType check
-		if (!ALLOWED_TYPES.includes(fileType)) {
+		if (!(ALLOWED_FILES_TYPES as readonly string[]).includes(fileType)) {
 			throw new ORPCError("BAD_REQUEST", {
 				message: "File type not allowed",
 			});
 		}
 
 		// Main logic
-		const key = `uploads/${nanoid(10)}`;
+		const key = `${StoragePrefix.UPLOADS}/${nanoid(10)}`;
 		const bucket = process.env.R2_BUCKET_NAME as string; // TODO: Update to use config module when credentials are available
 
 		const command = new PutObjectCommand({
