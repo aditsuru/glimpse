@@ -6,7 +6,7 @@ export async function confirmUpload(tempKey: string) {
 	const bucket = process.env.R2_BUCKET_NAME as string;
 	const permanentKey = tempKey.replace(
 		StoragePrefix.UPLOADS,
-		StoragePrefix.UPLOADS
+		StoragePrefix.MEDIA
 	);
 
 	await s3.send(

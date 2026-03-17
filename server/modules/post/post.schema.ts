@@ -50,7 +50,10 @@ export const postSchema = {
 		}).extend({
 			attachments: z.array(AttachmentSchema).optional(),
 		}),
-		output: PostOutputSchema,
+		output: z.object({
+			success: z.boolean(),
+			postId: z.nanoid(),
+		}),
 	},
 	delete: {
 		input: z.object({
@@ -58,7 +61,7 @@ export const postSchema = {
 		}),
 		output: z.object({
 			success: z.boolean(),
-			id: z.nanoid(),
+			postId: z.nanoid(),
 		}),
 	},
 };

@@ -73,13 +73,13 @@ export class PostService {
 				.limit(1),
 		]);
 
-		let attachments: z.infer<typeof AttachmentSchema>[] = [];
+		let attachments: Omit<z.infer<typeof AttachmentSchema>, "fileKey">[] = [];
 
 		if (hasAttachments) {
 			attachments = await this.db
 				.select({
 					fileUrl: attachmentsTable.fileUrl,
-					fileType: attachmentsTable.type,
+					fileType: attachmentsTable.fileType,
 				})
 				.from(attachmentsTable)
 				.where(eq(attachmentsTable.postId, id));
@@ -128,7 +128,7 @@ export class PostService {
 					)
 				: [];
 
-		const result = await this.db.transaction(async (tx) => {
+		const postId = await this.db.transaction(async (tx) => {
 			const [newPost] = await tx
 				.insert(postsTable)
 				.values({
@@ -138,9 +138,8 @@ export class PostService {
 				})
 				.returning();
 
-			let savedAttachments: z.infer<typeof AttachmentSchema>[] = [];
 			if (attachments && attachments.length > 0) {
-				savedAttachments = await tx
+				await tx
 					.insert(attachmentsTable)
 					.values(
 						validatedAttachments.map((attr) => ({
@@ -153,25 +152,12 @@ export class PostService {
 					.returning();
 			}
 
-			return { newPost, savedAttachments };
+			return newPost.id;
 		});
 
-		const { updatedAt, ...post } = result.newPost;
-
 		return {
-			...post,
-			attachments: result.savedAttachments.map(({ fileUrl, fileType }) => ({
-				fileUrl,
-				fileType,
-			})),
-			hasAttachments: result.savedAttachments.length > 0,
-			hasUserLiked: false,
-			hasUserBookmarked: false,
-			likes: 0,
-			bookmarks: 0,
-			comments: 0,
-			views: 0,
-			body: result.newPost.body ?? undefined,
+			postId,
+			success: true,
 		};
 	}
 }
