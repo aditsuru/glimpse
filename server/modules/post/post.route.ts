@@ -21,4 +21,13 @@ export const postRouter = base.router({
 				viewerId: context.session.user.id,
 			});
 		}),
+	create: postProcedure
+		.input(postSchema.create.input)
+		.output(postSchema.create.output)
+		.handler(async ({ input, context }) => {
+			return await context.postService.create({
+				...input,
+				userId: context.session.user.id,
+			});
+		}),
 });

@@ -9,6 +9,7 @@ import {
 	postLikesTable,
 	postsTable,
 } from "@/drizzle/schema";
+import { confirmUpload } from "@/lib/helpers/s3-helper";
 import type { AttachmentSchema, postSchema } from "./post.schema";
 
 export class PostService {
@@ -97,6 +98,80 @@ export class PostService {
 			hasUserLiked: hasUserLikedQuery.length > 0,
 			hasUserBookmarked: hasUserBookmarkedQuery.length > 0,
 			attachments: hasAttachments ? attachments : undefined,
+		};
+	}
+
+	async create({
+		attachments,
+		body,
+		userId,
+	}: z.infer<typeof postSchema.create.input> & {
+		userId: string;
+	}): Promise<z.infer<typeof postSchema.create.output>> {
+		if (!attachments && !body)
+			throw new ORPCError("BAD_REQUEST", {
+				message:
+					"Post cannot be empty. Please provide either a text body or at least one attachment.",
+			});
+
+		const validatedAttachments =
+			attachments && attachments.length > 0
+				? await Promise.all(
+						attachments.map(async (attr) => {
+							const fileData = await confirmUpload(attr.fileKey);
+							return {
+								fileKey: fileData.fileKey,
+								fileUrl: fileData.fileUrl,
+								fileType: attr.fileType,
+							};
+						})
+					)
+				: [];
+
+		const result = await this.db.transaction(async (tx) => {
+			const [newPost] = await tx
+				.insert(postsTable)
+				.values({
+					userId,
+					body: body ? body : undefined,
+					hasAttachments: attachments ? attachments?.length > 0 : false,
+				})
+				.returning();
+
+			let savedAttachments: z.infer<typeof AttachmentSchema>[] = [];
+			if (attachments && attachments.length > 0) {
+				savedAttachments = await tx
+					.insert(attachmentsTable)
+					.values(
+						validatedAttachments.map((attr) => ({
+							postId: newPost.id,
+							fileUrl: attr.fileUrl,
+							fileType: attr.fileType,
+							fileKey: attr.fileKey,
+						}))
+					)
+					.returning();
+			}
+
+			return { newPost, savedAttachments };
+		});
+
+		const { updatedAt, ...post } = result.newPost;
+
+		return {
+			...post,
+			attachments: result.savedAttachments.map(({ fileUrl, fileType }) => ({
+				fileUrl,
+				fileType,
+			})),
+			hasAttachments: result.savedAttachments.length > 0,
+			hasUserLiked: false,
+			hasUserBookmarked: false,
+			likes: 0,
+			bookmarks: 0,
+			comments: 0,
+			views: 0,
+			body: result.newPost.body ?? undefined,
 		};
 	}
 }

@@ -6,6 +6,31 @@ export const AttachmentSchema = z.object({
 	fileType: z.enum(ATTACHMENT_TYPES, {
 		error: "Please upload a valid image or video file.",
 	}),
+	fileKey: z.string(),
+});
+
+const BasePostSchema = z.object({
+	id: z.nanoid(),
+	userId: z.string(),
+	body: z.string().optional(),
+	hasAttachments: z.boolean(),
+	createdAt: z.coerce.date(),
+	attachments: z
+		.array(
+			AttachmentSchema.omit({
+				fileKey: true,
+			})
+		)
+		.optional(),
+});
+
+const PostOutputSchema = BasePostSchema.extend({
+	hasUserLiked: z.boolean(),
+	hasUserBookmarked: z.boolean(),
+	likes: z.number().nonnegative(),
+	bookmarks: z.number().nonnegative(),
+	comments: z.number().nonnegative(),
+	views: z.number().nonnegative(),
 });
 
 export const postSchema = {
@@ -13,19 +38,27 @@ export const postSchema = {
 		input: z.object({
 			postId: z.string(),
 		}),
-		output: z.object({
-			id: z.nanoid(),
-			userId: z.string(),
-			body: z.string().optional(),
-			hasAttachments: z.boolean(),
-			views: z.number().nonnegative(),
-			likes: z.number().nonnegative(),
-			bookmarks: z.number().nonnegative(),
-			comments: z.number().nonnegative(),
-			createdAt: z.coerce.date(),
+		output: PostOutputSchema,
+	},
+	create: {
+		input: BasePostSchema.omit({
+			id: true,
+			createdAt: true,
+			userId: true,
+			attachments: true,
+			hasAttachments: true,
+		}).extend({
 			attachments: z.array(AttachmentSchema).optional(),
-			hasUserLiked: z.boolean(),
-			hasUserBookmarked: z.boolean(),
+		}),
+		output: PostOutputSchema,
+	},
+	delete: {
+		input: z.object({
+			postId: z.nanoid(),
+		}),
+		output: z.object({
+			success: z.boolean(),
+			id: z.nanoid(),
 		}),
 	},
 };

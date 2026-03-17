@@ -19,7 +19,7 @@ export const attachmentsTable = pgTable(
 		postId: text("post_id")
 			.notNull()
 			.references(() => postsTable.id, { onDelete: "cascade" }),
-		type: attachmentTypeEnum("type").notNull(),
+		fileType: attachmentTypeEnum("type").notNull(),
 		fileUrl: text("file_url").notNull(),
 		fileKey: text("file_key").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
