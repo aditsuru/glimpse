@@ -23,5 +23,19 @@ export async function confirmUpload(tempKey: string) {
 		})
 	);
 
-	return `${process.env.R2_PUBLIC_URL}/${permanentKey}`;
+	return {
+		fileUrl: `${process.env.R2_PUBLIC_URL}/${permanentKey}`,
+		fileKey: permanentKey,
+	};
+}
+
+export async function deleteFile(key: string) {
+	const bucket = process.env.R2_BUCKET_NAME as string;
+
+	await s3.send(
+		new DeleteObjectCommand({
+			Bucket: bucket,
+			Key: key,
+		})
+	);
 }

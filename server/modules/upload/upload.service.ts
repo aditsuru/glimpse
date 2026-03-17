@@ -21,18 +21,18 @@ export class UploadService {
 		}
 
 		// Main logic
-		const key = `${StoragePrefix.UPLOADS}/${nanoid(10)}`;
+		const fileKey = `${StoragePrefix.UPLOADS}/${nanoid(10)}`;
 		const bucket = process.env.R2_BUCKET_NAME as string; // TODO: Update to use config module when credentials are available
 
 		const command = new PutObjectCommand({
 			Bucket: bucket,
-			Key: key,
+			Key: fileKey,
 			ContentType: fileType,
 		});
 
 		const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 60 });
-		const fileUrl = `${process.env.R2_PUBLIC_URL}/${key}`; // TODO: Update to use config module when credentials are available
+		const fileUrl = `${process.env.R2_PUBLIC_URL}/${fileKey}`; // TODO: Update to use config module when credentials are available
 
-		return { presignedUrl, fileUrl };
+		return { presignedUrl, fileUrl, fileKey };
 	}
 }

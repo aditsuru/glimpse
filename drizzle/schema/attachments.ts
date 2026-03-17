@@ -21,6 +21,7 @@ export const attachmentsTable = pgTable(
 			.references(() => postsTable.id, { onDelete: "cascade" }),
 		type: attachmentTypeEnum("type").notNull(),
 		fileUrl: text("file_url").notNull(),
+		fileKey: text("file_key").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),
