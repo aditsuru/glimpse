@@ -30,4 +30,13 @@ export const postRouter = base.router({
 				userId: context.session.user.id,
 			});
 		}),
+	delete: postProcedure
+		.input(postSchema.delete.input)
+		.output(postSchema.delete.output)
+		.handler(async ({ input, context }) => {
+			return await context.postService.delete({
+				...input,
+				userId: context.session.user.id,
+			});
+		}),
 });

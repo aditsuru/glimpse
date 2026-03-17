@@ -9,7 +9,8 @@ import {
 	postLikesTable,
 	postsTable,
 } from "@/drizzle/schema";
-import { confirmUpload } from "@/lib/helpers/s3-helper";
+import { confirmUpload, deleteFile } from "@/lib/helpers/s3-helper";
+import { logger } from "@/lib/logger";
 import type { AttachmentSchema, postSchema } from "./post.schema";
 
 export class PostService {
@@ -158,6 +159,55 @@ export class PostService {
 		return {
 			postId,
 			success: true,
+		};
+	}
+
+	async delete({
+		postId,
+		userId,
+	}: z.infer<typeof postSchema.delete.input> & {
+		userId: string;
+	}): Promise<z.infer<typeof postSchema.delete.output>> {
+		const keys = await this.db.transaction(async (tx) => {
+			const [post] = await tx
+				.select()
+				.from(postsTable)
+				.where(and(eq(postsTable.id, postId), eq(postsTable.userId, userId)))
+				.limit(1);
+
+			if (!post) {
+				throw new ORPCError("NOT_FOUND", {
+					message: "Post not found or you do not have permission to delete it.",
+				});
+			}
+
+			let keys: string[] = [];
+			if (post.hasAttachments) {
+				const attachments = await tx
+					.select({
+						fileKey: attachmentsTable.fileKey,
+					})
+					.from(attachmentsTable)
+					.where(eq(attachmentsTable.postId, postId));
+
+				keys = attachments.map(({ fileKey }) => fileKey);
+			}
+
+			await tx.delete(postsTable).where(eq(postsTable.id, postId));
+			return keys;
+		});
+
+		if (keys.length > 0) {
+			Promise.all(
+				keys.map(async (fileKey) => {
+					await deleteFile(fileKey);
+				})
+			).catch((err) => logger.error("Failed to cleanup S3 files:", err));
+		}
+
+		return {
+			success: true,
+			postId,
 		};
 	}
 }
