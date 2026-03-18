@@ -8,6 +8,8 @@ import {
 	commentsTable,
 	postLikesTable,
 	postsTable,
+	profilesTable,
+	user,
 } from "@/drizzle/schema";
 import { confirmUpload, deleteFile } from "@/lib/helpers/s3-helper";
 import { logger } from "@/lib/logger";
@@ -33,11 +35,17 @@ export class PostService {
 				likes: count(postLikesTable.userId).as("likes"),
 				comments: count(commentsTable.id).as("comments"),
 				bookmarks: count(bookmarksTable.userId).as("bookmarks"),
+				authorName: user.name,
+				authorUsername: user.username,
+				authorAvatarUrl: profilesTable.avatarUrl,
+				authorIsVerified: profilesTable.isGlimpseVerified,
 			})
 			.from(postsTable)
 			.leftJoin(postLikesTable, eq(postLikesTable.postId, postsTable.id))
 			.leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
 			.leftJoin(bookmarksTable, eq(bookmarksTable.postId, postsTable.id))
+			.innerJoin(user, eq(user.id, postsTable.userId))
+			.innerJoin(profilesTable, eq(profilesTable.userId, postsTable.userId))
 			.where(eq(postsTable.id, postId))
 			.groupBy(postsTable.id);
 
@@ -55,6 +63,10 @@ export class PostService {
 			likes,
 			comments,
 			bookmarks,
+			authorAvatarUrl,
+			authorIsVerified,
+			authorName,
+			authorUsername,
 		} = post;
 
 		const [hasUserLikedQuery, hasUserBookmarkedQuery] = await Promise.all([
@@ -105,6 +117,10 @@ export class PostService {
 			hasUserLiked: hasUserLikedQuery.length > 0,
 			hasUserBookmarked: hasUserBookmarkedQuery.length > 0,
 			attachments: hasAttachments ? attachments : undefined,
+			authorAvatarUrl,
+			authorIsVerified,
+			authorName,
+			authorUsername,
 		};
 	}
 

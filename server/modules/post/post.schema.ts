@@ -31,6 +31,10 @@ const PostOutputSchema = BasePostSchema.extend({
 	bookmarks: z.number().nonnegative(),
 	comments: z.number().nonnegative(),
 	views: z.number().nonnegative(),
+	authorName: z.string(),
+	authorUsername: z.string(),
+	authorAvatarUrl: z.string().nullable(),
+	authorIsVerified: z.boolean(),
 });
 
 export const postSchema = {

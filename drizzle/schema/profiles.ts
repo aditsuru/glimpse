@@ -16,8 +16,10 @@ export const profilesTable = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		avatarUrl: text("avatar_url"),
-		bannerUrl: text("banner_url"),
+		avatarUrl: text("avatar_url").default("/defaults/avatar.png").notNull(),
+		bannerUrl: text("banner_url")
+			.default("/defaults/avatar-banner.png")
+			.notNull(),
 		bio: text("bio"),
 		website: text("website"),
 		isGlimpseVerified: boolean("is_glimpse_verified").default(false).notNull(),

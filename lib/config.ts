@@ -23,6 +23,11 @@ export const config = createEnv({
 		GOOGLE_CLIENT_SECRET: z.string().nonempty(),
 		GITHUB_CLIENT_ID: z.string().nonempty(),
 		GITHUB_CLIENT_SECRET: z.string().nonempty(),
+
+		// Business
+
+		// Pagination
+		COMMENTS_PAGINATION_LIMIT: z.coerce.number().positive(),
 	},
 	client: {},
 	experimental__runtimeEnv: {},
