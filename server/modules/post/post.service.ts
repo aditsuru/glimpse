@@ -22,36 +22,42 @@ export class PostService {
 	}: z.infer<typeof postSchema.get.input> & {
 		viewerId: string;
 	}): Promise<z.infer<typeof postSchema.get.output>> {
-		const post = (
-			await this.db.select().from(postsTable).where(eq(postsTable.id, postId))
-		)[0];
+		const [post] = await this.db
+			.select({
+				id: postsTable.id,
+				body: postsTable.body,
+				createdAt: postsTable.createdAt,
+				hasAttachments: postsTable.hasAttachments,
+				userId: postsTable.userId,
+				views: postsTable.views,
+				likes: count(postLikesTable.userId).as("likes"),
+				comments: count(commentsTable.id).as("comments"),
+				bookmarks: count(bookmarksTable.userId).as("bookmarks"),
+			})
+			.from(postsTable)
+			.leftJoin(postLikesTable, eq(postLikesTable.postId, postsTable.id))
+			.leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+			.leftJoin(bookmarksTable, eq(bookmarksTable.postId, postsTable.id))
+			.where(eq(postsTable.id, postId))
+			.groupBy(postsTable.id);
 
 		if (!post) {
 			throw new ORPCError("NOT_FOUND", { message: "Post not found" });
 		}
 
-		const { id, body, createdAt, hasAttachments, userId, views } = post;
+		const {
+			id,
+			body,
+			createdAt,
+			hasAttachments,
+			userId,
+			views,
+			likes,
+			comments,
+			bookmarks,
+		} = post;
 
-		// TODO: optimize with joins
-		const [
-			likesCount,
-			commentsCount,
-			bookmarksCount,
-			hasUserLikedQuery,
-			hasUserBookmarkedQuery,
-		] = await Promise.all([
-			this.db
-				.select({ count: count() })
-				.from(postLikesTable)
-				.where(eq(postLikesTable.postId, id)),
-			this.db
-				.select({ count: count() })
-				.from(commentsTable)
-				.where(eq(commentsTable.postId, id)),
-			this.db
-				.select({ count: count() })
-				.from(bookmarksTable)
-				.where(eq(bookmarksTable.postId, id)),
+		const [hasUserLikedQuery, hasUserBookmarkedQuery] = await Promise.all([
 			this.db
 				.select()
 				.from(postLikesTable)
@@ -93,9 +99,9 @@ export class PostService {
 			hasAttachments,
 			userId,
 			views,
-			likes: Number(likesCount[0].count),
-			comments: Number(commentsCount[0].count),
-			bookmarks: Number(bookmarksCount[0].count),
+			likes: Number(likes),
+			comments: Number(comments),
+			bookmarks: Number(bookmarks),
 			hasUserLiked: hasUserLikedQuery.length > 0,
 			hasUserBookmarked: hasUserBookmarkedQuery.length > 0,
 			attachments: hasAttachments ? attachments : undefined,
