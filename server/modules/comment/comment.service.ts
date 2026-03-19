@@ -156,6 +156,67 @@ export class CommentService {
 		);
 	}
 
+	async create({
+		parentCommentId,
+		postId,
+		body,
+		userId,
+	}: z.infer<typeof commentSchema.create.input> & {
+		userId: string;
+	}): Promise<z.infer<typeof commentSchema.create.output>> {
+		if (parentCommentId) {
+			const [parent] = await this.db
+				.select()
+				.from(commentsTable)
+				.where(eq(commentsTable.id, parentCommentId))
+				.limit(1);
+
+			if (!parent)
+				throw new ORPCError("NOT_FOUND", { message: "Comment not found" });
+			if (parent.parentCommentId)
+				throw new ORPCError("BAD_REQUEST", {
+					message: "More than one level of nesting is not allowed",
+				});
+		}
+
+		const [comment] = await this.db
+			.insert(commentsTable)
+			.values({
+				userId,
+				parentCommentId,
+				postId,
+				body,
+			})
+			.returning();
+
+		return {
+			commentId: comment.id,
+		};
+	}
+
+	async delete({
+		commentId,
+		userId,
+	}: z.infer<typeof commentSchema.delete.input> & {
+		userId: string;
+	}): Promise<z.infer<typeof commentSchema.delete.output>> {
+		const [comment] = await this.db
+			.delete(commentsTable)
+			.where(
+				and(eq(commentsTable.id, commentId), eq(commentsTable.userId, userId))
+			)
+			.returning();
+
+		if (!comment)
+			throw new ORPCError("NOT_FOUND", {
+				message: "Comment not found or you don't have permission to delete it",
+			});
+
+		return {
+			commentId: comment.id,
+		};
+	}
+
 	// Helper methods
 	private async buildCommentPage<
 		C extends {

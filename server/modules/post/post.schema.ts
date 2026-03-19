@@ -55,7 +55,6 @@ export const postSchema = {
 			attachments: z.array(AttachmentSchema).optional(),
 		}),
 		output: z.object({
-			success: z.boolean(),
 			postId: z.nanoid(),
 		}),
 	},
@@ -64,7 +63,6 @@ export const postSchema = {
 			postId: z.nanoid(),
 		}),
 		output: z.object({
-			success: z.boolean(),
 			postId: z.nanoid(),
 		}),
 	},

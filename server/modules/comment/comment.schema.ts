@@ -4,7 +4,7 @@ const BaseCommentSchema = z.object({
 	id: z.nanoid(),
 	userId: z.string(),
 	postId: z.string(),
-	body: z.string().optional(),
+	body: z.string(),
 	createdAt: z.coerce.date(),
 });
 
@@ -52,6 +52,24 @@ export const commentSchema = {
 				})
 			),
 			nextCursor: z.date().nullable(),
+		}),
+	},
+	create: {
+		input: BaseCommentSchema.omit({
+			id: true,
+			createdAt: true,
+			userId: true,
+		}).extend({
+			parentCommentId: z.nanoid().optional(),
+		}),
+		output: z.object({
+			commentId: z.nanoid(),
+		}),
+	},
+	delete: {
+		input: z.object({ commentId: z.string() }),
+		output: z.object({
+			commentId: z.nanoid(),
 		}),
 	},
 };

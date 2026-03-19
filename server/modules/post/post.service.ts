@@ -180,7 +180,6 @@ export class PostService {
 
 		return {
 			postId,
-			success: true,
 		};
 	}
 
@@ -228,7 +227,6 @@ export class PostService {
 		}
 
 		return {
-			success: true,
 			postId,
 		};
 	}
