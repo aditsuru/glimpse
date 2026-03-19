@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { and, count, eq, gt, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, lt } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import {
@@ -53,12 +53,116 @@ export class CommentService {
 			.where(
 				and(
 					eq(commentsTable.postId, postId),
-					nextCursor ? gt(commentsTable.createdAt, nextCursor) : undefined
+					nextCursor ? lt(commentsTable.createdAt, nextCursor) : undefined
 				)
 			)
 			.groupBy(commentsTable.id)
+			.orderBy(desc(commentsTable.createdAt))
 			.limit(config.COMMENTS_PAGINATION_LIMIT + 1);
 
+		return this.buildCommentPage(
+			comments,
+			viewerId,
+			config.COMMENTS_PAGINATION_LIMIT
+		);
+	}
+
+	async getByComment({
+		parentCommentId,
+		nextCursor,
+		viewerId,
+	}: z.infer<typeof commentSchema.getByComment.input> & {
+		viewerId: string;
+	}): Promise<z.infer<typeof commentSchema.getByComment.output>> {
+		const comments = await this.db
+			.select({
+				id: commentsTable.id,
+				body: commentsTable.body,
+				parentCommentId: commentsTable.parentCommentId,
+				userId: commentsTable.userId,
+				postId: commentsTable.postId,
+				createdAt: commentsTable.createdAt,
+				likes: count(commentLikesTable.userId).as("likes"),
+				authorAvatarUrl: profilesTable.avatarUrl,
+				authorName: user.name,
+				authorUsername: user.username,
+				authorIsVerified: profilesTable.isGlimpseVerified,
+			})
+			.from(commentsTable)
+			.leftJoin(
+				commentLikesTable,
+				eq(commentLikesTable.commentId, commentsTable.id)
+			)
+			.innerJoin(user, eq(user.id, commentsTable.userId))
+			.innerJoin(profilesTable, eq(profilesTable.userId, commentsTable.userId))
+			.where(
+				and(
+					eq(commentsTable.parentCommentId, parentCommentId),
+					nextCursor ? lt(commentsTable.createdAt, nextCursor) : undefined
+				)
+			)
+			.groupBy(commentsTable.id)
+			.orderBy(desc(commentsTable.createdAt))
+			.limit(config.COMMENTS_PAGINATION_LIMIT + 1);
+
+		return this.buildCommentPage(
+			comments,
+			viewerId,
+			config.COMMENTS_PAGINATION_LIMIT
+		);
+	}
+
+	async getCommentsHistory({
+		nextCursor,
+		viewerId,
+	}: z.infer<typeof commentSchema.getCommentsHistory.input> & {
+		viewerId: string;
+	}): Promise<z.infer<typeof commentSchema.getCommentsHistory.output>> {
+		const comments = await this.db
+			.select({
+				id: commentsTable.id,
+				body: commentsTable.body,
+				parentCommentId: commentsTable.parentCommentId,
+				postId: commentsTable.postId,
+				userId: commentsTable.userId,
+				createdAt: commentsTable.createdAt,
+				likes: count(commentLikesTable.userId).as("likes"),
+				authorAvatarUrl: profilesTable.avatarUrl,
+				authorName: user.name,
+				authorUsername: user.username,
+				authorIsVerified: profilesTable.isGlimpseVerified,
+			})
+			.from(commentsTable)
+			.leftJoin(
+				commentLikesTable,
+				eq(commentLikesTable.commentId, commentsTable.id)
+			)
+			.innerJoin(user, eq(user.id, commentsTable.userId))
+			.innerJoin(profilesTable, eq(profilesTable.userId, commentsTable.userId))
+			.where(
+				and(
+					eq(commentsTable.userId, viewerId),
+					nextCursor ? lt(commentsTable.createdAt, nextCursor) : undefined
+				)
+			)
+			.groupBy(commentsTable.id)
+			.orderBy(desc(commentsTable.createdAt))
+			.limit(config.COMMENTS_PAGINATION_LIMIT + 1);
+
+		return this.buildCommentPage(
+			comments,
+			viewerId,
+			config.COMMENTS_PAGINATION_LIMIT
+		);
+	}
+
+	// Helper methods
+	private async buildCommentPage<
+		C extends {
+			id: string;
+			createdAt: Date;
+		},
+	>(comments: C[], viewerId: string, limit: number) {
 		let hasUserLikedMap = new Set();
 		if (comments.length > 0) {
 			const commentsLikedByUserWithinLimit = await this.db
@@ -86,11 +190,9 @@ export class CommentService {
 			hasUserLiked: hasUserLikedMap.has(c.id),
 		}));
 
-		const hasNextPage = commentsMap.length > config.COMMENTS_PAGINATION_LIMIT;
+		const hasNextPage = commentsMap.length > limit;
 
-		const items = hasNextPage
-			? commentsMap.slice(0, config.COMMENTS_PAGINATION_LIMIT)
-			: commentsMap;
+		const items = hasNextPage ? commentsMap.slice(0, limit) : commentsMap;
 
 		return {
 			items,

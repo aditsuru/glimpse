@@ -21,4 +21,13 @@ export const commentRouter = base.router({
 				viewerId: context.session.user.id,
 			});
 		}),
+	getByComment: commentProcedure
+		.input(commentSchema.getByComment.input)
+		.output(commentSchema.getByComment.output)
+		.handler(async ({ input, context }) => {
+			return await context.commentService.getByComment({
+				...input,
+				viewerId: context.session.user.id,
+			});
+		}),
 });
