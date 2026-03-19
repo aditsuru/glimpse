@@ -14,14 +14,17 @@ export const commentSchema = {
 			postId: z.nanoid(),
 			nextCursor: z.date().optional(),
 		}),
-		output: z.array(
-			BaseCommentSchema.extend({
-				authorUsername: z.string(),
-				authorAvatarUrl: z.string().nullable(),
-				authorIsVerified: z.boolean(),
-				hasUserLiked: z.boolean(),
-				likes: z.number().nonnegative(),
-			})
-		),
+		output: z.object({
+			items: z.array(
+				BaseCommentSchema.extend({
+					authorUsername: z.string(),
+					authorAvatarUrl: z.string().nullable(),
+					authorIsVerified: z.boolean(),
+					hasUserLiked: z.boolean(),
+					likes: z.number().nonnegative(),
+				})
+			),
+			nextCursor: z.date().nullable(),
+		}),
 	},
 };

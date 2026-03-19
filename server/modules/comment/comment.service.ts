@@ -57,7 +57,7 @@ export class CommentService {
 				)
 			)
 			.groupBy(commentsTable.id)
-			.limit(config.COMMENTS_PAGINATION_LIMIT);
+			.limit(config.COMMENTS_PAGINATION_LIMIT + 1);
 
 		let hasUserLikedMap = new Set();
 		if (comments.length > 0) {
@@ -86,6 +86,15 @@ export class CommentService {
 			hasUserLiked: hasUserLikedMap.has(c.id),
 		}));
 
-		return commentsMap;
+		const hasNextPage = commentsMap.length > config.COMMENTS_PAGINATION_LIMIT;
+
+		const items = hasNextPage
+			? commentsMap.slice(0, config.COMMENTS_PAGINATION_LIMIT)
+			: commentsMap;
+
+		return {
+			items,
+			nextCursor: hasNextPage ? items[items.length - 1].createdAt : null,
+		};
 	}
 }
