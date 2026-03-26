@@ -24,7 +24,7 @@ const BasePostSchema = z.object({
 		.optional(),
 });
 
-const PostOutputSchema = BasePostSchema.extend({
+export const PostOutputSchema = BasePostSchema.extend({
 	hasUserLiked: z.boolean(),
 	hasUserBookmarked: z.boolean(),
 	likes: z.number().nonnegative(),

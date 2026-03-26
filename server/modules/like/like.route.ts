@@ -1,6 +1,32 @@
 import { authedProcedure, base } from "@/server/os";
 import { likeSchema } from "./like.schema";
-import { LikeCommentService, LikePostService } from "./like.service";
+import {
+	LikeCommentService,
+	LikePostService,
+	LikeProfileService,
+} from "./like.service";
+
+// Profile
+const likeProfileProcedure = authedProcedure.use(({ context, next }) => {
+	const likeProfileService = new LikeProfileService(context.db);
+	return next({
+		context: {
+			likeProfileService,
+		},
+	});
+});
+
+const likeProfileRouter = base.router({
+	getLikesHistory: likeProfileProcedure
+		.input(likeSchema.profile.getLikesHistory.input)
+		.output(likeSchema.profile.getLikesHistory.output)
+		.handler(async ({ input, context }) => {
+			return await context.likeProfileService.getLikesHistory({
+				...input,
+				viewerId: context.session.user.id,
+			});
+		}),
+});
 
 // Posts
 const likePostProcedure = authedProcedure.use(({ context, next }) => {
@@ -83,4 +109,5 @@ const likeCommentRouter = base.router({
 export const likeRouter = base.router({
 	post: likePostRouter,
 	comment: likeCommentRouter,
+	profile: likeProfileRouter,
 });

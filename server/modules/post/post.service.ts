@@ -18,6 +18,7 @@ import type { AttachmentSchema, postSchema } from "./post.schema";
 export class PostService {
 	constructor(private db: typeof DBType) {}
 
+	// --- AI GUIDED START ---
 	async get({
 		postId,
 		viewerId,
@@ -123,6 +124,7 @@ export class PostService {
 			authorUsername,
 		};
 	}
+	// --- AI GUIDED END ---
 
 	async create({
 		attachments,
