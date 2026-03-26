@@ -11,7 +11,11 @@ import {
 	profilesTable,
 	user,
 } from "@/drizzle/schema";
-import { confirmUpload, deleteFile } from "@/lib/helpers/s3-helper";
+import {
+	confirmUpload,
+	deleteFile,
+	getPermanentKeyAndUrl,
+} from "@/lib/helpers/s3-helper";
 import { logger } from "@/lib/logger";
 import type { AttachmentSchema, postSchema } from "./post.schema";
 
@@ -139,19 +143,19 @@ export class PostService {
 					"Post cannot be empty. Please provide either a text body or at least one attachment.",
 			});
 
-		const validatedAttachments =
-			attachments && attachments.length > 0
-				? await Promise.all(
-						attachments.map(async (attr) => {
-							const fileData = await confirmUpload(attr.fileKey);
-							return {
-								fileKey: fileData.fileKey,
-								fileUrl: fileData.fileUrl,
-								fileType: attr.fileType,
-							};
-						})
-					)
-				: [];
+		const hasAttachments = !!(attachments && attachments.length > 0);
+		let validatedAttachments: z.infer<typeof AttachmentSchema>[] = [];
+
+		if (hasAttachments) {
+			validatedAttachments = attachments.map((attr) => {
+				const { fileUrl, permanentKey } = getPermanentKeyAndUrl(attr.fileKey);
+				return {
+					fileKey: permanentKey,
+					fileUrl,
+					fileType: attr.fileType,
+				};
+			});
+		}
 
 		const postId = await this.db.transaction(async (tx) => {
 			const [newPost] = await tx
@@ -159,11 +163,11 @@ export class PostService {
 				.values({
 					userId,
 					body: body ? body : undefined,
-					hasAttachments: attachments ? attachments?.length > 0 : false,
+					hasAttachments,
 				})
 				.returning();
 
-			if (attachments && attachments.length > 0) {
+			if (hasAttachments) {
 				await tx
 					.insert(attachmentsTable)
 					.values(
@@ -179,6 +183,13 @@ export class PostService {
 
 			return newPost.id;
 		});
+
+		hasAttachments &&
+			(await Promise.all(
+				attachments.map(async (attr) => {
+					await confirmUpload(attr.fileKey);
+				})
+			));
 
 		return {
 			postId,
