@@ -1,0 +1,10 @@
+import * as z from "zod";
+
+export const {{name}}Schema = {
+    get: {
+        input: z.object({
+            {{name}}Id: z.string(),
+        }),
+        output: z.object({})
+    }
+}
