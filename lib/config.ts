@@ -19,16 +19,17 @@ export const config = createEnv({
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
 			.default(300000), // Input ms value; Output seconds
 
-		GOOGLE_CLIENT_ID: z.string().nonempty(),
-		GOOGLE_CLIENT_SECRET: z.string().nonempty(),
-		GITHUB_CLIENT_ID: z.string().nonempty(),
-		GITHUB_CLIENT_SECRET: z.string().nonempty(),
+		GOOGLE_CLIENT_ID: z.string(),
+		GOOGLE_CLIENT_SECRET: z.string(),
+		GITHUB_CLIENT_ID: z.string(),
+		GITHUB_CLIENT_SECRET: z.string(),
 
 		// Business
 
 		// Pagination
-		COMMENTS_PAGINATION_LIMIT: z.coerce.number().positive(),
-		POSTS_PAGINATION_LIMIT: z.coerce.number().positive(),
+		COMMENTS_PAGINATION_LIMIT: z.coerce.number().positive().default(10),
+		POSTS_PAGINATION_LIMIT: z.coerce.number().positive().default(10),
+		PROFILE_PAGINATION_LIMIT: z.coerce.number().positive().default(10),
 	},
 	client: {},
 	experimental__runtimeEnv: {},
