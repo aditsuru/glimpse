@@ -1,4 +1,4 @@
-import { commentRouter } from "./modules/comment/comment.router";
+import { commentRouter } from "./modules/comment/comment.route";
 import { postRouter } from "./modules/post/post.route";
 import { uploadRouter } from "./modules/upload/upload.route";
 import { base } from "./os";
