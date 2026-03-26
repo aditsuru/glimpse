@@ -28,7 +28,7 @@ export const config = createEnv({
 
 		// Pagination
 		COMMENTS_PAGINATION_LIMIT: z.coerce.number().positive(),
-		LIKES_PAGINATION_LIMIT: z.coerce.number().positive(),
+		POSTS_PAGINATION_LIMIT: z.coerce.number().positive(),
 	},
 	client: {},
 	experimental__runtimeEnv: {},

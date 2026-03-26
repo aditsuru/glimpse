@@ -39,14 +39,6 @@ const likePostProcedure = authedProcedure.use(({ context, next }) => {
 });
 
 const likePostRouter = base.router({
-	getLikes: likePostProcedure
-		.input(likeSchema.post.getLikes.input)
-		.output(likeSchema.post.getLikes.output)
-		.handler(async ({ input, context }) => {
-			return await context.likePostService.getLikes({
-				...input,
-			});
-		}),
 	add: likePostProcedure
 		.input(likeSchema.post.add.input)
 		.output(likeSchema.post.add.output)
@@ -78,14 +70,6 @@ const likeCommentProcedure = authedProcedure.use(({ context, next }) => {
 });
 
 const likeCommentRouter = base.router({
-	getLikes: likeCommentProcedure
-		.input(likeSchema.comment.getLikes.input)
-		.output(likeSchema.comment.getLikes.output)
-		.handler(async ({ input, context }) => {
-			return await context.likeCommentService.getLikes({
-				...input,
-			});
-		}),
 	add: likeCommentProcedure
 		.input(likeSchema.comment.add.input)
 		.output(likeSchema.comment.add.output)
