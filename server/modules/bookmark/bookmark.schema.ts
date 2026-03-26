@@ -30,12 +30,4 @@ export const bookmarkSchema = {
 			count: z.number().nonnegative(),
 		}),
 	},
-	getBookmarks: {
-		input: z.object({
-			postId: z.nanoid(),
-		}),
-		output: z.object({
-			count: z.number().nonnegative(),
-		}),
-	},
 };

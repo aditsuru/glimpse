@@ -63,37 +63,22 @@ export class LikeProfileService {
 			.orderBy(desc(userLikes.createdAt))
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
-		const [hasUserLikedQuery, hasUserBookmarkedQuery] =
+		const hasUserBookmarkedQuery =
 			posts.length > 0
-				? await Promise.all([
-						this.db
-							.select({ postId: postLikesTable.postId })
-							.from(postLikesTable)
-							.where(
-								and(
-									eq(postLikesTable.userId, viewerId),
-									inArray(
-										postLikesTable.postId,
-										posts.map((p) => p.id)
-									)
+				? await this.db
+						.select({ postId: bookmarksTable.postId })
+						.from(bookmarksTable)
+						.where(
+							and(
+								eq(bookmarksTable.userId, viewerId),
+								inArray(
+									bookmarksTable.postId,
+									posts.map((p) => p.id)
 								)
-							),
-						this.db
-							.select({ postId: bookmarksTable.postId })
-							.from(bookmarksTable)
-							.where(
-								and(
-									eq(bookmarksTable.userId, viewerId),
-									inArray(
-										bookmarksTable.postId,
-										posts.map((p) => p.id)
-									)
-								)
-							),
-					])
-				: [[], []];
+							)
+						)
+				: [];
 
-		const likedSet = new Set(hasUserLikedQuery.map((r) => r.postId));
 		const bookmarkedSet = new Set(hasUserBookmarkedQuery.map((r) => r.postId));
 
 		const attachmentsMap = new Map<
@@ -134,9 +119,9 @@ export class LikeProfileService {
 			comments: Number(post.comments),
 			bookmarks: Number(post.bookmarks),
 			body: post.body ?? undefined,
-			hasUserLiked: likedSet.has(post.id),
+			hasUserLiked: true,
 			hasUserBookmarked: bookmarkedSet.has(post.id),
-			attachments: attachmentsMap.get(post.id),
+			attachments: attachmentsMap.get(post.id) ?? undefined,
 		}));
 
 		const hasNextPage = items.length > config.POSTS_PAGINATION_LIMIT;
@@ -157,9 +142,9 @@ export class LikePostService {
 
 	private async getLikes({
 		postId,
-	}: z.infer<typeof likeSchema.post.getLikes.input>): Promise<
-		z.infer<typeof likeSchema.post.getLikes.output>
-	> {
+	}: {
+		postId: string;
+	}): Promise<{ count: number }> {
 		const [{ count: likesCount }] = await this.db
 			.select({ count: count() })
 			.from(postLikesTable)
@@ -219,9 +204,9 @@ export class LikeCommentService {
 
 	private async getLikes({
 		commentId,
-	}: z.infer<typeof likeSchema.comment.getLikes.input>): Promise<
-		z.infer<typeof likeSchema.comment.getLikes.output>
-	> {
+	}: {
+		commentId: string;
+	}): Promise<{ count: number }> {
 		const likesCount = await this.db
 			.select({ count: count() })
 			.from(commentLikesTable)

@@ -64,38 +64,23 @@ export class BookmarkService {
 			.orderBy(desc(userBookmarks.createdAt))
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
-		const [hasUserLikedQuery, hasUserBookmarkedQuery] =
+		const hasUserLikedQuery =
 			posts.length > 0
-				? await Promise.all([
-						this.db
-							.select({ postId: postLikesTable.postId })
-							.from(postLikesTable)
-							.where(
-								and(
-									eq(postLikesTable.userId, viewerId),
-									inArray(
-										postLikesTable.postId,
-										posts.map((p) => p.id)
-									)
+				? await this.db
+						.select({ postId: postLikesTable.postId })
+						.from(postLikesTable)
+						.where(
+							and(
+								eq(postLikesTable.userId, viewerId),
+								inArray(
+									postLikesTable.postId,
+									posts.map((p) => p.id)
 								)
-							),
-						this.db
-							.select({ postId: bookmarksTable.postId })
-							.from(bookmarksTable)
-							.where(
-								and(
-									eq(bookmarksTable.userId, viewerId),
-									inArray(
-										bookmarksTable.postId,
-										posts.map((p) => p.id)
-									)
-								)
-							),
-					])
-				: [[], []];
+							)
+						)
+				: [];
 
 		const likedSet = new Set(hasUserLikedQuery.map((r) => r.postId));
-		const bookmarkedSet = new Set(hasUserBookmarkedQuery.map((r) => r.postId));
 
 		const attachmentsMap = new Map<
 			string,
@@ -136,8 +121,8 @@ export class BookmarkService {
 			bookmarks: Number(post.bookmarks),
 			body: post.body ?? undefined,
 			hasUserLiked: likedSet.has(post.id),
-			hasUserBookmarked: bookmarkedSet.has(post.id),
-			attachments: attachmentsMap.get(post.id),
+			hasUserBookmarked: true,
+			attachments: attachmentsMap.get(post.id) ?? undefined,
 		}));
 
 		const hasNextPage = items.length > config.POSTS_PAGINATION_LIMIT;
@@ -197,9 +182,9 @@ export class BookmarkService {
 
 	private async getBookmarks({
 		postId,
-	}: z.infer<typeof bookmarkSchema.getBookmarks.input>): Promise<
-		z.infer<typeof bookmarkSchema.getBookmarks.output>
-	> {
+	}: {
+		postId: string;
+	}): Promise<{ count: number }> {
 		const [{ count: bookmarksCount }] = await this.db
 			.select({ count: count() })
 			.from(bookmarksTable)
