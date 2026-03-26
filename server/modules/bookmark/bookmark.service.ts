@@ -132,7 +132,9 @@ export class BookmarkService {
 
 		return {
 			items: sliced,
-			nextCursor: hasNextPage ? sliced[sliced.length - 1].createdAt : null,
+			nextCursor: hasNextPage
+				? posts[config.POSTS_PAGINATION_LIMIT - 1].bookmarkedAt
+				: null,
 		};
 	}
 	// --- AI GENERATED END ---

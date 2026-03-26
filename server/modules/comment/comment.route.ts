@@ -30,4 +30,22 @@ export const commentRouter = base.router({
 				viewerId: context.session.user.id,
 			});
 		}),
+	create: commentProcedure
+		.input(commentSchema.create.input)
+		.output(commentSchema.create.output)
+		.handler(async ({ input, context }) => {
+			return await context.commentService.create({
+				...input,
+				userId: context.session.user.id,
+			});
+		}),
+	delete: commentProcedure
+		.input(commentSchema.delete.input)
+		.output(commentSchema.delete.output)
+		.handler(async ({ input, context }) => {
+			return await context.commentService.delete({
+				...input,
+				userId: context.session.user.id,
+			});
+		}),
 });

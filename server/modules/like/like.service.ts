@@ -131,7 +131,9 @@ export class LikeProfileService {
 
 		return {
 			items: sliced,
-			nextCursor: hasNextPage ? sliced[sliced.length - 1].createdAt : null,
+			nextCursor: hasNextPage
+				? posts[config.POSTS_PAGINATION_LIMIT - 1].likedAt
+				: null,
 		};
 	}
 	// --- AI GENERATED END ---
