@@ -213,6 +213,7 @@ export class LikePostService {
 		};
 	}
 }
+
 export class LikeCommentService {
 	constructor(private db: typeof DBType) {}
 

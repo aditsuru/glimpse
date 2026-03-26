@@ -151,4 +151,62 @@ export class BookmarkService {
 		};
 	}
 	// --- AI GENERATED END ---
+
+	async add({
+		postId,
+		userId,
+	}: z.infer<typeof bookmarkSchema.add.input> & {
+		userId: string;
+	}): Promise<z.infer<typeof bookmarkSchema.add.output>> {
+		await this.db
+			.insert(bookmarksTable)
+			.values({
+				postId,
+				userId,
+			})
+			.onConflictDoNothing();
+
+		const { count } = await this.getBookmarks({ postId });
+
+		return {
+			count,
+		};
+	}
+
+	async remove({
+		postId,
+		userId,
+	}: z.infer<typeof bookmarkSchema.remove.input> & {
+		userId: string;
+	}): Promise<z.infer<typeof bookmarkSchema.remove.output>> {
+		await this.db
+			.delete(bookmarksTable)
+			.where(
+				and(
+					eq(bookmarksTable.postId, postId),
+					eq(bookmarksTable.userId, userId)
+				)
+			);
+
+		const { count } = await this.getBookmarks({ postId });
+
+		return {
+			count,
+		};
+	}
+
+	private async getBookmarks({
+		postId,
+	}: z.infer<typeof bookmarkSchema.getBookmarks.input>): Promise<
+		z.infer<typeof bookmarkSchema.getBookmarks.output>
+	> {
+		const [{ count: bookmarksCount }] = await this.db
+			.select({ count: count() })
+			.from(bookmarksTable)
+			.where(eq(bookmarksTable.postId, postId));
+
+		return {
+			count: Number(bookmarksCount),
+		};
+	}
 }

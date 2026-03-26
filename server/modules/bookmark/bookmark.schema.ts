@@ -14,4 +14,28 @@ export const bookmarkSchema = {
 			}),
 		},
 	},
+	add: {
+		input: z.object({
+			postId: z.nanoid(),
+		}),
+		output: z.object({
+			count: z.number().nonnegative(),
+		}),
+	},
+	remove: {
+		input: z.object({
+			postId: z.nanoid(),
+		}),
+		output: z.object({
+			count: z.number().nonnegative(),
+		}),
+	},
+	getBookmarks: {
+		input: z.object({
+			postId: z.nanoid(),
+		}),
+		output: z.object({
+			count: z.number().nonnegative(),
+		}),
+	},
 };

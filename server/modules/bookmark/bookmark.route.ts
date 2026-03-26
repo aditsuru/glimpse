@@ -23,4 +23,22 @@ export const bookmarkRouter = base.router({
 				});
 			}),
 	}),
+	add: bookmarkProcedure
+		.input(bookmarkSchema.add.input)
+		.output(bookmarkSchema.add.output)
+		.handler(async ({ input, context }) => {
+			return await context.bookmarkService.add({
+				...input,
+				userId: context.session.user.id,
+			});
+		}),
+	remove: bookmarkProcedure
+		.input(bookmarkSchema.remove.input)
+		.output(bookmarkSchema.remove.output)
+		.handler(async ({ input, context }) => {
+			return await context.bookmarkService.remove({
+				...input,
+				userId: context.session.user.id,
+			});
+		}),
 });
