@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { generateFromEmail } from "unique-username-generator";
 import { db } from "@/drizzle/db";
 import { config } from "@/lib/config";
 
@@ -13,10 +14,8 @@ export const auth = betterAuth({
 				unique: true,
 			},
 		},
-		fields: {
-			image: undefined,
-		},
 	},
+
 	emailAndPassword: {
 		enabled: true,
 	},
@@ -35,10 +34,16 @@ export const auth = betterAuth({
 		github: {
 			clientId: config.GITHUB_CLIENT_ID,
 			clientSecret: config.GITHUB_CLIENT_SECRET,
+			mapProfileToUser: (profile) => ({
+				username: generateFromEmail(profile.email, 3),
+			}),
 		},
 		google: {
 			clientId: config.GOOGLE_CLIENT_ID,
 			clientSecret: config.GOOGLE_CLIENT_SECRET,
+			mapProfileToUser: (profile) => ({
+				username: generateFromEmail(profile.email, 3),
+			}),
 		},
 	},
 	session: {
