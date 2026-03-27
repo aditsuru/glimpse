@@ -6,9 +6,9 @@ export const profileSchema = {
 			.object({
 				bio: z.string(),
 				website: z.string(),
-				avatarUrl: z.url(),
+				avatarUrl: z.string(),
 				avatarKey: z.string(),
-				bannerUrl: z.url(),
+				bannerUrl: z.string(),
 				bannerKey: z.string(),
 				name: z.string(),
 				username: z.string(),

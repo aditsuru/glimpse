@@ -2,7 +2,7 @@ import * as z from "zod";
 import { ATTACHMENT_TYPES } from "@/lib/constants";
 
 export const AttachmentSchema = z.object({
-	fileUrl: z.url(),
+	fileUrl: z.string(),
 	fileType: z.enum(ATTACHMENT_TYPES, {
 		error: "Please upload a valid image or video file.",
 	}),

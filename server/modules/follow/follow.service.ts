@@ -133,7 +133,7 @@ export class FollowService {
 		const [{ count: followingsCount }] = await this.db
 			.select({ count: count() })
 			.from(followersTable)
-			.where(eq(followersTable.followerId, followingId));
+			.where(eq(followersTable.followingId, followingId));
 
 		return {
 			count: Number(followingsCount),

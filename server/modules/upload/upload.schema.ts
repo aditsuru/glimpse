@@ -6,8 +6,8 @@ export const uploadSchema = {
 			fileType: z.string(),
 		}),
 		output: z.object({
-			presignedUrl: z.url(),
-			fileUrl: z.url(),
+			presignedUrl: z.string(),
+			fileUrl: z.string(),
 			fileKey: z.string(),
 		}),
 	},

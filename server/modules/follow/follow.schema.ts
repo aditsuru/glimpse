@@ -2,7 +2,7 @@ import * as z from "zod";
 
 const BaseProfileSchema = z.object({
 	profileId: z.string(),
-	avatarUrl: z.url(),
+	avatarUrl: z.string(),
 	username: z.string(),
 	name: z.string(),
 	isGlimpseVerified: z.boolean(),

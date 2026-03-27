@@ -66,10 +66,12 @@ export class ProfileService {
 				.set(profileUpdateData)
 				.where(eq(profilesTable.userId, userId)),
 
-			auth.api.updateUser({
-				body: { name, username },
-				headers: await headers(),
-			}),
+			name !== undefined || username !== undefined
+				? auth.api.updateUser({
+						body: { name, username },
+						headers: await headers(),
+					})
+				: Promise.resolve(),
 		]);
 
 		await Promise.allSettled(fileOperations);
