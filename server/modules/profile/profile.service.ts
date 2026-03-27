@@ -1,10 +1,11 @@
 import { ORPCError } from "@orpc/server";
-import { eq } from "drizzle-orm";
+import { and, asc, eq, gt, ilike } from "drizzle-orm";
 import { headers } from "next/headers";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import { profilesTable, user } from "@/drizzle/schema";
 import { auth } from "@/lib/auth";
+import { config } from "@/lib/config";
 import {
 	getFollowersCount,
 	getFollowingsCount,
@@ -119,6 +120,43 @@ export class ProfileService {
 
 		return {
 			success: true,
+		};
+	}
+
+	async searchUsers({
+		query,
+		nextCursor,
+	}: z.infer<typeof profileSchema.searchUsers.input>): Promise<
+		z.infer<typeof profileSchema.searchUsers.output>
+	> {
+		const profiles = await this.db
+			.select({
+				username: user.username,
+				name: user.name,
+				avatarUrl: profilesTable.avatarUrl,
+				isGlimpseVerified: profilesTable.isGlimpseVerified,
+				createdAt: user.createdAt,
+			})
+			.from(user)
+			.innerJoin(profilesTable, eq(profilesTable.userId, user.id))
+			.where(
+				and(
+					ilike(user.username, `${query}%`),
+					nextCursor ? gt(user.username, nextCursor) : undefined
+				)
+			)
+			.orderBy(asc(user.username))
+			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
+
+		const hasNextPage = profiles.length > config.PROFILE_PAGINATION_LIMIT;
+
+		const items = hasNextPage
+			? profiles.slice(0, config.PROFILE_PAGINATION_LIMIT)
+			: profiles;
+
+		return {
+			items,
+			nextCursor: hasNextPage ? items[items.length - 1].username : null,
 		};
 	}
 }

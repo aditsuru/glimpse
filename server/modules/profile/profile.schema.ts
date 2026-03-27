@@ -36,4 +36,21 @@ export const profileSchema = {
 			success: z.boolean(),
 		}),
 	},
+	searchUsers: {
+		input: z.object({
+			query: z.string(),
+			nextCursor: z.string().optional(),
+		}),
+		output: z.object({
+			items: z.array(
+				z.object({
+					username: z.string(),
+					name: z.string(),
+					avatarUrl: z.string(),
+					isGlimpseVerified: z.boolean(),
+				})
+			),
+			nextCursor: z.string().nullable(),
+		}),
+	},
 };
