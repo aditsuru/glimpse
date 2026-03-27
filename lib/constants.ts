@@ -8,3 +8,19 @@ export const ALLOWED_FILES_TYPES = [
 ] as const;
 
 export const ATTACHMENT_TYPES = ["image", "gif", "video"] as const;
+
+export const RESERVED_USERNAMES = new Set([
+	"admin",
+	"administrator",
+	"root",
+	"support",
+	"help",
+	"system",
+	"api",
+	"dev",
+	"www",
+	"webmaster",
+	"status",
+	"about",
+	"settings",
+]);

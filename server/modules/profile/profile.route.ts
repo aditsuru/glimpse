@@ -37,4 +37,12 @@ export const profileRouter = base.router({
 				...input,
 			});
 		}),
+	checkUsername: profileProcedure
+		.input(profileSchema.checkUsername.input)
+		.output(profileSchema.checkUsername.output)
+		.handler(async ({ input, context }) => {
+			return await context.profileService.checkUsername({
+				...input,
+			});
+		}),
 });

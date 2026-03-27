@@ -18,6 +18,7 @@ export const profileSchema = {
 			userId: z.nanoid(),
 		}),
 	},
+
 	update: {
 		input: z
 			.object({
@@ -36,6 +37,7 @@ export const profileSchema = {
 			success: z.boolean(),
 		}),
 	},
+
 	searchUsers: {
 		input: z.object({
 			query: z.string(),
@@ -51,6 +53,15 @@ export const profileSchema = {
 				})
 			),
 			nextCursor: z.string().nullable(),
+		}),
+	},
+
+	checkUsername: {
+		input: z.object({
+			username: z.string(),
+		}),
+		output: z.object({
+			isAvailable: z.boolean(),
 		}),
 	},
 };

@@ -1,15 +1,17 @@
 import { ORPCError } from "@orpc/server";
-import { and, asc, eq, gt, ilike } from "drizzle-orm";
+import { and, asc, eq, gt, ilike, sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import { profilesTable, user } from "@/drizzle/schema";
 import { auth } from "@/lib/auth";
 import { config } from "@/lib/config";
+import { RESERVED_USERNAMES } from "@/lib/constants";
 import {
 	getFollowersCount,
 	getFollowingsCount,
 } from "@/server/shared/follow.helper";
+import { isSafe } from "@/server/shared/profanity";
 import {
 	confirmUpload,
 	deleteFile,
@@ -157,6 +159,31 @@ export class ProfileService {
 		return {
 			items,
 			nextCursor: hasNextPage ? items[items.length - 1].username : null,
+		};
+	}
+
+	async checkUsername({
+		username,
+	}: z.infer<typeof profileSchema.checkUsername.input>): Promise<
+		z.infer<typeof profileSchema.checkUsername.output>
+	> {
+		username = username.toLowerCase();
+
+		if (!isSafe(username) || RESERVED_USERNAMES.has(username))
+			return {
+				isAvailable: false,
+			};
+
+		const result = await this.db
+			.select({ id: user.id })
+			.from(user)
+			.where(sql`lower(${user.username}) = ${username}`)
+			.limit(1);
+
+		const isAvailable = result.length === 0;
+
+		return {
+			isAvailable,
 		};
 	}
 }
