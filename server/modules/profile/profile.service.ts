@@ -6,14 +6,14 @@ import type { db as DBType } from "@/drizzle/db";
 import { profilesTable, user } from "@/drizzle/schema";
 import { auth } from "@/lib/auth";
 import {
-	confirmUpload,
-	deleteFile,
-	getPermanentKeyAndUrl,
-} from "@/lib/helpers/s3-helper";
-import {
 	getFollowersCount,
 	getFollowingsCount,
 } from "@/server/shared/follow.helper";
+import {
+	confirmUpload,
+	deleteFile,
+	getPermanentKeyAndUrl,
+} from "@/server/shared/s3.helper";
 import type { profileSchema } from "./profile.schema";
 
 export class ProfileService {

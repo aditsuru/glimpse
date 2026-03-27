@@ -11,12 +11,12 @@ import {
 	profilesTable,
 	user,
 } from "@/drizzle/schema";
+import { logger } from "@/lib/logger";
 import {
 	confirmUpload,
 	deleteFile,
 	getPermanentKeyAndUrl,
-} from "@/lib/helpers/s3-helper";
-import { logger } from "@/lib/logger";
+} from "@/server/shared/s3.helper";
 import type { AttachmentSchema, postSchema } from "./post.schema";
 
 export class PostService {
