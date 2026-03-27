@@ -30,6 +30,15 @@ export const commentRouter = base.router({
 				viewerId: context.session.user.id,
 			});
 		}),
+	getCommentsHistory: commentProcedure
+		.input(commentSchema.getCommentsHistory.input)
+		.output(commentSchema.getCommentsHistory.output)
+		.handler(async ({ input, context }) => {
+			return await context.commentService.getCommentsHistory({
+				...input,
+				viewerId: context.session.user.id,
+			});
+		}),
 	create: commentProcedure
 		.input(commentSchema.create.input)
 		.output(commentSchema.create.output)

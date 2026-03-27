@@ -16,7 +16,6 @@ export class ProfileService {
 
 	async update({
 		userId,
-
 		name,
 		username,
 		...args
