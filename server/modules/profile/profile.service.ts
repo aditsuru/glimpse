@@ -1,18 +1,60 @@
+import { ORPCError } from "@orpc/server";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
-import { profilesTable } from "@/drizzle/schema";
+import { profilesTable, user } from "@/drizzle/schema";
 import { auth } from "@/lib/auth";
 import {
 	confirmUpload,
 	deleteFile,
 	getPermanentKeyAndUrl,
 } from "@/lib/helpers/s3-helper";
+import {
+	getFollowersCount,
+	getFollowingsCount,
+} from "@/server/shared/follow.helper";
 import type { profileSchema } from "./profile.schema";
 
 export class ProfileService {
 	constructor(private db: typeof DBType) {}
+
+	async get({
+		username,
+	}: z.infer<typeof profileSchema.get.input>): Promise<
+		z.infer<typeof profileSchema.get.output>
+	> {
+		const [userProfile] = await this.db
+			.select({
+				avatarUrl: profilesTable.avatarUrl,
+				bannerUrl: profilesTable.bannerUrl,
+				username: user.username,
+				name: user.name,
+				bio: profilesTable.bio,
+				website: profilesTable.website,
+				isGlimpseVerified: profilesTable.isGlimpseVerified,
+				userId: profilesTable.userId,
+			})
+			.from(profilesTable)
+			.innerJoin(user, eq(profilesTable.userId, user.id))
+			.where(eq(user.username, username))
+			.limit(1);
+
+		if (!userProfile)
+			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
+
+		const [{ count: followersCount }, { count: followingsCount }] =
+			await Promise.all([
+				getFollowersCount({ userId: userProfile.userId }),
+				getFollowingsCount({ userId: userProfile.userId }),
+			]);
+
+		return {
+			...userProfile,
+			followersCount,
+			followingsCount,
+		};
+	}
 
 	async update({
 		userId,

@@ -1,6 +1,23 @@
 import * as z from "zod";
 
 export const profileSchema = {
+	get: {
+		input: z.object({
+			username: z.string(),
+		}),
+		output: z.object({
+			avatarUrl: z.string(),
+			bannerUrl: z.string(),
+			username: z.string(),
+			name: z.string(),
+			bio: z.string().nullable(),
+			website: z.string().nullable(),
+			isGlimpseVerified: z.boolean(),
+			followersCount: z.number(),
+			followingsCount: z.number(),
+			userId: z.nanoid(),
+		}),
+	},
 	update: {
 		input: z
 			.object({

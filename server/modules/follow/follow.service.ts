@@ -1,8 +1,9 @@
-import { and, count, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, lt } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import { followersTable, profilesTable, user } from "@/drizzle/schema";
 import { config } from "@/lib/config";
+import { getFollowingsCount } from "@/server/shared/follow.helper";
 import type { followSchema } from "./follow.schema";
 
 export class FollowService {
@@ -104,7 +105,7 @@ export class FollowService {
 			})
 			.onConflictDoNothing();
 
-		return await this.getFollowingsCount({ followingId });
+		return await getFollowingsCount({ followingId });
 	}
 
 	async remove({
@@ -122,21 +123,6 @@ export class FollowService {
 				)
 			);
 
-		return await this.getFollowingsCount({ followingId });
-	}
-
-	private async getFollowingsCount({
-		followingId,
-	}: {
-		followingId: string;
-	}): Promise<{ count: number }> {
-		const [{ count: followingsCount }] = await this.db
-			.select({ count: count() })
-			.from(followersTable)
-			.where(eq(followersTable.followingId, followingId));
-
-		return {
-			count: Number(followingsCount),
-		};
+		return await getFollowingsCount({ followingId });
 	}
 }
