@@ -11,7 +11,7 @@ import {
 	getFollowersCount,
 	getFollowingsCount,
 } from "@/server/shared/follow.helper";
-import { isSafe } from "@/server/shared/profanity";
+import { isSafe } from "@/server/shared/profanity.helper";
 import {
 	confirmUpload,
 	deleteFile,

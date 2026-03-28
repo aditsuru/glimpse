@@ -53,9 +53,9 @@ export class FollowService {
 	async getFollowings({
 		nextCursor,
 		userId,
-	}: z.infer<typeof followSchema.getFollowers.input> & {
+	}: z.infer<typeof followSchema.getFollowings.input> & {
 		userId: string;
-	}): Promise<z.infer<typeof followSchema.getFollowers.output>> {
+	}): Promise<z.infer<typeof followSchema.getFollowings.output>> {
 		const followings = await this.db
 			.select({
 				profileId: user.id,
@@ -105,7 +105,7 @@ export class FollowService {
 			})
 			.onConflictDoNothing();
 
-		return await getFollowingsCount({ followingId });
+		return await getFollowingsCount({ userId: followingId });
 	}
 
 	async remove({
@@ -123,6 +123,6 @@ export class FollowService {
 				)
 			);
 
-		return await getFollowingsCount({ followingId });
+		return await getFollowingsCount({ userId: followingId });
 	}
 }
