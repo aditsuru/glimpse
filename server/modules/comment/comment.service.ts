@@ -10,6 +10,7 @@ import {
 	user,
 } from "@/drizzle/schema";
 import { config } from "@/lib/config";
+import { paginateResult } from "@/server/shared/paginate.helper";
 import type { commentSchema } from "./comment.schema";
 
 export class CommentService {
@@ -251,13 +252,10 @@ export class CommentService {
 			hasUserLiked: hasUserLikedMap.has(c.id),
 		}));
 
-		const hasNextPage = commentsMap.length > limit;
-
-		const items = hasNextPage ? commentsMap.slice(0, limit) : commentsMap;
-
-		return {
-			items,
-			nextCursor: hasNextPage ? items[items.length - 1].createdAt : null,
-		};
+		return paginateResult(
+			commentsMap,
+			config.PROFILE_PAGINATION_LIMIT,
+			(item) => item.createdAt
+		);
 	}
 }

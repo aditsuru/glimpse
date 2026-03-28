@@ -11,6 +11,7 @@ import {
 	getFollowersCount,
 	getFollowingsCount,
 } from "@/server/shared/follow.helper";
+import { paginateResult } from "@/server/shared/paginate.helper";
 import { isSafe } from "@/server/shared/profanity.helper";
 import {
 	confirmUpload,
@@ -150,16 +151,11 @@ export class ProfileService {
 			.orderBy(asc(user.username))
 			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
 
-		const hasNextPage = profiles.length > config.PROFILE_PAGINATION_LIMIT;
-
-		const items = hasNextPage
-			? profiles.slice(0, config.PROFILE_PAGINATION_LIMIT)
-			: profiles;
-
-		return {
-			items,
-			nextCursor: hasNextPage ? items[items.length - 1].username : null,
-		};
+		return paginateResult(
+			profiles,
+			config.PROFILE_PAGINATION_LIMIT,
+			(item) => item.username
+		);
 	}
 
 	async checkUsername({

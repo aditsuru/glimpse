@@ -14,6 +14,7 @@ import {
 } from "@/drizzle/schema";
 import { config } from "@/lib/config";
 import type { ATTACHMENT_TYPES } from "@/lib/constants";
+import { paginateResult } from "@/server/shared/paginate.helper";
 import type { likeSchema } from "./like.schema";
 
 export class LikeProfileService {
@@ -124,17 +125,11 @@ export class LikeProfileService {
 			attachments: attachmentsMap.get(post.id) ?? undefined,
 		}));
 
-		const hasNextPage = items.length > config.POSTS_PAGINATION_LIMIT;
-		const sliced = hasNextPage
-			? items.slice(0, config.POSTS_PAGINATION_LIMIT)
-			: items;
-
-		return {
-			items: sliced,
-			nextCursor: hasNextPage
-				? posts[config.POSTS_PAGINATION_LIMIT - 1].likedAt
-				: null,
-		};
+		return paginateResult(
+			items,
+			config.PROFILE_PAGINATION_LIMIT,
+			(item) => item.createdAt
+		);
 	}
 	// --- AI GENERATED END ---
 }

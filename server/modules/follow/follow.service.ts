@@ -4,6 +4,7 @@ import type { db as DBType } from "@/drizzle/db";
 import { followersTable, profilesTable, user } from "@/drizzle/schema";
 import { config } from "@/lib/config";
 import { getFollowingsCount } from "@/server/shared/follow.helper";
+import { paginateResult } from "@/server/shared/paginate.helper";
 import type { followSchema } from "./follow.schema";
 
 export class FollowService {
@@ -38,16 +39,11 @@ export class FollowService {
 			.orderBy(desc(user.createdAt))
 			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
 
-		const hasNextPage = followers.length > config.PROFILE_PAGINATION_LIMIT;
-
-		const items = hasNextPage
-			? followers.slice(0, config.PROFILE_PAGINATION_LIMIT)
-			: followers;
-
-		return {
-			items,
-			nextCursor: hasNextPage ? items[items.length - 1].createdAt : null,
-		};
+		return paginateResult(
+			followers,
+			config.PROFILE_PAGINATION_LIMIT,
+			(item) => item.createdAt
+		);
 	}
 
 	async getFollowings({
@@ -79,16 +75,11 @@ export class FollowService {
 			.orderBy(desc(user.createdAt))
 			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
 
-		const hasNextPage = followings.length > config.PROFILE_PAGINATION_LIMIT;
-
-		const items = hasNextPage
-			? followings.slice(0, config.PROFILE_PAGINATION_LIMIT)
-			: followings;
-
-		return {
-			items,
-			nextCursor: hasNextPage ? items[items.length - 1].createdAt : null,
-		};
+		return paginateResult(
+			followings,
+			config.PROFILE_PAGINATION_LIMIT,
+			(item) => item.createdAt
+		);
 	}
 
 	async add({

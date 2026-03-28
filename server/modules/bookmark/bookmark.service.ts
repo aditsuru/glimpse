@@ -13,6 +13,7 @@ import {
 } from "@/drizzle/schema";
 import { config } from "@/lib/config";
 import type { ATTACHMENT_TYPES } from "@/lib/constants";
+import { paginateResult } from "@/server/shared/paginate.helper";
 import type { bookmarkSchema } from "./bookmark.schema";
 
 export class BookmarkService {
@@ -125,17 +126,11 @@ export class BookmarkService {
 			attachments: attachmentsMap.get(post.id) ?? undefined,
 		}));
 
-		const hasNextPage = items.length > config.POSTS_PAGINATION_LIMIT;
-		const sliced = hasNextPage
-			? items.slice(0, config.POSTS_PAGINATION_LIMIT)
-			: items;
-
-		return {
-			items: sliced,
-			nextCursor: hasNextPage
-				? posts[config.POSTS_PAGINATION_LIMIT - 1].bookmarkedAt
-				: null,
-		};
+		return paginateResult(
+			items,
+			config.PROFILE_PAGINATION_LIMIT,
+			(item) => item.createdAt
+		);
 	}
 	// --- AI GENERATED END ---
 
