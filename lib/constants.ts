@@ -13,6 +13,7 @@ export const REDIS_KEYS = {
 	POST_SEEN: (userId: string) => `post:seen:${userId}`,
 	VIEWS_COUNT: (postId: string) => `post:views:${postId}`,
 	SYNC_PENDING_VIEWS_LIST: () => `sync:pending:views`,
+	RATE_LIMIT: (ip: string) => `ratelimit:auth:${ip}`,
 };
 
 export const RESERVED_USERNAMES = new Set([

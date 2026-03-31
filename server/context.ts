@@ -3,13 +3,20 @@ import { db } from "@/drizzle/db";
 import { auth } from "@/lib/auth";
 
 export async function createContext() {
+	const reqHeaders = await headers();
 	const session = await auth.api.getSession({
-		headers: await headers(),
+		headers: reqHeaders,
 	});
+
+	const ip =
+		reqHeaders.get("x-forwarded-for")?.split(",")[0] ||
+		reqHeaders.get("x-real-ip") ||
+		"127.0.0.1";
 
 	return {
 		db,
 		session,
+		ip,
 	};
 }
 

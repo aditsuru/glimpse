@@ -18,12 +18,26 @@ export const config = createEnv({
 
 		REDIS_FEED_SEEN_MAX_ITEMS: z.coerce.number().default(500),
 
+		// Rate Limiting
+		RATE_LIMIT_MAX: z.coerce.number().default(60),
+		RATE_LIMIT_WINDOW: z
+			.string()
+			.transform((val) => ms(val as StringValue) / 1000)
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default(10),
+		AUTH_RATE_LIMIT_MAX: z.coerce.number().default(20),
+		AUTH_RATE_LIMIT_WINDOW: z
+			.string()
+			.transform((val) => ms(val as StringValue) / 1000)
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default(10),
+
 		// Better auth config
 		COOKIE_CACHE_AGE: z
 			.string()
 			.transform((val) => ms(val as StringValue) / 1000)
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
-			.default(300000), // Input ms value; Output seconds
+			.default(300), // Input ms lib value; Output seconds
 
 		GOOGLE_CLIENT_ID: z.string(),
 		GOOGLE_CLIENT_SECRET: z.string(),

@@ -24,6 +24,7 @@
 		"@orpc/tanstack-query": "^1.13.7",
 		"@t3-oss/env-nextjs": "^0.13.10",
 		"@types/ms": "^2.1.0",
+		"@upstash/ratelimit": "^2.0.8",
 		"@upstash/redis": "^1.37.0",
 		"@upstash/workflow": "^1.2.0",
 		"better-auth": "^1.5.5",
