@@ -9,6 +9,7 @@
 	},
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"cSpell.words": [
+		"decrby",
 		"ilike",
 		"QSTASH",
 		"sadd",

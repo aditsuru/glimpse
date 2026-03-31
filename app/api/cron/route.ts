@@ -22,29 +22,37 @@ export const { POST } = serve(async (context) => {
 
 	// Step 3: Update the Database
 	await context.run("update-drizzle", async () => {
-		const syncPromises = postIds.map((id, index) => {
-			const count = counts[index];
+		await db.transaction(async (tx) => {
+			for (let i = 0; i < postIds.length; i++) {
+				const count = counts[i];
 
-			if (!count || count <= 0) return Promise.resolve();
+				if (!count || count <= 0) continue;
 
-			return db
-				.update(postsTable)
-				.set({
-					views: sql`${postsTable.views} + ${count}`,
-				})
-				.where(eq(postsTable.id, id));
+				await tx
+					.update(postsTable)
+					.set({
+						views: sql`${postsTable.views} + ${count}`,
+					})
+					.where(eq(postsTable.id, postIds[i]));
+			}
 		});
-
-		await Promise.all(syncPromises);
 	});
 
 	// Step 4: Cleanup Redis
 	await context.run("cleanup-redis", async () => {
-		const postViewCountKeys = postIds.map((id) => REDIS_KEYS.VIEWS_COUNT(id));
-		await Promise.all([
-			redis.srem(REDIS_KEYS.SYNC_PENDING_VIEWS_LIST(), ...postIds),
-			redis.del(...postViewCountKeys),
-		]);
+		const pipeline = redis.pipeline();
+
+		pipeline.srem(REDIS_KEYS.SYNC_PENDING_VIEWS_LIST(), ...postIds);
+
+		postIds.forEach((id, index) => {
+			const count = counts[index];
+			if (count && count > 0) {
+				pipeline.decrby(REDIS_KEYS.VIEWS_COUNT(id), count);
+			}
+		});
+
+		await pipeline.exec();
 	});
+
 	logger.info("Cron job successfully updated views count from Redis.");
 });
