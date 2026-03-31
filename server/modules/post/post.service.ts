@@ -1,15 +1,12 @@
 import { ORPCError } from "@orpc/server";
-import { and, count, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import {
 	attachmentsTable,
 	bookmarksTable,
-	commentsTable,
 	postLikesTable,
 	postsTable,
-	profilesTable,
-	user,
 } from "@/drizzle/schema";
 import { logger } from "@/lib/logger";
 import { markPostAsSeen } from "@/server/shared/helpers/redis";
@@ -18,6 +15,8 @@ import {
 	deleteFile,
 	getPermanentKeyAndUrl,
 } from "@/server/shared/helpers/s3";
+import { fetchAttachmentsMap } from "@/server/shared/queries/attachments";
+import { fetchPostPage } from "@/server/shared/queries/post";
 import type { AttachmentSchema } from "@/server/shared/schemas/post";
 import type { postSchema } from "./post.schema";
 
@@ -33,30 +32,7 @@ export class PostService {
 	}: z.infer<typeof postSchema.get.input>): Promise<
 		z.infer<typeof postSchema.get.output>
 	> {
-		const [post] = await this.db
-			.select({
-				id: postsTable.id,
-				body: postsTable.body,
-				createdAt: postsTable.createdAt,
-				hasAttachments: postsTable.hasAttachments,
-				userId: postsTable.userId,
-				views: postsTable.views,
-				likes: count(postLikesTable.userId).as("likes"),
-				comments: count(commentsTable.id).as("comments"),
-				bookmarks: count(bookmarksTable.userId).as("bookmarks"),
-				authorName: user.name,
-				authorUsername: user.username,
-				authorAvatarUrl: profilesTable.avatarUrl,
-				authorIsVerified: profilesTable.isGlimpseVerified,
-			})
-			.from(postsTable)
-			.leftJoin(postLikesTable, eq(postLikesTable.postId, postsTable.id))
-			.leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
-			.leftJoin(bookmarksTable, eq(bookmarksTable.postId, postsTable.id))
-			.innerJoin(user, eq(user.id, postsTable.userId))
-			.innerJoin(profilesTable, eq(profilesTable.userId, postsTable.userId))
-			.where(eq(postsTable.id, postId))
-			.groupBy(postsTable.id);
+		const [post] = await fetchPostPage(this.db, 1, eq(postsTable.id, postId));
 
 		if (!post) {
 			throw new ORPCError("NOT_FOUND", { message: "Post not found" });
@@ -101,17 +77,12 @@ export class PostService {
 				.limit(1),
 		]);
 
-		let attachments: Omit<z.infer<typeof AttachmentSchema>, "fileKey">[] = [];
-
-		if (hasAttachments) {
-			attachments = await this.db
-				.select({
-					fileUrl: attachmentsTable.fileUrl,
-					fileType: attachmentsTable.fileType,
-				})
-				.from(attachmentsTable)
-				.where(eq(attachmentsTable.postId, id));
-		}
+		const attachments = await fetchAttachmentsMap(this.db, [
+			{
+				id,
+				hasAttachments,
+			},
+		]);
 
 		return {
 			id,
@@ -125,7 +96,7 @@ export class PostService {
 			bookmarks: Number(bookmarks),
 			hasUserLiked: hasUserLikedQuery.length > 0,
 			hasUserBookmarked: hasUserBookmarkedQuery.length > 0,
-			attachments: hasAttachments ? attachments : undefined,
+			attachments: attachments.get(id) ?? undefined,
 			authorAvatarUrl,
 			authorIsVerified,
 			authorName,

@@ -25,5 +25,9 @@ export async function markPostAsSeen(userId: string, postId: string) {
 export async function getSeenPostIds(userId: string) {
 	const key = REDIS_KEYS.POST_SEEN(userId);
 
-	return await redis.zrange(key, 0, config.REDIS_FEED_SEEN_MAX_ITEMS - 1);
+	return await redis.zrange<string[]>(
+		key,
+		0,
+		config.REDIS_FEED_SEEN_MAX_ITEMS - 1
+	);
 }

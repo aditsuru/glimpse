@@ -1,7 +1,22 @@
-import { type AnyColumn, and, count, eq, inArray } from "drizzle-orm";
+import {
+	type AnyColumn,
+	and,
+	count,
+	desc,
+	eq,
+	inArray,
+	type SQL,
+} from "drizzle-orm";
 import type { AnyPgTable } from "drizzle-orm/pg-core";
 import type { db as DBType } from "@/drizzle/db";
-import { bookmarksTable, postLikesTable } from "@/drizzle/schema";
+import {
+	bookmarksTable,
+	commentsTable,
+	postLikesTable,
+	postsTable,
+	profilesTable,
+	user,
+} from "@/drizzle/schema";
 
 export async function fetchUserLikedPostIds(
 	db: typeof DBType,
@@ -50,4 +65,40 @@ export async function getInteractionCount(
 		.from(table)
 		.where(eq(column, id));
 	return Number(c);
+}
+
+export async function fetchPostPage(
+	db: typeof DBType,
+	limit: number,
+	where?: SQL,
+	orderBy?: SQL
+) {
+	const posts = await db
+		.select({
+			id: postsTable.id,
+			body: postsTable.body,
+			createdAt: postsTable.createdAt,
+			hasAttachments: postsTable.hasAttachments,
+			userId: postsTable.userId,
+			views: postsTable.views,
+			likes: count(postLikesTable.userId).as("likes"),
+			comments: count(commentsTable.id).as("comments"),
+			bookmarks: count(bookmarksTable.userId).as("bookmarks"),
+			authorName: user.name,
+			authorUsername: user.username,
+			authorAvatarUrl: profilesTable.avatarUrl,
+			authorIsVerified: profilesTable.isGlimpseVerified,
+		})
+		.from(postsTable)
+		.leftJoin(postLikesTable, eq(postLikesTable.postId, postsTable.id))
+		.leftJoin(commentsTable, eq(commentsTable.postId, postsTable.id))
+		.leftJoin(bookmarksTable, eq(bookmarksTable.postId, postsTable.id))
+		.innerJoin(user, eq(user.id, postsTable.userId))
+		.innerJoin(profilesTable, eq(profilesTable.userId, postsTable.userId))
+		.where(where)
+		.groupBy(postsTable.id)
+		.orderBy(orderBy ?? desc(postsTable.createdAt))
+		.limit(limit);
+
+	return posts;
 }
