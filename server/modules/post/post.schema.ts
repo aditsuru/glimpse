@@ -66,4 +66,12 @@ export const postSchema = {
 			postId: z.nanoid(),
 		}),
 	},
+	markPostSeen: {
+		input: z.object({
+			postId: z.nanoid(),
+		}),
+		output: z.object({
+			success: true,
+		}),
+	},
 };

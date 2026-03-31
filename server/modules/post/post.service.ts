@@ -12,6 +12,7 @@ import {
 	user,
 } from "@/drizzle/schema";
 import { logger } from "@/lib/logger";
+import { markPostAsSeen } from "@/server/shared/redis.helper";
 import {
 	confirmUpload,
 	deleteFile,
@@ -242,5 +243,15 @@ export class PostService {
 		return {
 			postId,
 		};
+	}
+
+	async markPostSeen({
+		userId,
+		postId,
+	}: z.infer<typeof postSchema.markPostSeen.input> & {
+		userId: string;
+	}): Promise<z.infer<typeof postSchema.markPostSeen.output>> {
+		await markPostAsSeen(userId, postId);
+		return { success: true };
 	}
 }
