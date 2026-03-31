@@ -6,4 +6,6 @@ export const BaseProfileSchema = z.object({
 	username: z.string(),
 	name: z.string(),
 	isGlimpseVerified: z.boolean(),
+	isFollowingUser: z.boolean(),
+	isFollowedByUser: z.boolean(),
 });

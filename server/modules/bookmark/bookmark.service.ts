@@ -1,4 +1,4 @@
-import { and, count, desc, eq, lt } from "drizzle-orm";
+import { and, countDistinct, desc, eq, lt } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
@@ -41,9 +41,9 @@ export class BookmarkService {
 				hasAttachments: postsTable.hasAttachments,
 				userId: postsTable.userId,
 				views: postsTable.views,
-				likes: count(postLikesTable.userId).as("likes"),
-				comments: count(commentsTable.id).as("comments"),
-				bookmarks: count(bookmarksTable.userId).as("bookmarks"),
+				likes: countDistinct(postLikesTable.userId).as("likes"),
+				comments: countDistinct(commentsTable.id).as("comments"),
+				bookmarks: countDistinct(bookmarksTable.userId).as("bookmarks"),
 				authorName: user.name,
 				authorUsername: user.username,
 				authorAvatarUrl: profilesTable.avatarUrl,
@@ -69,17 +69,23 @@ export class BookmarkService {
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
 		if (posts.length === 0) {
-			return paginateResult([], config.PROFILE_PAGINATION_LIMIT, () => null);
+			return { items: [], nextCursor: null };
 		}
 
-		const postIds = posts.map((post) => post.id);
+		const paginated = paginateResult(
+			posts,
+			config.PROFILE_PAGINATION_LIMIT,
+			(post) => post.bookmarkedAt
+		);
+
+		const postIds = paginated.items.map((post) => post.id);
 
 		const [likedSet, attachmentsMap] = await Promise.all([
 			fetchUserLikedPostIds(this.db, this.userId, postIds),
-			fetchAttachmentsMap(this.db, posts),
+			fetchAttachmentsMap(this.db, paginated.items),
 		]);
 
-		const items = posts.map(({ bookmarkedAt, ...post }) => ({
+		const items = paginated.items.map(({ bookmarkedAt, ...post }) => ({
 			...post,
 			likes: Number(post.likes),
 			comments: Number(post.comments),
@@ -90,13 +96,11 @@ export class BookmarkService {
 			attachments: attachmentsMap.get(post.id) ?? undefined,
 		}));
 
-		return paginateResult(
+		return {
 			items,
-			config.PROFILE_PAGINATION_LIMIT,
-			(item) => item.createdAt
-		);
+			nextCursor: paginated.nextCursor,
+		};
 	}
-
 	// --- AI GENERATED END ---
 
 	async add({

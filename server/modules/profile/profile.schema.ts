@@ -15,7 +15,9 @@ export const profileSchema = {
 			isGlimpseVerified: z.boolean(),
 			followersCount: z.number(),
 			followingsCount: z.number(),
-			userId: z.nanoid(),
+			userId: z.string(),
+			isFollowingUser: z.boolean(),
+			isFollowedByUser: z.boolean(),
 		}),
 	},
 
@@ -50,6 +52,8 @@ export const profileSchema = {
 					name: z.string(),
 					avatarUrl: z.string(),
 					isGlimpseVerified: z.boolean(),
+					isFollowingUser: z.boolean(),
+					isFollowedByUser: z.boolean(),
 				})
 			),
 			nextCursor: z.string().nullable(),

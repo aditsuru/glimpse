@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/server";
-import { and, count, desc, eq, lt } from "drizzle-orm";
+import { and, countDistinct, desc, eq, lt } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import {
@@ -40,7 +40,7 @@ export class CommentService {
 				postId: commentsTable.postId,
 				userId: commentsTable.userId,
 				createdAt: commentsTable.createdAt,
-				likes: count(commentLikesTable.userId).as("likes"),
+				likes: countDistinct(commentLikesTable.userId).as("likes"),
 				authorAvatarUrl: profilesTable.avatarUrl,
 				authorName: user.name,
 				authorUsername: user.username,
@@ -85,7 +85,7 @@ export class CommentService {
 				userId: commentsTable.userId,
 				postId: commentsTable.postId,
 				createdAt: commentsTable.createdAt,
-				likes: count(commentLikesTable.userId).as("likes"),
+				likes: countDistinct(commentLikesTable.userId).as("likes"),
 				authorAvatarUrl: profilesTable.avatarUrl,
 				authorName: user.name,
 				authorUsername: user.username,
@@ -129,7 +129,7 @@ export class CommentService {
 				postId: commentsTable.postId,
 				userId: commentsTable.userId,
 				createdAt: commentsTable.createdAt,
-				likes: count(commentLikesTable.userId).as("likes"),
+				likes: countDistinct(commentLikesTable.userId).as("likes"),
 				authorAvatarUrl: profilesTable.avatarUrl,
 				authorName: user.name,
 				authorUsername: user.username,

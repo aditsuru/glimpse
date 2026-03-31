@@ -1,4 +1,4 @@
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, lt, sql } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import { followersTable, profilesTable, user } from "@/drizzle/schema";
@@ -26,6 +26,14 @@ export class FollowService {
 				name: user.name,
 				isGlimpseVerified: profilesTable.isGlimpseVerified,
 				createdAt: user.createdAt,
+				isFollowingUser:
+					sql<boolean>`EXISTS(SELECT 1 FROM ${followersTable} WHERE ${followersTable.followerId} = ${this.userId} AND ${followersTable.followingId} = ${user.id})`.as(
+						"is_following_user"
+					),
+				isFollowedByUser:
+					sql<boolean>`EXISTS(SELECT 1 FROM ${followersTable} WHERE ${followersTable.followerId} = ${user.id} AND ${followersTable.followingId} = ${this.userId})`.as(
+						"is_followed_by_user"
+					),
 			})
 			.from(user)
 			.innerJoin(profilesTable, eq(profilesTable.userId, user.id))
@@ -37,7 +45,6 @@ export class FollowService {
 				)
 			)
 			.where(nextCursor ? lt(user.createdAt, nextCursor) : undefined)
-			.groupBy(user.id)
 			.orderBy(desc(user.createdAt))
 			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
 
@@ -61,6 +68,14 @@ export class FollowService {
 				name: user.name,
 				isGlimpseVerified: profilesTable.isGlimpseVerified,
 				createdAt: user.createdAt,
+				isFollowingUser:
+					sql<boolean>`EXISTS(SELECT 1 FROM ${followersTable} WHERE ${followersTable.followerId} = ${this.userId} AND ${followersTable.followingId} = ${user.id})`.as(
+						"is_following_user"
+					),
+				isFollowedByUser:
+					sql<boolean>`EXISTS(SELECT 1 FROM ${followersTable} WHERE ${followersTable.followerId} = ${user.id} AND ${followersTable.followingId} = ${this.userId})`.as(
+						"is_followed_by_user"
+					),
 			})
 			.from(user)
 			.innerJoin(profilesTable, eq(profilesTable.userId, user.id))
@@ -72,7 +87,6 @@ export class FollowService {
 				)
 			)
 			.where(nextCursor ? lt(user.createdAt, nextCursor) : undefined)
-			.groupBy(user.id)
 			.orderBy(desc(user.createdAt))
 			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
 

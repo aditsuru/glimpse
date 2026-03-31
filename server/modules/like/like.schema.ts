@@ -16,7 +16,7 @@ export const likeSchema = {
 	post: {
 		add: {
 			input: z.object({
-				postId: z.nanoid(),
+				postId: z.string(),
 			}),
 			output: z.object({
 				count: z.number().nonnegative(),
@@ -24,7 +24,7 @@ export const likeSchema = {
 		},
 		remove: {
 			input: z.object({
-				postId: z.nanoid(),
+				postId: z.string(),
 			}),
 			output: z.object({
 				count: z.number().nonnegative(),
@@ -34,7 +34,7 @@ export const likeSchema = {
 	comment: {
 		add: {
 			input: z.object({
-				commentId: z.nanoid(),
+				commentId: z.string(),
 			}),
 			output: z.object({
 				count: z.number().nonnegative(),
@@ -42,7 +42,7 @@ export const likeSchema = {
 		},
 		remove: {
 			input: z.object({
-				commentId: z.nanoid(),
+				commentId: z.string(),
 			}),
 			output: z.object({
 				count: z.number().nonnegative(),

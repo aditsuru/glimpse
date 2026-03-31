@@ -3,7 +3,7 @@ import { and, asc, eq, gt, ilike, sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
-import { profilesTable, user } from "@/drizzle/schema";
+import { followersTable, profilesTable, user } from "@/drizzle/schema";
 import { auth } from "@/lib/auth";
 import { config } from "@/lib/config";
 import { RESERVED_USERNAMES } from "@/lib/constants";
@@ -41,6 +41,14 @@ export class ProfileService {
 				website: profilesTable.website,
 				isGlimpseVerified: profilesTable.isGlimpseVerified,
 				userId: profilesTable.userId,
+				isFollowingUser:
+					sql<boolean>`EXISTS(SELECT 1 FROM ${followersTable} WHERE ${followersTable.followerId} = ${this.userId} AND ${followersTable.followingId} = ${user.id})`.as(
+						"is_following_user"
+					),
+				isFollowedByUser:
+					sql<boolean>`EXISTS(SELECT 1 FROM ${followersTable} WHERE ${followersTable.followerId} = ${user.id} AND ${followersTable.followingId} = ${this.userId})`.as(
+						"is_followed_by_user"
+					),
 			})
 			.from(profilesTable)
 			.innerJoin(user, eq(profilesTable.userId, user.id))
@@ -66,14 +74,20 @@ export class ProfileService {
 	async update({
 		name,
 		username,
-		...args
+		bio,
+		website,
+		avatarKey,
+		avatarUrl,
+		bannerKey,
+		bannerUrl,
 	}: z.infer<typeof profileSchema.update.input>): Promise<
 		z.infer<typeof profileSchema.update.output>
 	> {
-		const { avatarKey, avatarUrl, bannerKey, bannerUrl } = args;
-
-		const profileUpdateData = { ...args };
+		const profileUpdateData: Partial<typeof profilesTable.$inferInsert> = {};
 		const fileOperations = [];
+
+		if (bio !== undefined) profileUpdateData.bio = bio;
+		if (website !== undefined) profileUpdateData.website = website;
 
 		if (avatarKey && avatarUrl) {
 			const avatar = getPermanentKeyAndUrl(avatarKey);
@@ -108,10 +122,12 @@ export class ProfileService {
 		}
 
 		await Promise.all([
-			this.db
-				.update(profilesTable)
-				.set(profileUpdateData)
-				.where(eq(profilesTable.userId, this.userId)),
+			Object.keys(profileUpdateData).length > 0
+				? this.db
+						.update(profilesTable)
+						.set(profileUpdateData)
+						.where(eq(profilesTable.userId, this.userId))
+				: Promise.resolve(),
 
 			name !== undefined || username !== undefined
 				? auth.api.updateUser({
@@ -141,6 +157,14 @@ export class ProfileService {
 				avatarUrl: profilesTable.avatarUrl,
 				isGlimpseVerified: profilesTable.isGlimpseVerified,
 				createdAt: user.createdAt,
+				isFollowingUser:
+					sql<boolean>`EXISTS(SELECT 1 FROM ${followersTable} WHERE ${followersTable.followerId} = ${this.userId} AND ${followersTable.followingId} = ${user.id})`.as(
+						"is_following_user"
+					),
+				isFollowedByUser:
+					sql<boolean>`EXISTS(SELECT 1 FROM ${followersTable} WHERE ${followersTable.followerId} = ${user.id} AND ${followersTable.followingId} = ${this.userId})`.as(
+						"is_followed_by_user"
+					),
 			})
 			.from(user)
 			.innerJoin(profilesTable, eq(profilesTable.userId, user.id))

@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const BaseCommentSchema = z.object({
-	id: z.nanoid(),
+	id: z.string(),
 	userId: z.string(),
 	postId: z.string(),
 	body: z.string(),

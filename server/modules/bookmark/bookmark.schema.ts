@@ -15,7 +15,7 @@ export const bookmarkSchema = {
 	},
 	add: {
 		input: z.object({
-			postId: z.nanoid(),
+			postId: z.string(),
 		}),
 		output: z.object({
 			count: z.number().nonnegative(),
@@ -23,7 +23,7 @@ export const bookmarkSchema = {
 	},
 	remove: {
 		input: z.object({
-			postId: z.nanoid(),
+			postId: z.string(),
 		}),
 		output: z.object({
 			count: z.number().nonnegative(),

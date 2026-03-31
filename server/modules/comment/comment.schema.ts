@@ -7,7 +7,7 @@ import {
 export const commentSchema = {
 	getByPost: {
 		input: z.object({
-			postId: z.nanoid(),
+			postId: z.string(),
 			nextCursor: z.date().optional(),
 		}),
 		output: z.object({
@@ -17,13 +17,13 @@ export const commentSchema = {
 	},
 	getByComment: {
 		input: z.object({
-			parentCommentId: z.nanoid(),
+			parentCommentId: z.string(),
 			nextCursor: z.date().optional(),
 		}),
 		output: z.object({
 			items: z.array(
 				OutputCommentSchema.extend({
-					parentCommentId: z.nanoid().nullable(),
+					parentCommentId: z.string().nullable(),
 				})
 			),
 			nextCursor: z.date().nullable(),
@@ -36,7 +36,7 @@ export const commentSchema = {
 		output: z.object({
 			items: z.array(
 				OutputCommentSchema.extend({
-					parentCommentId: z.nanoid().nullable(),
+					parentCommentId: z.string().nullable(),
 				})
 			),
 			nextCursor: z.date().nullable(),
@@ -48,16 +48,16 @@ export const commentSchema = {
 			createdAt: true,
 			userId: true,
 		}).extend({
-			parentCommentId: z.nanoid().optional(),
+			parentCommentId: z.string().optional(),
 		}),
 		output: z.object({
-			commentId: z.nanoid(),
+			commentId: z.string(),
 		}),
 	},
 	delete: {
 		input: z.object({ commentId: z.string() }),
 		output: z.object({
-			commentId: z.nanoid(),
+			commentId: z.string(),
 		}),
 	},
 };

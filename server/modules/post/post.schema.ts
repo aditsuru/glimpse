@@ -23,20 +23,20 @@ export const postSchema = {
 			attachments: z.array(AttachmentSchema).optional(),
 		}),
 		output: z.object({
-			postId: z.nanoid(),
+			postId: z.string(),
 		}),
 	},
 	delete: {
 		input: z.object({
-			postId: z.nanoid(),
+			postId: z.string(),
 		}),
 		output: z.object({
-			postId: z.nanoid(),
+			postId: z.string(),
 		}),
 	},
 	markPostSeen: {
 		input: z.object({
-			postId: z.nanoid(),
+			postId: z.string(),
 		}),
 		output: z.object({
 			success: true,

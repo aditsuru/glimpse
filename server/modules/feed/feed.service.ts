@@ -59,7 +59,7 @@ export class FeedService {
 			};
 		} else if (source === "db") {
 			// Calculate P (Engagement)
-			const points = sql`((count(${postLikesTable.userId}) * 2) + (count(${commentsTable.id}) * 5) + ${postsTable.views})`;
+			const points = sql`((count(distinct ${postLikesTable.userId}) * 2) + (count(distinct ${commentsTable.id}) * 5) + ${postsTable.views})`;
 
 			// Calculate T (Time in hours)
 			const hoursOld = sql`EXTRACT(EPOCH FROM (now() - ${postsTable.createdAt})) / 3600`;

@@ -10,7 +10,7 @@ export const AttachmentSchema = z.object({
 });
 
 export const BasePostSchema = z.object({
-	id: z.nanoid(),
+	id: z.string(),
 	userId: z.string(),
 	body: z.string().optional(),
 	hasAttachments: z.boolean(),
