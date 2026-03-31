@@ -51,6 +51,33 @@ export const config = createEnv({
 		POSTS_PAGINATION_LIMIT: z.coerce.number().positive().default(10),
 		PROFILE_PAGINATION_LIMIT: z.coerce.number().positive().default(10),
 	},
-	client: {},
-	experimental__runtimeEnv: {},
+	client: {
+		// General
+		NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
+
+		// React Query
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME: z
+			.string()
+			.transform((val) => ms(val as StringValue))
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default(300000),
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME: z
+			.string()
+			.transform((val) => ms(val as StringValue))
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default(300000),
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT: z.coerce
+			.number()
+			.nonnegative()
+			.default(1),
+	},
+	experimental__runtimeEnv: {
+		NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME:
+			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME,
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME:
+			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME,
+		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT:
+			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
+	},
 });
