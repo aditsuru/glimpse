@@ -68,13 +68,16 @@ export class BookmarkService {
 			.orderBy(desc(userBookmarks.createdAt))
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
-		const likedSet = await fetchUserLikedPostIds(
-			this.db,
-			this.userId,
-			posts.map((post) => post.id)
-		);
+		if (posts.length === 0) {
+			return paginateResult([], config.PROFILE_PAGINATION_LIMIT, () => null);
+		}
 
-		const attachmentsMap = await fetchAttachmentsMap(this.db, posts);
+		const postIds = posts.map((post) => post.id);
+
+		const [likedSet, attachmentsMap] = await Promise.all([
+			fetchUserLikedPostIds(this.db, this.userId, postIds),
+			fetchAttachmentsMap(this.db, posts),
+		]);
 
 		const items = posts.map(({ bookmarkedAt, ...post }) => ({
 			...post,
