@@ -9,6 +9,12 @@ export const ALLOWED_FILES_TYPES = [
 
 export const ATTACHMENT_TYPES = ["image", "gif", "video"] as const;
 
+export const REDIS_KEYS = {
+	POST_SEEN: (userId: string) => `post:seen:${userId}`,
+	VIEWS_COUNT: (postId: string) => `post:views:${postId}`,
+	SYNC_PENDING_VIEWS_LIST: () => `sync:pending:views`,
+};
+
 export const RESERVED_USERNAMES = new Set([
 	"admin",
 	"administrator",

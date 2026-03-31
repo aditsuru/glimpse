@@ -12,6 +12,12 @@ export const config = createEnv({
 		// Database
 		DATABASE_URL: z.url(),
 
+		// Redis
+		UPSTASH_REDIS_REST_URL: z.url(),
+		UPSTASH_REDIS_REST_TOKEN: z.string(),
+
+		REDIS_FEED_SEEN_MAX_ITEMS: z.coerce.number().default(500),
+
 		// Better auth config
 		COOKIE_CACHE_AGE: z
 			.string()
