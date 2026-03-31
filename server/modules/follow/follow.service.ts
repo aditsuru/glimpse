@@ -3,19 +3,21 @@ import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import { followersTable, profilesTable, user } from "@/drizzle/schema";
 import { config } from "@/lib/config";
-import { getFollowingsCount } from "@/server/shared/follow.helper";
-import { paginateResult } from "@/server/shared/paginate.helper";
+import { paginateResult } from "@/server/shared/helpers/paginate";
+import { getFollowingsCount } from "@/server/shared/queries/follow";
 import type { followSchema } from "./follow.schema";
 
 export class FollowService {
-	constructor(private db: typeof DBType) {}
+	constructor(
+		private db: typeof DBType,
+		private userId: string
+	) {}
 
 	async getFollowers({
 		nextCursor,
-		userId,
-	}: z.infer<typeof followSchema.getFollowers.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof followSchema.getFollowers.output>> {
+	}: z.infer<typeof followSchema.getFollowers.input>): Promise<
+		z.infer<typeof followSchema.getFollowers.output>
+	> {
 		const followers = await this.db
 			.select({
 				profileId: user.id,
@@ -31,7 +33,7 @@ export class FollowService {
 				followersTable,
 				and(
 					eq(followersTable.followerId, user.id),
-					eq(followersTable.followingId, userId)
+					eq(followersTable.followingId, this.userId)
 				)
 			)
 			.where(nextCursor ? lt(user.createdAt, nextCursor) : undefined)
@@ -48,10 +50,9 @@ export class FollowService {
 
 	async getFollowings({
 		nextCursor,
-		userId,
-	}: z.infer<typeof followSchema.getFollowings.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof followSchema.getFollowings.output>> {
+	}: z.infer<typeof followSchema.getFollowings.input>): Promise<
+		z.infer<typeof followSchema.getFollowings.output>
+	> {
 		const followings = await this.db
 			.select({
 				profileId: user.id,
@@ -67,7 +68,7 @@ export class FollowService {
 				followersTable,
 				and(
 					eq(followersTable.followingId, user.id),
-					eq(followersTable.followerId, userId)
+					eq(followersTable.followerId, this.userId)
 				)
 			)
 			.where(nextCursor ? lt(user.createdAt, nextCursor) : undefined)
@@ -84,14 +85,13 @@ export class FollowService {
 
 	async add({
 		followingId,
-		userId,
-	}: z.infer<typeof followSchema.add.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof followSchema.add.output>> {
+	}: z.infer<typeof followSchema.add.input>): Promise<
+		z.infer<typeof followSchema.add.output>
+	> {
 		await this.db
 			.insert(followersTable)
 			.values({
-				followerId: userId,
+				followerId: this.userId,
 				followingId,
 			})
 			.onConflictDoNothing();
@@ -101,15 +101,14 @@ export class FollowService {
 
 	async remove({
 		followingId,
-		userId,
-	}: z.infer<typeof followSchema.remove.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof followSchema.remove.output>> {
+	}: z.infer<typeof followSchema.remove.input>): Promise<
+		z.infer<typeof followSchema.remove.output>
+	> {
 		await this.db
 			.delete(followersTable)
 			.where(
 				and(
-					eq(followersTable.followerId, userId),
+					eq(followersTable.followerId, this.userId),
 					eq(followersTable.followingId, followingId)
 				)
 			);

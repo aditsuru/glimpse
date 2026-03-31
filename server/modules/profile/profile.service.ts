@@ -7,21 +7,24 @@ import { profilesTable, user } from "@/drizzle/schema";
 import { auth } from "@/lib/auth";
 import { config } from "@/lib/config";
 import { RESERVED_USERNAMES } from "@/lib/constants";
-import {
-	getFollowersCount,
-	getFollowingsCount,
-} from "@/server/shared/follow.helper";
-import { paginateResult } from "@/server/shared/paginate.helper";
-import { isSafe } from "@/server/shared/profanity.helper";
+import { paginateResult } from "@/server/shared/helpers/paginate";
+import { isSafe } from "@/server/shared/helpers/profanity";
 import {
 	confirmUpload,
 	deleteFile,
 	getPermanentKeyAndUrl,
-} from "@/server/shared/s3.helper";
+} from "@/server/shared/helpers/s3";
+import {
+	getFollowersCount,
+	getFollowingsCount,
+} from "@/server/shared/queries/follow";
 import type { profileSchema } from "./profile.schema";
 
 export class ProfileService {
-	constructor(private db: typeof DBType) {}
+	constructor(
+		private db: typeof DBType,
+		private userId: string
+	) {}
 
 	async get({
 		username,
@@ -61,13 +64,12 @@ export class ProfileService {
 	}
 
 	async update({
-		userId,
 		name,
 		username,
 		...args
-	}: z.infer<typeof profileSchema.update.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof profileSchema.update.output>> {
+	}: z.infer<typeof profileSchema.update.input>): Promise<
+		z.infer<typeof profileSchema.update.output>
+	> {
 		const { avatarKey, avatarUrl, bannerKey, bannerUrl } = args;
 
 		const profileUpdateData = { ...args };
@@ -95,7 +97,7 @@ export class ProfileService {
 				bannerKey: profilesTable.bannerKey,
 			})
 			.from(profilesTable)
-			.where(eq(profilesTable.userId, userId))
+			.where(eq(profilesTable.userId, this.userId))
 			.limit(1);
 
 		if (avatarKey && currentProfile?.avatarKey) {
@@ -109,7 +111,7 @@ export class ProfileService {
 			this.db
 				.update(profilesTable)
 				.set(profileUpdateData)
-				.where(eq(profilesTable.userId, userId)),
+				.where(eq(profilesTable.userId, this.userId)),
 
 			name !== undefined || username !== undefined
 				? auth.api.updateUser({

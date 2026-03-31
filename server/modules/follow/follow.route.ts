@@ -3,7 +3,7 @@ import { followSchema } from "./follow.schema";
 import { FollowService } from "./follow.service";
 
 const followProcedure = authedProcedure.use(({ context, next }) => {
-	const followService = new FollowService(context.db);
+	const followService = new FollowService(context.db, context.session.user.id);
 	return next({
 		context: {
 			followService,
@@ -18,7 +18,6 @@ export const followRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.followService.getFollowers({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 	getFollowings: followProcedure
@@ -27,7 +26,6 @@ export const followRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.followService.getFollowings({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 
@@ -37,7 +35,6 @@ export const followRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.followService.add({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 
@@ -47,7 +44,6 @@ export const followRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.followService.remove({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 });

@@ -3,7 +3,10 @@ import { commentSchema } from "./comment.schema";
 import { CommentService } from "./comment.service";
 
 const commentProcedure = authedProcedure.use(({ context, next }) => {
-	const commentService = new CommentService(context.db);
+	const commentService = new CommentService(
+		context.db,
+		context.session.user.id
+	);
 	return next({
 		context: {
 			commentService,
@@ -18,7 +21,6 @@ export const commentRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.commentService.getByPost({
 				...input,
-				viewerId: context.session.user.id,
 			});
 		}),
 	getByComment: commentProcedure
@@ -27,7 +29,6 @@ export const commentRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.commentService.getByComment({
 				...input,
-				viewerId: context.session.user.id,
 			});
 		}),
 	getCommentsHistory: commentProcedure
@@ -36,7 +37,6 @@ export const commentRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.commentService.getCommentsHistory({
 				...input,
-				viewerId: context.session.user.id,
 			});
 		}),
 	create: commentProcedure
@@ -45,7 +45,6 @@ export const commentRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.commentService.create({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 	delete: commentProcedure
@@ -54,7 +53,6 @@ export const commentRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.commentService.delete({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 });

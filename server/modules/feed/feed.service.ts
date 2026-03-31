@@ -9,8 +9,8 @@ export class FeedService {
 		userId,
 	}: z.infer<typeof feedSchema.get.input> & {
 		userId: string;
-	}): Promise<z.infer<typeof feedSchema.get.output>> {
-		// Implementation
-		return {}
-    }
+	}) {
+		// : Promise<z.infer<typeof feedSchema.get.output>>
+		return {};
+	}
 }

@@ -3,7 +3,7 @@ import { postSchema } from "./post.schema";
 import { PostService } from "./post.service";
 
 const postProcedure = authedProcedure.use(({ context, next }) => {
-	const postService = new PostService(context.db);
+	const postService = new PostService(context.db, context.session.user.id);
 	return next({
 		context: {
 			postService,
@@ -18,7 +18,6 @@ export const postRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.postService.get({
 				...input,
-				viewerId: context.session.user.id,
 			});
 		}),
 	create: postProcedure
@@ -27,7 +26,6 @@ export const postRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.postService.create({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 	delete: postProcedure
@@ -36,7 +34,6 @@ export const postRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.postService.delete({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 });

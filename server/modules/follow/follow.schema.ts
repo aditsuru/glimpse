@@ -1,12 +1,5 @@
 import * as z from "zod";
-
-const BaseProfileSchema = z.object({
-	profileId: z.string(),
-	avatarUrl: z.string(),
-	username: z.string(),
-	name: z.string(),
-	isGlimpseVerified: z.boolean(),
-});
+import { BaseProfileSchema } from "@/server/shared/schemas/profile";
 
 export const followSchema = {
 	getFollowers: {

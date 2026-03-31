@@ -1,9 +1,8 @@
-import { and, count, desc, eq, inArray, lt } from "drizzle-orm";
+import { and, count, desc, eq, lt } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import {
-	attachmentsTable,
 	bookmarksTable,
 	commentsTable,
 	postLikesTable,
@@ -12,20 +11,24 @@ import {
 	user,
 } from "@/drizzle/schema";
 import { config } from "@/lib/config";
-import type { ATTACHMENT_TYPES } from "@/lib/constants";
-import { paginateResult } from "@/server/shared/paginate.helper";
+import { paginateResult } from "@/server/shared/helpers/paginate";
+import { fetchAttachmentsMap } from "@/server/shared/queries/attachments";
+import {
+	fetchUserLikedPostIds,
+	getInteractionCount,
+} from "@/server/shared/queries/post";
 import type { bookmarkSchema } from "./bookmark.schema";
 
 export class BookmarkService {
-	constructor(private db: typeof DBType) {}
+	constructor(
+		private db: typeof DBType,
+		private userId: string
+	) {}
 
 	// --- AI GENERATED START ---
 	async getBookmarksHistory({
 		nextCursor,
-		viewerId,
-	}: z.infer<typeof bookmarkSchema.profile.getBookmarksHistory.input> & {
-		viewerId: string;
-	}): Promise<
+	}: z.infer<typeof bookmarkSchema.profile.getBookmarksHistory.input>): Promise<
 		z.infer<typeof bookmarkSchema.profile.getBookmarksHistory.output>
 	> {
 		const userBookmarks = alias(bookmarksTable, "user_bookmarks");
@@ -52,7 +55,7 @@ export class BookmarkService {
 				userBookmarks,
 				and(
 					eq(userBookmarks.postId, postsTable.id),
-					eq(userBookmarks.userId, viewerId),
+					eq(userBookmarks.userId, this.userId),
 					nextCursor ? lt(userBookmarks.createdAt, nextCursor) : undefined
 				)
 			)
@@ -65,55 +68,13 @@ export class BookmarkService {
 			.orderBy(desc(userBookmarks.createdAt))
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
-		const hasUserLikedQuery =
-			posts.length > 0
-				? await this.db
-						.select({ postId: postLikesTable.postId })
-						.from(postLikesTable)
-						.where(
-							and(
-								eq(postLikesTable.userId, viewerId),
-								inArray(
-									postLikesTable.postId,
-									posts.map((p) => p.id)
-								)
-							)
-						)
-				: [];
+		const likedSet = await fetchUserLikedPostIds(
+			this.db,
+			this.userId,
+			posts.map((post) => post.id)
+		);
 
-		const likedSet = new Set(hasUserLikedQuery.map((r) => r.postId));
-
-		const attachmentsMap = new Map<
-			string,
-			{ fileUrl: string; fileType: (typeof ATTACHMENT_TYPES)[number] }[]
-		>();
-
-		const postsWithAttachments = posts.filter((p) => p.hasAttachments);
-		if (postsWithAttachments.length > 0) {
-			const allAttachments = await this.db
-				.select({
-					postId: attachmentsTable.postId,
-					fileUrl: attachmentsTable.fileUrl,
-					fileType: attachmentsTable.fileType,
-				})
-				.from(attachmentsTable)
-				.where(
-					inArray(
-						attachmentsTable.postId,
-						postsWithAttachments.map((p) => p.id)
-					)
-				);
-
-			for (const attachment of allAttachments) {
-				if (!attachmentsMap.has(attachment.postId)) {
-					attachmentsMap.set(attachment.postId, []);
-				}
-				attachmentsMap.get(attachment.postId)?.push({
-					fileUrl: attachment.fileUrl,
-					fileType: attachment.fileType,
-				});
-			}
-		}
+		const attachmentsMap = await fetchAttachmentsMap(this.db, posts);
 
 		const items = posts.map(({ bookmarkedAt, ...post }) => ({
 			...post,
@@ -132,19 +93,19 @@ export class BookmarkService {
 			(item) => item.createdAt
 		);
 	}
+
 	// --- AI GENERATED END ---
 
 	async add({
 		postId,
-		userId,
-	}: z.infer<typeof bookmarkSchema.add.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof bookmarkSchema.add.output>> {
+	}: z.infer<typeof bookmarkSchema.add.input>): Promise<
+		z.infer<typeof bookmarkSchema.add.output>
+	> {
 		await this.db
 			.insert(bookmarksTable)
 			.values({
 				postId,
-				userId,
+				userId: this.userId,
 			})
 			.onConflictDoNothing();
 
@@ -157,16 +118,15 @@ export class BookmarkService {
 
 	async remove({
 		postId,
-		userId,
-	}: z.infer<typeof bookmarkSchema.remove.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof bookmarkSchema.remove.output>> {
+	}: z.infer<typeof bookmarkSchema.remove.input>): Promise<
+		z.infer<typeof bookmarkSchema.remove.output>
+	> {
 		await this.db
 			.delete(bookmarksTable)
 			.where(
 				and(
 					eq(bookmarksTable.postId, postId),
-					eq(bookmarksTable.userId, userId)
+					eq(bookmarksTable.userId, this.userId)
 				)
 			);
 
@@ -182,13 +142,13 @@ export class BookmarkService {
 	}: {
 		postId: string;
 	}): Promise<{ count: number }> {
-		const [{ count: bookmarksCount }] = await this.db
-			.select({ count: count() })
-			.from(bookmarksTable)
-			.where(eq(bookmarksTable.postId, postId));
-
 		return {
-			count: Number(bookmarksCount),
+			count: await getInteractionCount(
+				this.db,
+				bookmarksTable,
+				bookmarksTable.postId,
+				postId
+			),
 		};
 	}
 }

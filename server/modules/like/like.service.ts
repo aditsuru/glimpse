@@ -1,9 +1,8 @@
-import { and, count, desc, eq, inArray, lt } from "drizzle-orm";
+import { and, count, desc, eq, lt } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type * as z from "zod";
 import type { db as DBType } from "@/drizzle/db";
 import {
-	attachmentsTable,
 	bookmarksTable,
 	commentLikesTable,
 	commentsTable,
@@ -13,20 +12,26 @@ import {
 	user,
 } from "@/drizzle/schema";
 import { config } from "@/lib/config";
-import type { ATTACHMENT_TYPES } from "@/lib/constants";
-import { paginateResult } from "@/server/shared/paginate.helper";
+import { paginateResult } from "@/server/shared/helpers/paginate";
+import { fetchAttachmentsMap } from "@/server/shared/queries/attachments";
+import {
+	fetchUserBookmarkedPostIds,
+	getInteractionCount,
+} from "@/server/shared/queries/post";
 import type { likeSchema } from "./like.schema";
 
 export class LikeProfileService {
-	constructor(private db: typeof DBType) {}
+	constructor(
+		private db: typeof DBType,
+		private userId: string
+	) {}
 
 	// --- AI GENERATED START ---
 	async getLikesHistory({
 		nextCursor,
-		viewerId,
-	}: z.infer<typeof likeSchema.profile.getLikesHistory.input> & {
-		viewerId: string;
-	}): Promise<z.infer<typeof likeSchema.profile.getLikesHistory.output>> {
+	}: z.infer<typeof likeSchema.profile.getLikesHistory.input>): Promise<
+		z.infer<typeof likeSchema.profile.getLikesHistory.output>
+	> {
 		const userLikes = alias(postLikesTable, "user_likes");
 
 		const posts = await this.db
@@ -51,7 +56,7 @@ export class LikeProfileService {
 				userLikes,
 				and(
 					eq(userLikes.postId, postsTable.id),
-					eq(userLikes.userId, viewerId),
+					eq(userLikes.userId, this.userId),
 					nextCursor ? lt(userLikes.createdAt, nextCursor) : undefined
 				)
 			)
@@ -64,55 +69,13 @@ export class LikeProfileService {
 			.orderBy(desc(userLikes.createdAt))
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
-		const hasUserBookmarkedQuery =
-			posts.length > 0
-				? await this.db
-						.select({ postId: bookmarksTable.postId })
-						.from(bookmarksTable)
-						.where(
-							and(
-								eq(bookmarksTable.userId, viewerId),
-								inArray(
-									bookmarksTable.postId,
-									posts.map((p) => p.id)
-								)
-							)
-						)
-				: [];
+		const bookmarkedSet = await fetchUserBookmarkedPostIds(
+			this.db,
+			this.userId,
+			posts.map((post) => post.id)
+		);
 
-		const bookmarkedSet = new Set(hasUserBookmarkedQuery.map((r) => r.postId));
-
-		const attachmentsMap = new Map<
-			string,
-			{ fileUrl: string; fileType: (typeof ATTACHMENT_TYPES)[number] }[]
-		>();
-
-		const postsWithAttachments = posts.filter((p) => p.hasAttachments);
-		if (postsWithAttachments.length > 0) {
-			const allAttachments = await this.db
-				.select({
-					postId: attachmentsTable.postId,
-					fileUrl: attachmentsTable.fileUrl,
-					fileType: attachmentsTable.fileType,
-				})
-				.from(attachmentsTable)
-				.where(
-					inArray(
-						attachmentsTable.postId,
-						postsWithAttachments.map((p) => p.id)
-					)
-				);
-
-			for (const attachment of allAttachments) {
-				if (!attachmentsMap.has(attachment.postId)) {
-					attachmentsMap.set(attachment.postId, []);
-				}
-				attachmentsMap.get(attachment.postId)?.push({
-					fileUrl: attachment.fileUrl,
-					fileType: attachment.fileType,
-				});
-			}
-		}
+		const attachmentsMap = await fetchAttachmentsMap(this.db, posts);
 
 		const items = posts.map(({ likedAt, ...post }) => ({
 			...post,
@@ -135,34 +98,36 @@ export class LikeProfileService {
 }
 
 export class LikePostService {
-	constructor(private db: typeof DBType) {}
+	constructor(
+		private db: typeof DBType,
+		private userId: string
+	) {}
 
 	private async getLikes({
 		postId,
 	}: {
 		postId: string;
 	}): Promise<{ count: number }> {
-		const [{ count: likesCount }] = await this.db
-			.select({ count: count() })
-			.from(postLikesTable)
-			.where(eq(postLikesTable.postId, postId));
-
 		return {
-			count: Number(likesCount),
+			count: await getInteractionCount(
+				this.db,
+				postLikesTable,
+				postLikesTable.postId,
+				postId
+			),
 		};
 	}
 
 	async add({
 		postId,
-		userId,
-	}: z.infer<typeof likeSchema.post.add.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof likeSchema.post.add.output>> {
+	}: z.infer<typeof likeSchema.post.add.input>): Promise<
+		z.infer<typeof likeSchema.post.add.output>
+	> {
 		await this.db
 			.insert(postLikesTable)
 			.values({
 				postId,
-				userId,
+				userId: this.userId,
 			})
 			.onConflictDoNothing();
 
@@ -175,16 +140,15 @@ export class LikePostService {
 
 	async remove({
 		postId,
-		userId,
-	}: z.infer<typeof likeSchema.post.remove.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof likeSchema.post.remove.output>> {
+	}: z.infer<typeof likeSchema.post.remove.input>): Promise<
+		z.infer<typeof likeSchema.post.remove.output>
+	> {
 		await this.db
 			.delete(postLikesTable)
 			.where(
 				and(
 					eq(postLikesTable.postId, postId),
-					eq(postLikesTable.userId, userId)
+					eq(postLikesTable.userId, this.userId)
 				)
 			);
 
@@ -197,34 +161,36 @@ export class LikePostService {
 }
 
 export class LikeCommentService {
-	constructor(private db: typeof DBType) {}
+	constructor(
+		private db: typeof DBType,
+		private userId: string
+	) {}
 
 	private async getLikes({
 		commentId,
 	}: {
 		commentId: string;
 	}): Promise<{ count: number }> {
-		const likesCount = await this.db
-			.select({ count: count() })
-			.from(commentLikesTable)
-			.where(eq(commentLikesTable.commentId, commentId));
-
 		return {
-			count: Number(likesCount[0].count),
+			count: await getInteractionCount(
+				this.db,
+				commentLikesTable,
+				commentLikesTable.commentId,
+				commentId
+			),
 		};
 	}
 
 	async add({
 		commentId,
-		userId,
-	}: z.infer<typeof likeSchema.comment.add.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof likeSchema.comment.add.output>> {
+	}: z.infer<typeof likeSchema.comment.add.input>): Promise<
+		z.infer<typeof likeSchema.comment.add.output>
+	> {
 		await this.db
 			.insert(commentLikesTable)
 			.values({
 				commentId,
-				userId,
+				userId: this.userId,
 			})
 			.onConflictDoNothing();
 
@@ -237,16 +203,15 @@ export class LikeCommentService {
 
 	async remove({
 		commentId,
-		userId,
-	}: z.infer<typeof likeSchema.comment.remove.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof likeSchema.comment.remove.output>> {
+	}: z.infer<typeof likeSchema.comment.remove.input>): Promise<
+		z.infer<typeof likeSchema.comment.remove.output>
+	> {
 		await this.db
 			.delete(commentLikesTable)
 			.where(
 				and(
 					eq(commentLikesTable.commentId, commentId),
-					eq(commentLikesTable.userId, userId)
+					eq(commentLikesTable.userId, this.userId)
 				)
 			);
 

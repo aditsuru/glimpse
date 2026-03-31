@@ -3,7 +3,10 @@ import { bookmarkSchema } from "./bookmark.schema";
 import { BookmarkService } from "./bookmark.service";
 
 const bookmarkProcedure = authedProcedure.use(({ context, next }) => {
-	const bookmarkService = new BookmarkService(context.db);
+	const bookmarkService = new BookmarkService(
+		context.db,
+		context.session.user.id
+	);
 	return next({
 		context: {
 			bookmarkService,
@@ -19,7 +22,6 @@ export const bookmarkRouter = base.router({
 			.handler(async ({ input, context }) => {
 				return await context.bookmarkService.getBookmarksHistory({
 					...input,
-					viewerId: context.session.user.id,
 				});
 			}),
 	}),
@@ -29,7 +31,6 @@ export const bookmarkRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.bookmarkService.add({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 	remove: bookmarkProcedure
@@ -38,7 +39,6 @@ export const bookmarkRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.bookmarkService.remove({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 });

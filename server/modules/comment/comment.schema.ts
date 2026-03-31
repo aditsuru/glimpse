@@ -1,20 +1,8 @@
 import * as z from "zod";
-
-const BaseCommentSchema = z.object({
-	id: z.nanoid(),
-	userId: z.string(),
-	postId: z.string(),
-	body: z.string(),
-	createdAt: z.coerce.date(),
-});
-
-const OutputCommentSchema = BaseCommentSchema.extend({
-	authorUsername: z.string(),
-	authorAvatarUrl: z.string(),
-	authorIsVerified: z.boolean(),
-	hasUserLiked: z.boolean(),
-	likes: z.number().nonnegative(),
-});
+import {
+	BaseCommentSchema,
+	OutputCommentSchema,
+} from "@/server/shared/schemas/comment";
 
 export const commentSchema = {
 	getByPost: {

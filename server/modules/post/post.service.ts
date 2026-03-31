@@ -12,24 +12,27 @@ import {
 	user,
 } from "@/drizzle/schema";
 import { logger } from "@/lib/logger";
-import { markPostAsSeen } from "@/server/shared/redis.helper";
+import { markPostAsSeen } from "@/server/shared/helpers/redis";
 import {
 	confirmUpload,
 	deleteFile,
 	getPermanentKeyAndUrl,
-} from "@/server/shared/s3.helper";
-import type { AttachmentSchema, postSchema } from "./post.schema";
+} from "@/server/shared/helpers/s3";
+import type { AttachmentSchema } from "@/server/shared/schemas/post";
+import type { postSchema } from "./post.schema";
 
 export class PostService {
-	constructor(private db: typeof DBType) {}
+	constructor(
+		private db: typeof DBType,
+		private userId: string
+	) {}
 
 	// --- AI GUIDED START ---
 	async get({
 		postId,
-		viewerId,
-	}: z.infer<typeof postSchema.get.input> & {
-		viewerId: string;
-	}): Promise<z.infer<typeof postSchema.get.output>> {
+	}: z.infer<typeof postSchema.get.input>): Promise<
+		z.infer<typeof postSchema.get.output>
+	> {
 		const [post] = await this.db
 			.select({
 				id: postsTable.id,
@@ -82,7 +85,7 @@ export class PostService {
 				.where(
 					and(
 						eq(postLikesTable.postId, id),
-						eq(postLikesTable.userId, viewerId)
+						eq(postLikesTable.userId, this.userId)
 					)
 				)
 				.limit(1),
@@ -92,7 +95,7 @@ export class PostService {
 				.where(
 					and(
 						eq(bookmarksTable.postId, id),
-						eq(bookmarksTable.userId, viewerId)
+						eq(bookmarksTable.userId, this.userId)
 					)
 				)
 				.limit(1),
@@ -134,10 +137,9 @@ export class PostService {
 	async create({
 		attachments,
 		body,
-		userId,
-	}: z.infer<typeof postSchema.create.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof postSchema.create.output>> {
+	}: z.infer<typeof postSchema.create.input>): Promise<
+		z.infer<typeof postSchema.create.output>
+	> {
 		if (!attachments && !body)
 			throw new ORPCError("BAD_REQUEST", {
 				message:
@@ -162,7 +164,7 @@ export class PostService {
 			const [newPost] = await tx
 				.insert(postsTable)
 				.values({
-					userId,
+					userId: this.userId,
 					body: body ? body : undefined,
 					hasAttachments,
 				})
@@ -199,15 +201,16 @@ export class PostService {
 
 	async delete({
 		postId,
-		userId,
-	}: z.infer<typeof postSchema.delete.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof postSchema.delete.output>> {
+	}: z.infer<typeof postSchema.delete.input>): Promise<
+		z.infer<typeof postSchema.delete.output>
+	> {
 		const keys = await this.db.transaction(async (tx) => {
 			const [post] = await tx
 				.select()
 				.from(postsTable)
-				.where(and(eq(postsTable.id, postId), eq(postsTable.userId, userId)))
+				.where(
+					and(eq(postsTable.id, postId), eq(postsTable.userId, this.userId))
+				)
 				.limit(1);
 
 			if (!post) {
@@ -246,12 +249,11 @@ export class PostService {
 	}
 
 	async markPostSeen({
-		userId,
 		postId,
-	}: z.infer<typeof postSchema.markPostSeen.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof postSchema.markPostSeen.output>> {
-		await markPostAsSeen(userId, postId);
+	}: z.infer<typeof postSchema.markPostSeen.input>): Promise<
+		z.infer<typeof postSchema.markPostSeen.output>
+	> {
+		await markPostAsSeen(this.userId, postId);
 		return { success: true };
 	}
 }

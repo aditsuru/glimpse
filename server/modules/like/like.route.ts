@@ -8,7 +8,10 @@ import {
 
 // Profile
 const likeProfileProcedure = authedProcedure.use(({ context, next }) => {
-	const likeProfileService = new LikeProfileService(context.db);
+	const likeProfileService = new LikeProfileService(
+		context.db,
+		context.session.user.id
+	);
 	return next({
 		context: {
 			likeProfileService,
@@ -23,14 +26,16 @@ const likeProfileRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.likeProfileService.getLikesHistory({
 				...input,
-				viewerId: context.session.user.id,
 			});
 		}),
 });
 
 // Posts
 const likePostProcedure = authedProcedure.use(({ context, next }) => {
-	const likePostService = new LikePostService(context.db);
+	const likePostService = new LikePostService(
+		context.db,
+		context.session.user.id
+	);
 	return next({
 		context: {
 			likePostService,
@@ -45,7 +50,6 @@ const likePostRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.likePostService.add({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 	remove: likePostProcedure
@@ -54,14 +58,16 @@ const likePostRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.likePostService.remove({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 });
 
 // Comments
 const likeCommentProcedure = authedProcedure.use(({ context, next }) => {
-	const likeCommentService = new LikeCommentService(context.db);
+	const likeCommentService = new LikeCommentService(
+		context.db,
+		context.session.user.id
+	);
 	return next({
 		context: {
 			likeCommentService,
@@ -76,7 +82,6 @@ const likeCommentRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.likeCommentService.add({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 	remove: likeCommentProcedure
@@ -85,7 +90,6 @@ const likeCommentRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.likeCommentService.remove({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 });

@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { PostOutputSchema } from "../post/post.schema";
+import { PostOutputSchema } from "@/server/shared/schemas/post";
 
 export const likeSchema = {
 	profile: {
