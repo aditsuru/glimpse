@@ -3,7 +3,11 @@ import { {{name}}Schema } from "./{{name}}.schema";
 import { {{pascalCase name}}Service } from "./{{name}}.service";
 
 const {{name}}Procedure = authedProcedure.use(({ context, next }) => {
-	const {{name}}Service = new {{pascalCase name}}Service(context.db);
+	const {{name}}Service = new {{pascalCase name}}Service(
+		context.db, 
+		context.session.user.id
+		);
+
 	return next({
 		context: {
 			{{name}}Service,
@@ -18,7 +22,6 @@ export const {{name}}Router = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.{{name}}Service.get({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 });

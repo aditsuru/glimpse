@@ -3,7 +3,7 @@ import { feedSchema } from "./feed.schema";
 import { FeedService } from "./feed.service";
 
 const feedProcedure = authedProcedure.use(({ context, next }) => {
-	const feedService = new FeedService(context.db);
+	const feedService = new FeedService(context.db, context.session.user.id);
 	return next({
 		context: {
 			feedService,
@@ -18,7 +18,6 @@ export const feedRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.feedService.get({
 				...input,
-				userId: context.session.user.id,
 			});
 		}),
 });

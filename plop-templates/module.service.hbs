@@ -3,13 +3,11 @@ import type { db as DBType } from "@/drizzle/db";
 import type { {{name}}Schema } from "./{{name}}.schema";
 
 export class {{pascalCase name}}Service {
-	constructor(private db: typeof DBType) {}
+	constructor(private db: typeof DBType, private userId: string) {}
 
 	async get({
-		userId,
-	}: z.infer<typeof {{name}}Schema.get.input> & {
-		userId: string;
-	}): Promise<z.infer<typeof {{name}}Schema.get.output>> {
+		{{name}}Id
+	}: z.infer<typeof {{name}}Schema.get.input>): Promise<z.infer<typeof {{name}}Schema.get.output>> {
 		// Implementation
 		return {}
     }
