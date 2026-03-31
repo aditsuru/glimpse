@@ -118,13 +118,19 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+	*,
+	*::before,
+	*::after {
+		/* biome-ignore lint/complexity/noImportantStyles: Application uses it's own cursor */
+		cursor: none !important;
 	}
-  body {
-    @apply bg-background text-foreground;
+	* {
+		@apply border-border outline-ring/50;
 	}
-  html {
-    @apply font-sans;
+	body {
+		@apply bg-background text-foreground;
+	}
+	html {
+		@apply font-sans;
 	}
 }
