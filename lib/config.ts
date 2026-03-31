@@ -25,7 +25,7 @@ export const config = createEnv({
 			.transform((val) => ms(val as StringValue) / 1000)
 			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
 			.default(10),
-		AUTH_RATE_LIMIT_MAX: z.coerce.number().default(20),
+		AUTH_RATE_LIMIT_MAX: z.coerce.number().default(10),
 		AUTH_RATE_LIMIT_WINDOW: z
 			.string()
 			.transform((val) => ms(val as StringValue) / 1000)
