@@ -1,5 +1,6 @@
 import { bookmarkRouter } from "./modules/bookmark/bookmark.route";
 import { commentRouter } from "./modules/comment/comment.route";
+import { feedRouter } from "./modules/feed/feed.route";
 import { likeRouter } from "./modules/like/like.route";
 import { postRouter } from "./modules/post/post.route";
 import { profileRouter } from "./modules/profile/profile.route";
@@ -13,6 +14,7 @@ export const router = base.router({
 	like: likeRouter,
 	bookmark: bookmarkRouter,
 	profile: profileRouter,
+	feed: feedRouter,
 });
 
 export type Router = typeof router;
