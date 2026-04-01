@@ -20,7 +20,7 @@ Glimpse is a social platform built around an algorithmic feed that surfaces cont
 The feed is personalized per user, excludes already-seen content, and degrades gracefully when new content runs out. Authentication is handled with email verification enforced at the route group level, with custom logic to keep the flow flexible without being permissive.
 
 > [!NOTE]
-> This project is in early development and not yet functional.
+> Backend complete. Frontend in progress.
 
 ### Tech Stack
 
@@ -76,7 +76,7 @@ View tracking is batched — counts are written to Redis on scroll and flushed t
 - How Redis sorted sets work and using them for efficient, time-ordered seen-post tracking
 - Presigned URL pattern for direct browser-to-S3 uploads
 - Managing auth route groups with custom middleware instead of relying on library defaults
-- Structuring a tRPC API with consistent return types and shared pagination contracts
+- Structuring an oRPC API with consistent return types and shared pagination contracts
 
 [stars-url]: https://github.com/aditsuru/glimpse/stargazers
-[discord-url]: https://discord.gg/YOUR_INVITE_CODE
+[discord-url]: https://discord.gg/HP2YPGSrWU
