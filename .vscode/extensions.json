@@ -1,0 +1,10 @@
+{
+	"recommendations": [
+		"oven.bun-vscode",
+		"biomejs.biome",
+		"streetsidesoftware.code-spell-checker",
+		"esbenp.prettier-vscode",
+		"EditorConfig.EditorConfig",
+		"bradlc.vscode-tailwindcss"
+	]
+}

@@ -4,20 +4,11 @@
 	"editor.codeActionsOnSave": {
 		"source.organizeImports.biome": "explicit"
 	},
-	"[jsonc]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	"[javascript][typescript][json][jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"typescript.tsdk": "node_modules/typescript/lib",
-	"cSpell.words": [
-		"decrby",
-		"ilike",
-		"QSTASH",
-		"sadd",
-		"smembers",
-		"srem",
-		"zadd",
-		"zrange",
-		"zremrangebyrank"
-	],
+	"[github-actions-workflow][markdown][xml][yaml]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
 	"js/ts.tsdk.path": "node_modules/typescript/lib"
 }
