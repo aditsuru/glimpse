@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { generateFromEmail } from "unique-username-generator";
 import { db } from "@/drizzle/db";
+import { sendVerificationEmail } from "@/email/email";
 import { config } from "@/lib/config";
 import { redis } from "./redis";
 
@@ -41,17 +42,17 @@ export const auth = betterAuth({
 		enabled: true,
 	},
 
-	// emailVerification: {
-	// 	sendOnSignUp: true,
-	// 	autoSignInAfterVerification: true,
-	// 	sendVerificationEmail: async ({ user, url }) => {
-	// 		sendVerificationEmail({
-	// 			name: user.name,
-	// 			to: user.email,
-	// 			url,
-	// 		});
-	// 	},
-	// },
+	emailVerification: {
+		sendOnSignUp: true,
+		autoSignInAfterVerification: true,
+		sendVerificationEmail: async ({ user, url }) => {
+			sendVerificationEmail({
+				username: user.name,
+				to: user.email,
+				verificationUrl: url,
+			});
+		},
+	},
 
 	socialProviders: {
 		github: {

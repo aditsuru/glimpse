@@ -50,6 +50,9 @@ export const config = createEnv({
 		COMMENTS_PAGINATION_LIMIT: z.coerce.number().positive().default(10),
 		POSTS_PAGINATION_LIMIT: z.coerce.number().positive().default(10),
 		PROFILE_PAGINATION_LIMIT: z.coerce.number().positive().default(10),
+
+		// Resend
+		RESEND_API_KEY: z.string().nonempty(),
 	},
 	client: {
 		// General
