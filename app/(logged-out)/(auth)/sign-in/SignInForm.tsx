@@ -1,24 +1,23 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import InputController from "@/components/form/InputController";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
 	FieldDescription,
 	FieldGroup,
-	FieldLabel,
 	FieldSeparator,
 } from "@/components/ui/field";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { SignInSchema, type SignInSchemaType } from "../schema";
 import { authClient } from "@/lib/clients/auth-client";
-import { useRouter } from "next/navigation";
-import { Controller } from "react-hook-form";
-import InputController from "@/components/form/InputController";
+import { cn } from "@/lib/utils";
+import { SignInSchema, type SignInSchemaType } from "../schema";
+import { GithubIcon, GoogleIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 
 export function SignInForm({
 	className,
@@ -67,14 +66,14 @@ export function SignInForm({
 							href="#"
 							className="flex flex-col items-center gap-2 font-medium"
 						>
-							<div className="flex size-8 items-center justify-center rounded-md">
+							<div className="flex items-center justify-center rounded-md">
 								<Avatar size="lg">
 									<AvatarImage
 										src="/static/logo.png"
 										alt="Glimpse"
 										className="grayscale"
 									/>
-									<AvatarFallback>CN</AvatarFallback>
+									<AvatarFallback>G</AvatarFallback>
 								</Avatar>
 							</div>
 							<span className="sr-only">Glimpse</span>
@@ -82,7 +81,7 @@ export function SignInForm({
 
 						<h1 className="text-xl font-bold">Welcome to Glimpse</h1>
 						<FieldDescription>
-							Don&apos;t have an account? <Link href="#">Sign up</Link>
+							Don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
 						</FieldDescription>
 					</div>
 					<InputController
@@ -112,13 +111,15 @@ export function SignInForm({
 					<Field>
 						<Button type="submit">Sign In</Button>
 					</Field>
-					<FieldSeparator>Or</FieldSeparator>
+					<FieldSeparator>Or continue with</FieldSeparator>
 					<Field className="grid gap-4 sm:grid-cols-2">
 						<Button variant="outline" type="button">
-							Continue with Apple
+							<HugeiconsIcon icon={GithubIcon} />
+							GitHub
 						</Button>
 						<Button variant="outline" type="button">
-							Continue with Google
+							<HugeiconsIcon icon={GoogleIcon} />
+							Google
 						</Button>
 					</Field>
 				</FieldGroup>
