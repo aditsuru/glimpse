@@ -1,39 +1,45 @@
 import { Button } from "@/components/ui/button";
-import { useCooldown } from "@/hooks/useCooldown";
+import { Spinner } from "@/components/ui/spinner";
 
 interface CooldownButtonProps {
-	storageKey: string;
-	cooldownMs: number;
-	onClick: (startCooldown: () => void) => Promise<void>;
 	label: string;
+	secondsLeft: number | null;
+	isSubmitting?: boolean;
+	onClick?: () => void;
 	cooldownLabel?: (secondsLeft: number) => string;
 	className?: string;
 }
 
 export function CooldownButton({
-	storageKey,
-	cooldownMs,
-	onClick,
 	label,
-	cooldownLabel = (s) => `You can resend again in ${s}`,
+	secondsLeft,
+	isSubmitting,
+	onClick,
+	cooldownLabel = (s) => `Wait ${s}s to resend`,
 	className,
 }: CooldownButtonProps) {
-	const { secondsLeft, startCooldown } = useCooldown(storageKey, cooldownMs);
-
-	if (secondsLeft === null)
+	if (secondsLeft === null) {
 		return (
 			<Button className={className} disabled>
 				{label}
 			</Button>
 		);
+	}
 
 	return (
 		<Button
+			type={onClick ? "button" : "submit"}
 			className={className}
-			onClick={() => onClick(startCooldown)}
-			disabled={secondsLeft > 0}
+			onClick={onClick}
+			disabled={secondsLeft > 0 || isSubmitting}
 		>
-			{secondsLeft <= 0 ? label : cooldownLabel(secondsLeft)}
+			{isSubmitting ? (
+				<Spinner className="mr-2" />
+			) : secondsLeft <= 0 ? (
+				label
+			) : (
+				cooldownLabel(secondsLeft)
+			)}
 		</Button>
 	);
 }

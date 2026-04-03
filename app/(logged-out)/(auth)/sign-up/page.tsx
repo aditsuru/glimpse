@@ -75,7 +75,7 @@ export default function SignUp() {
 		setIsRedirecting(true);
 		if (!data.user.emailVerified) {
 			localStorage.setItem(
-				LOCAL_STORAGE_KEYS.RESEND_EMAIL_COOLDOWN,
+				LOCAL_STORAGE_KEYS.VERIFY_EMAIL_COOLDOWN,
 				(Date.now() + config.NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT).toString()
 			);
 
