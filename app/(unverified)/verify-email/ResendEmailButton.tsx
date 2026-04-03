@@ -46,7 +46,7 @@ function ResendEmailButton({ className }: { className?: string }) {
 
 	const handleOnClick = async () => {
 		if (!session) {
-			toast.error("Something went wrong.", { position: "top-center" });
+			toast.error("Something went wrong.");
 			router.push("/sign-in");
 			return;
 		}
@@ -67,9 +67,7 @@ function ResendEmailButton({ className }: { className?: string }) {
 		);
 		setSecondsLeft(COOLDOWN_TIME_MS / 1000);
 
-		toast.info("Verification email sent successfully!", {
-			position: "top-center",
-		});
+		toast.info("Verification email sent successfully!");
 	};
 
 	if (secondsLeft === null)

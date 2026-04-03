@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import { cn } from "@/lib/utils";
+import Providers from "./providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -27,12 +28,18 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" className={cn("font-sans", inter.variable)}>
+		<html
+			lang="en"
+			className={cn("font-sans", inter.variable)}
+			suppressHydrationWarning
+		>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
 			>
-				{children}
-				<SmoothCursor />
+				<Providers>
+					{children}
+					<SmoothCursor />
+				</Providers>
 			</body>
 		</html>
 	);
