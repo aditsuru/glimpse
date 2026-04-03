@@ -74,7 +74,7 @@ export default function ResetPassword() {
 	return (
 		<div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
 			<div className="w-full max-w-sm">
-				<Card className="border-none shadow-none bg-transparent">
+				<Card>
 					<CardHeader>
 						<CardTitle>Set New Password</CardTitle>
 						<CardDescription>Enter your new password below.</CardDescription>
