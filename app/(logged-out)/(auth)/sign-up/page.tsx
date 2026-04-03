@@ -1,10 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SiGithub, SiGoogle } from "@icons-pack/react-simple-icons";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import InputController from "@/components/form/InputController";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,15 +14,16 @@ import {
 	FieldDescription,
 	FieldError,
 	FieldGroup,
-	FieldSeparator,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/clients/auth-client";
 import { cn } from "@/lib/utils";
+import OAuth from "../OAuth";
 import { SignUpSchema, type SignUpSchemaType } from "../schema";
 
 export default function SignUp() {
 	const pageRouter = useRouter();
+	const [isRedirecting, setIsRedirecting] = useState(false);
 
 	const form = useForm<SignUpSchemaType>({
 		resolver: zodResolver(SignUpSchema),
@@ -58,17 +59,12 @@ export default function SignUp() {
 			return;
 		}
 
-		if (!data.user.emailVerified) pageRouter.push("/verify-email");
+		setIsRedirecting(true);
+		if (!data.user.emailVerified) {
+			pageRouter.push("/verify-email");
+			return;
+		}
 		pageRouter.push("/");
-	};
-
-	// OAuth Sign-up
-	const handleSignUp = async (provider: "google" | "github") => {
-		await authClient.signIn.social({
-			provider: provider,
-			callbackURL: "/",
-			errorCallbackURL: "/sign-up?error=true",
-		});
 	};
 
 	return (
@@ -161,7 +157,7 @@ export default function SignUp() {
 					</FieldGroup>
 					<Field>
 						<Button type="submit" disabled={isSubmitting}>
-							{isSubmitting ? (
+							{isSubmitting || isRedirecting ? (
 								<div className="flex justify-center items-center gap-2">
 									<Spinner className="size-5" />
 								</div>
@@ -170,27 +166,7 @@ export default function SignUp() {
 							)}
 						</Button>
 					</Field>
-					<FieldSeparator>Or continue with</FieldSeparator>
-					<Field className="grid gap-4 sm:grid-cols-2">
-						<Button
-							variant="outline"
-							type="button"
-							disabled={isSubmitting}
-							onClick={() => handleSignUp("github")}
-						>
-							<SiGithub />
-							GitHub
-						</Button>
-						<Button
-							variant="outline"
-							type="button"
-							disabled={isSubmitting}
-							onClick={() => handleSignUp("google")}
-						>
-							<SiGoogle />
-							Google
-						</Button>
-					</Field>
+					<OAuth context="sign-up" isSubmitting />
 				</FieldGroup>
 			</form>
 		</div>
