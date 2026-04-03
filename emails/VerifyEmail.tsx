@@ -14,7 +14,6 @@ import {
 	Tailwind,
 	Text,
 } from "@react-email/components";
-import { config } from "@/lib/config";
 
 interface GlimpseVerifyEmailProps {
 	username: string;
@@ -22,7 +21,7 @@ interface GlimpseVerifyEmailProps {
 	verificationUrl: string;
 }
 
-const baseUrl = config.NEXT_PUBLIC_APP_URL;
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const GlimpseVerifyEmail = ({
 	username,

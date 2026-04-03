@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { generateFromEmail } from "unique-username-generator";
 import { db } from "@/drizzle/db";
-import { sendVerificationEmail } from "@/email/email";
+import { sendVerificationEmail } from "@/emails/email";
 import { config } from "@/lib/config";
 import { redis } from "./redis";
 
