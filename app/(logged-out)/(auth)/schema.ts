@@ -7,7 +7,7 @@ export const SignInSchema = z.object({
 		.nonempty("Password is required"),
 });
 
-export const signupSchema = z
+export const SignUpSchema = z
 	.object({
 		name: z
 			.string({ error: "Name is required" })
@@ -40,5 +40,5 @@ export const signupSchema = z
 		path: ["confirmPassword"],
 	});
 
-export type SignupSchemaType = z.infer<typeof signupSchema>;
+export type SignUpSchemaType = z.infer<typeof signUpSchema>;
 export type SignInSchemaType = z.infer<typeof SignInSchema>;
