@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { generateFromEmail } from "unique-username-generator";
 import { db } from "@/drizzle/db";
-import { sendVerificationEmail } from "@/emails/email";
+import { sendResetPasswordEmail, sendVerificationEmail } from "@/emails/email";
 import { config } from "@/lib/config";
 import { redis } from "./redis";
 
@@ -40,6 +40,13 @@ export const auth = betterAuth({
 
 	emailAndPassword: {
 		enabled: true,
+		sendResetPassword: async ({ user, url }) => {
+			await sendResetPasswordEmail({
+				username: user.name,
+				to: user.email,
+				resetPasswordUrl: url,
+			});
+		},
 	},
 
 	emailVerification: {

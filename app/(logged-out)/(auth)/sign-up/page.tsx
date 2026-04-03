@@ -76,9 +76,7 @@ export default function SignUp() {
 		if (!data.user.emailVerified) {
 			localStorage.setItem(
 				LOCAL_STORAGE_KEYS.RESEND_EMAIL_COOLDOWN,
-				(
-					Date.now() + config.NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT
-				).toString()
+				(Date.now() + config.NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT).toString()
 			);
 
 			pageRouter.push("/verify-email");
