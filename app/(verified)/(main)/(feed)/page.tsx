@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 function Home() {
 	return (
-		<div className="h-screen w-screen flex justify-center items-center">
+		<div className="h-full w-full flex justify-center items-center">
 			<Button
 				onClick={() =>
 					toast("Event has been created", {
