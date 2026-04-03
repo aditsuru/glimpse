@@ -98,7 +98,7 @@ export default function SignIn() {
 
 						<h1 className="text-xl font-bold">Welcome to Glimpse</h1>
 						<FieldDescription
-							className={`${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
+							className={`${isSubmitting || isRedirecting ? "pointer-events-none opacity-50" : ""}`}
 						>
 							Don&apos;t have an account? <Link href="/sign-up">Sign up</Link>
 						</FieldDescription>
@@ -122,7 +122,7 @@ export default function SignIn() {
 									<FieldDescription>
 										<Link
 											href="/forgot-password"
-											className={` ${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
+											className={` ${isSubmitting || isRedirecting ? "pointer-events-none opacity-50" : ""}`}
 										>
 											Forgot password?
 										</Link>
@@ -150,7 +150,7 @@ export default function SignIn() {
 						</div>
 					</FieldGroup>
 					<Field>
-						<Button type="submit" disabled={isSubmitting}>
+						<Button type="submit" disabled={isSubmitting || isRedirecting}>
 							{isSubmitting || isRedirecting ? (
 								<div className="flex justify-center items-center gap-2">
 									<Spinner className="size-5" />

@@ -14,6 +14,7 @@ interface InputControllerProps<T extends FieldValues>
 	formState: FormState<T>;
 	type: string;
 	labelSideElement?: React.ReactNode;
+	isRedirecting?: boolean;
 }
 
 function InputController<T extends FieldValues>({
@@ -24,6 +25,7 @@ function InputController<T extends FieldValues>({
 	formState,
 	type,
 	labelSideElement,
+	isRedirecting,
 	...props
 }: InputControllerProps<T>) {
 	return (
@@ -35,7 +37,7 @@ function InputController<T extends FieldValues>({
 					<div className="w-full flex justify-between">
 						<FieldLabel
 							htmlFor={field.name}
-							className={` ${formState.isSubmitting && "opacity-50"}`}
+							className={` ${formState.isSubmitting || (isRedirecting && "opacity-50")}`}
 						>
 							{label}
 						</FieldLabel>
@@ -49,7 +51,7 @@ function InputController<T extends FieldValues>({
 							id={field.name}
 							aria-invalid={fieldState.invalid}
 							type={type}
-							disabled={formState.isSubmitting}
+							disabled={formState.isSubmitting || isRedirecting}
 						/>
 					</div>
 					<AnimatePresence mode="wait">

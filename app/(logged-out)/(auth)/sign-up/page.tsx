@@ -109,7 +109,7 @@ export default function SignUp() {
 
 						<h1 className="text-xl font-bold">Welcome to Glimpse</h1>
 						<FieldDescription
-							className={`${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
+							className={`${isSubmitting || isRedirecting ? "pointer-events-none opacity-50" : ""}`}
 						>
 							Already have an account? <Link href="/sign-in">Sign In</Link>
 						</FieldDescription>
@@ -174,7 +174,7 @@ export default function SignUp() {
 						</div>
 					</FieldGroup>
 					<Field>
-						<Button type="submit" disabled={isSubmitting}>
+						<Button type="submit" disabled={isSubmitting || isRedirecting}>
 							{isSubmitting || isRedirecting ? (
 								<div className="flex justify-center items-center gap-2">
 									<Spinner className="size-5" />
