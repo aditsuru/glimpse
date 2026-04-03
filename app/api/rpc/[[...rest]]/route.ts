@@ -30,11 +30,18 @@ const handler = new RPCHandler<Context>(router, {
 });
 
 async function handleRequest(req: Request): Promise<Response> {
-	const session = await auth.api.getSession({ headers: req.headers });
+	const reqHeaders = req.headers;
+	const session = await auth.api.getSession({ headers: reqHeaders });
+
+	const ip =
+		reqHeaders.get("x-forwarded-for")?.split(",")[0] ||
+		reqHeaders.get("x-real-ip") ||
+		"127.0.0.1";
 
 	const context: Context = {
 		db,
 		session,
+		ip,
 	};
 
 	const { response } = await handler.handle(req, {
