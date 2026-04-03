@@ -121,7 +121,7 @@ export default function SignIn() {
 								labelSideElement={
 									<FieldDescription>
 										<Link
-											href="/reset-password"
+											href="/forgot-password"
 											className={` ${isSubmitting ? "pointer-events-none opacity-50" : ""}`}
 										>
 											Forgot password?
@@ -160,7 +160,10 @@ export default function SignIn() {
 							)}
 						</Button>
 					</Field>
-					<OAuth context="sign-in" isSubmitting />
+					<OAuth
+						context="sign-in"
+						isSubmitting={isSubmitting || isRedirecting}
+					/>
 				</FieldGroup>
 			</form>
 			<TechStack />

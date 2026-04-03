@@ -184,7 +184,10 @@ export default function SignUp() {
 							)}
 						</Button>
 					</Field>
-					<OAuth context="sign-up" isSubmitting />
+					<OAuth
+						context="sign-up"
+						isSubmitting={isSubmitting || isRedirecting}
+					/>
 				</FieldGroup>
 			</form>
 		</div>

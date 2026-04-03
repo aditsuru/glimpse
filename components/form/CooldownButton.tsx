@@ -15,7 +15,7 @@ export function CooldownButton({
 	secondsLeft,
 	isSubmitting,
 	onClick,
-	cooldownLabel = (s) => `Wait ${s}s to resend`,
+	cooldownLabel = (s) => `Wait ${s} to resend`,
 	className,
 }: CooldownButtonProps) {
 	if (secondsLeft === null) {

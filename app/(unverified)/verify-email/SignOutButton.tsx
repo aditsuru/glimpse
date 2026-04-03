@@ -11,7 +11,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { authClient } from "@/lib/clients/auth-client";
 
 function SignOutButton() {
@@ -29,10 +29,13 @@ function SignOutButton() {
 
 	return (
 		<AlertDialog>
-			<AlertDialogTrigger>
-				<Button variant="destructive" className="w-full px-4">
-					Sign Out
-				</Button>
+			<AlertDialogTrigger
+				className={buttonVariants({
+					variant: "destructive",
+					className: "w-full px-4",
+				})}
+			>
+				Sign Out
 			</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
