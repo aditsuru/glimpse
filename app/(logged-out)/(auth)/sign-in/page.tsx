@@ -3,9 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import InputController from "@/components/form/InputController";
 import TechStack from "@/components/misc/TechStack";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,7 +25,17 @@ import { SignInSchema, type SignInSchemaType } from "../schema";
 
 export default function SignIn() {
 	const pageRouter = useRouter();
+	const searchParams = useSearchParams();
 	const [isRedirecting, setIsRedirecting] = useState(false);
+
+	useEffect(() => {
+		const errorParam = searchParams.get("error");
+		if (errorParam) {
+			toast.error("Authentication failed. Please try again.");
+
+			pageRouter.replace("/sign-up");
+		}
+	}, [searchParams, pageRouter]);
 
 	const form = useForm<SignInSchemaType>({
 		resolver: zodResolver(SignInSchema),

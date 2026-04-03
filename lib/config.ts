@@ -58,6 +58,12 @@ export const config = createEnv({
 		// General
 		NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
 
+		NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT: z
+			.string()
+			.transform((val) => ms(val as StringValue))
+			.refine((val) => !Number.isNaN(val), { message: "Invalid time format" })
+			.default(60000),
+
 		// React Query
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_STALE_TIME: z
 			.string()
@@ -82,5 +88,7 @@ export const config = createEnv({
 			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_GC_TIME,
 		NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT:
 			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
+		NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT:
+			process.env.NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT,
 	},
 });

@@ -3,9 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import InputController from "@/components/form/InputController";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -17,13 +18,25 @@ import {
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/clients/auth-client";
+import { config } from "@/lib/config";
+import { LOCAL_STORAGE_KEYS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import OAuth from "../OAuth";
 import { SignUpSchema, type SignUpSchemaType } from "../schema";
 
 export default function SignUp() {
 	const pageRouter = useRouter();
+	const searchParams = useSearchParams();
 	const [isRedirecting, setIsRedirecting] = useState(false);
+
+	useEffect(() => {
+		const errorParam = searchParams.get("error");
+		if (errorParam) {
+			toast.error("Authentication failed. Please try again.");
+
+			pageRouter.replace("/sign-up");
+		}
+	}, [searchParams, pageRouter]);
 
 	const form = useForm<SignUpSchemaType>({
 		resolver: zodResolver(SignUpSchema),
@@ -61,6 +74,13 @@ export default function SignUp() {
 
 		setIsRedirecting(true);
 		if (!data.user.emailVerified) {
+			localStorage.setItem(
+				LOCAL_STORAGE_KEYS.RESEND_EMAIL_COOLDOWN,
+				(
+					Date.now() + config.NEXT_PUBLIC_VERIFICATION_EMAIL_RESEND_TIMEOUT
+				).toString()
+			);
+
 			pageRouter.push("/verify-email");
 			return;
 		}

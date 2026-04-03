@@ -31,3 +31,7 @@ export const RESERVED_USERNAMES = new Set([
 	"about",
 	"settings",
 ]);
+
+export const LOCAL_STORAGE_KEYS = {
+	RESEND_EMAIL_COOLDOWN: "resend_email_cooldown",
+};
