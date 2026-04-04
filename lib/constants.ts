@@ -8,6 +8,7 @@ export const ALLOWED_FILES_TYPES = [
 ] as const;
 
 export const ATTACHMENT_TYPES = ["image", "gif", "video"] as const;
+export type AttachmentType = (typeof ATTACHMENT_TYPES)[number];
 
 export const REDIS_KEYS = {
 	POST_SEEN: (userId: string) => `post:seen:${userId}`,
