@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { renderPostContent } from "@/lib/post/renderPostContent";
 import { Button } from "../ui/button";
 

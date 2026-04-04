@@ -1,22 +1,22 @@
 "use client";
 
-import type { PostOutput } from "@/server/shared/schemas/post";
-import { PostBody } from "./PostBody";
-import { ImageCarousel } from "../media/ImageCarousel";
-import { VideoPlayer } from "../media/VideoPlayer";
-import { Card } from "../ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { AspectRatio } from "../ui/aspect-ratio";
-import { initials, timeAgo } from "@/lib/utils";
 import {
 	BadgeCheck,
-	Heart,
-	MessageCircle,
 	Bookmark,
 	ChartNoAxesColumn,
+	Heart,
+	MessageCircle,
 } from "lucide-react";
-import { Button } from "../ui/button";
 import Link from "next/link";
+import { initials, timeAgo } from "@/lib/utils";
+import type { PostOutput } from "@/server/shared/schemas/post";
+import { ImageCarousel } from "../media/ImageCarousel";
+import { VideoPlayer } from "../media/VideoPlayer";
+import { AspectRatio } from "../ui/aspect-ratio";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { PostBody } from "./PostBody";
 
 function formatCount(n: number) {
 	if (n < 1000) return n.toString();

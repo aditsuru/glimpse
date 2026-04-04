@@ -1,5 +1,5 @@
-import StarterKit from "@tiptap/starter-kit";
 import Mention from "@tiptap/extension-mention";
+import StarterKit from "@tiptap/starter-kit";
 
 export const renderExtensions = [
 	StarterKit,
