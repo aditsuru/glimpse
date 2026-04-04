@@ -46,7 +46,7 @@ export const { POST } = serve(async (context) => {
 
 		postIds.forEach((id, index) => {
 			const count = counts[index];
-			if (count && count > 0) {
+			if (typeof count === "number" && count > 0) {
 				pipeline.decrby(REDIS_KEYS.VIEWS_COUNT(id), count);
 			}
 		});

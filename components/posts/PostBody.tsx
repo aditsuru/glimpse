@@ -4,6 +4,8 @@ import { Check, Copy } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { config } from "@/lib/config";
+
 import {
 	type PostSegment,
 	renderPostContent,
@@ -11,7 +13,7 @@ import {
 import { UrlEmbed } from "../media/UrlEmbed";
 import { Button } from "../ui/button";
 
-const CHAR_LIMIT = 600;
+const CHAR_LIMIT = config.NEXT_PUBLIC_POST_CHAR_LIMIT;
 
 function stableKey(segment: PostSegment): string {
 	switch (segment.type) {
@@ -71,7 +73,13 @@ function CodeBlock({ lang, code }: { lang: string; code: string }) {
 }
 
 export function PostBody({ content }: { content: string | object }) {
-	const segments = useMemo(() => renderPostContent(content), [content]);
+	const segments = useMemo(() => {
+		try {
+			return renderPostContent(content);
+		} catch (_error) {
+			return [];
+		}
+	}, [content]);
 	const [expanded, setExpanded] = useState(false);
 
 	const { visibleSegments, needsReadMore } = useMemo(() => {

@@ -1,3 +1,4 @@
+import type { Extensions } from "@tiptap/core";
 import Link from "@tiptap/extension-link";
 import Mention from "@tiptap/extension-mention";
 import { generateHTML } from "@tiptap/html";
@@ -23,9 +24,7 @@ export type PostSegment =
 	| { type: "code"; lang: string; code: string }
 	| { type: "embed"; url: string };
 
-// Fresh instances per call — never module-level, avoids tiptap's
-// internal name-deduplication warning across generateHTML calls.
-function makeExtensions() {
+function makeExtensions(): Extensions {
 	const exts = [
 		StarterKit,
 		Link.configure({
@@ -47,8 +46,6 @@ function makeExtensions() {
 		}),
 	];
 
-	// tiptap's resolveExtensions walks all deps recursively — deduplicate
-	// by name to prevent the "Duplicate extension names found" warning.
 	const seen = new Set<string>();
 	return exts.filter((ext) => {
 		if (seen.has(ext.name)) return false;
@@ -68,22 +65,27 @@ function getLinkOnlyUrl(node: TiptapNode): string | null {
 	return linkMark.attrs.href;
 }
 
-function flushNodes(nodes: TiptapNode[], segments: PostSegment[]) {
+function flushNodes(
+	nodes: TiptapNode[],
+	segments: PostSegment[],
+	extensions: Extensions
+) {
 	if (nodes.length === 0) return;
 	segments.push({
 		type: "html",
-		html: generateHTML({ type: "doc", content: nodes }, makeExtensions()),
+		html: generateHTML({ type: "doc", content: nodes }, extensions),
 	});
 }
 
 export function renderPostContent(rawJson: string | object): PostSegment[] {
 	const doc = typeof rawJson === "string" ? JSON.parse(rawJson) : rawJson;
 	const segments: PostSegment[] = [];
+	const extensions = makeExtensions();
 	let currentNodes: TiptapNode[] = [];
 
 	for (const node of doc.content ?? []) {
 		if (node.type === "codeBlock") {
-			flushNodes(currentNodes, segments);
+			flushNodes(currentNodes, segments, extensions);
 			currentNodes = [];
 			segments.push({
 				type: "code",
@@ -95,7 +97,7 @@ export function renderPostContent(rawJson: string | object): PostSegment[] {
 
 		const embedUrl = getLinkOnlyUrl(node);
 		if (embedUrl) {
-			flushNodes(currentNodes, segments);
+			flushNodes(currentNodes, segments, extensions);
 			currentNodes = [];
 			segments.push({ type: "embed", url: embedUrl });
 			continue;
@@ -104,6 +106,6 @@ export function renderPostContent(rawJson: string | object): PostSegment[] {
 		currentNodes.push(node);
 	}
 
-	flushNodes(currentNodes, segments);
+	flushNodes(currentNodes, segments, extensions);
 	return segments;
 }

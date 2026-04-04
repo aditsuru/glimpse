@@ -1,6 +1,4 @@
-import { VideoPlayer } from "@/components/media/VideoPlayer";
 import PostCard from "@/components/posts/PostCard";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const mockPost = {
 	id: "post_1",
@@ -196,7 +194,7 @@ const mockPost = {
 
 function Home() {
 	return (
-		<div className="h-full w-full flex justify-center items-center pt-34">
+		<div className="h-full w-full flex justify-center items-start">
 			<PostCard {...mockPost} />
 		</div>
 	);

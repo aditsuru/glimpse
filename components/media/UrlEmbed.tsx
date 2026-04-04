@@ -4,6 +4,7 @@ import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 interface OgData {
 	title: string | null;
@@ -52,11 +53,13 @@ export function UrlEmbed({ url }: UrlEmbedProps) {
 
 			{state === "loading" && (
 				<Card className="w-full animate-pulse bg-muted border overflow-hidden">
-					<div className="w-full aspect-[1.91/1] bg-muted-foreground/10" />
+					<AspectRatio ratio={1.91 / 1} className="bg-muted-foreground/10" />
 					<div className="p-3 flex flex-col gap-2">
-						<div className="h-3 w-1/4 rounded bg-muted-foreground/10" />
-						<div className="h-4 w-3/4 rounded bg-muted-foreground/10" />
-						<div className="h-3 w-2/3 rounded bg-muted-foreground/10" />
+						<div className="p-3 flex flex-col gap-2">
+							<div className="h-3 w-1/4 rounded bg-muted-foreground/10" />
+							<div className="h-4 w-3/4 rounded bg-muted-foreground/10" />
+							<div className="h-3 w-2/3 rounded bg-muted-foreground/10" />
+						</div>
 					</div>
 				</Card>
 			)}
@@ -70,7 +73,7 @@ export function UrlEmbed({ url }: UrlEmbedProps) {
 				>
 					<Card className="overflow-hidden hover:bg-muted/50 transition-colors">
 						{data.image && (
-							<div className="relative w-full aspect-[1.91/1]">
+							<AspectRatio ratio={1.91 / 1}>
 								<Image
 									src={data.image}
 									alt={data.title ?? ""}
@@ -79,7 +82,7 @@ export function UrlEmbed({ url }: UrlEmbedProps) {
 									className="object-cover"
 									unoptimized
 								/>
-							</div>
+							</AspectRatio>
 						)}
 						<div className="p-3 flex flex-col gap-1">
 							{data.siteName && (

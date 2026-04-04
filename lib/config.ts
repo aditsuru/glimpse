@@ -58,6 +58,8 @@ export const config = createEnv({
 		// General
 		NEXT_PUBLIC_APP_URL: z.url().default("http://localhost:3000"),
 
+		NEXT_PUBLIC_POST_CHAR_LIMIT: z.coerce.number().default(300),
+
 		NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT: z
 			.string()
 			.transform((val) => ms(val as StringValue))
@@ -90,5 +92,6 @@ export const config = createEnv({
 			process.env.NEXT_PUBLIC_QUERY_CLIENT_DEFAULT_MAX_RETRY_COUNT,
 		NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT:
 			process.env.NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT,
+		NEXT_PUBLIC_POST_CHAR_LIMIT: process.env.NEXT_PUBLIC_POST_CHAR_LIMIT,
 	},
 });
