@@ -9,34 +9,34 @@ import {
 	MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { authClient } from "@/lib/clients/auth-client";
+import { config } from "@/lib/config";
 import { initials, timeAgo } from "@/lib/utils";
 import type { PostOutput } from "@/server/shared/schemas/post";
 import { ImageCarousel } from "../media/ImageCarousel";
 import { VideoPlayer } from "../media/VideoPlayer";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { PostBody } from "./PostBody";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { authClient } from "@/lib/clients/auth-client";
-import { useState } from "react";
-import {
-	AlertDialog,
-	AlertDialogContent,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogCancel,
-	AlertDialogAction,
-} from "../ui/alert-dialog";
-import { config } from "@/lib/config";
+import { PostBody } from "./PostBody";
 
 function formatCount(n: number) {
 	if (n < 1000) return n.toString();

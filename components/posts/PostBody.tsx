@@ -1,14 +1,14 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
-import { UrlEmbed } from "../media/UrlEmbed";
 import { useMemo, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import {
-	renderPostContent,
 	type PostSegment,
+	renderPostContent,
 } from "@/lib/post/renderPostContent";
+import { UrlEmbed } from "../media/UrlEmbed";
 import { Button } from "../ui/button";
 
 const CHAR_LIMIT = 600;

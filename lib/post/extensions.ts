@@ -1,6 +1,6 @@
+import Link from "@tiptap/extension-link";
 import Mention from "@tiptap/extension-mention";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
 
 // RENDER ONLY — do not import this into your editor setup.
 // Your editor should have its own separate extensions array.

@@ -1,6 +1,6 @@
-import { generateHTML } from "@tiptap/html";
 import Link from "@tiptap/extension-link";
 import Mention from "@tiptap/extension-mention";
+import { generateHTML } from "@tiptap/html";
 import StarterKit from "@tiptap/starter-kit";
 
 type MarkAttrs = Record<string, string | null | undefined>;
