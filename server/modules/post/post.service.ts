@@ -118,6 +118,16 @@ export class PostService {
 			});
 
 		const hasAttachments = !!(attachments && attachments.length > 0);
+
+		if (hasAttachments) {
+			const hasVideo = attachments.some((a) => a.fileType === "video");
+			if (hasVideo && attachments.length > 1) {
+				throw new ORPCError("BAD_REQUEST", {
+					message: "Videos must be posted standalone.",
+				});
+			}
+		}
+
 		let validatedAttachments: z.infer<typeof AttachmentSchema>[] = [];
 
 		if (hasAttachments) {
