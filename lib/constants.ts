@@ -36,4 +36,5 @@ export const RESERVED_USERNAMES = new Set([
 export const LOCAL_STORAGE_KEYS = {
 	VERIFY_EMAIL_COOLDOWN: "verify_email_cooldown",
 	FORGOT_PASSWORD_COOLDOWN: "forgot_password_cooldown",
+	GLIMPSE_MEDIA_STORAGE: "glimpse-media-storage",
 };

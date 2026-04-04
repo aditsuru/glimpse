@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/complexity/noImportantStyles: none */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -121,9 +122,14 @@
 	*,
 	*::before,
 	*::after {
-		/* biome-ignore lint/complexity/noImportantStyles: Application uses it's own cursor */
 		cursor: none !important;
 	}
+
+	:fullscreen,
+	:fullscreen * {
+		cursor: auto !important;
+	}
+
 	* {
 		@apply border-border outline-ring/50;
 	}
