@@ -282,7 +282,7 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 
 							{menuOpen && (
 								<div
-									className="absolute bottom-12 right-0 w-58 rounded-md border bg-popover text-popover-foreground shadow-md z-50 overflow-hidden"
+									className="absolute bottom-10 right-4 w-58 rounded-md border bg-popover text-popover-foreground shadow-md z-50 overflow-hidden"
 									onClick={(e) => e.stopPropagation()}
 								>
 									{menuView === "root" && (

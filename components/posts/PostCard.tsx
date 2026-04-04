@@ -4,6 +4,7 @@ import {
 	BadgeCheck,
 	Bookmark,
 	ChartNoAxesColumn,
+	EllipsisVertical,
 	Heart,
 	MessageCircle,
 } from "lucide-react";
@@ -110,7 +111,7 @@ function PostCard({
 						<Button
 							variant="ghost"
 							size="sm"
-							className="gap-1.5 text-muted-foreground"
+							className="gap-1.5 text-muted-foreground hover:bg-transparent!"
 						>
 							<Heart
 								size={16}
@@ -124,7 +125,7 @@ function PostCard({
 						<Button
 							variant="ghost"
 							size="sm"
-							className="gap-1.5 text-muted-foreground"
+							className="gap-1.5 text-muted-foreground hover:bg-transparent!"
 						>
 							<MessageCircle size={16} />
 							<span className="text-xs">{formatCount(comments)}</span>
@@ -133,7 +134,7 @@ function PostCard({
 						<Button
 							variant="ghost"
 							size="sm"
-							className="gap-1.5 text-muted-foreground"
+							className="gap-1.5 text-muted-foreground hover:bg-transparent!"
 						>
 							<Bookmark
 								size={16}
@@ -147,6 +148,14 @@ function PostCard({
 						<Button variant="ghost" size="sm" className="gap-1.5" disabled>
 							<ChartNoAxesColumn size={16} />
 							<span className="text-xs">{formatCount(views)}</span>
+						</Button>
+
+						<Button
+							variant="ghost"
+							size="sm"
+							className="gap-1.5 text-muted-foreground hover:bg-transparent!"
+						>
+							<EllipsisVertical size={16} />
 						</Button>
 					</div>
 				</div>

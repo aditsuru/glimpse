@@ -83,7 +83,8 @@ const mockPost = {
 	views: 4821,
 	authorName: "Aditya Chandra",
 	authorUsername: "adityachandra",
-	authorAvatarUrl: "null", // will fallback to initials
+	authorAvatarUrl:
+		"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg", // will fallback to initials
 	authorIsVerified: true,
 };
 
