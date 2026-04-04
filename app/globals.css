@@ -130,6 +130,14 @@
 		cursor: auto !important;
 	}
 
+	.post-body pre {
+		@apply bg-muted rounded-md p-4 overflow-x-auto text-sm my-2;
+	}
+
+	.post-body pre code {
+		@apply font-mono text-foreground bg-transparent p-0;
+	}
+
 	* {
 		@apply border-border outline-ring/50;
 	}

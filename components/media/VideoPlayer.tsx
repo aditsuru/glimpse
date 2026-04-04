@@ -27,12 +27,12 @@ type Speed = (typeof SPEEDS)[number];
 
 interface VideoPlayerProps {
 	src: string;
-	autoPlay: boolean;
+	autoPlay?: boolean;
 }
 
 type MenuView = "root" | "speed";
 
-export function VideoPlayer({ src, autoPlay }: VideoPlayerProps) {
+export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	const videoRef = React.useRef<HTMLVideoElement>(null);
 	const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -183,7 +183,7 @@ export function VideoPlayer({ src, autoPlay }: VideoPlayerProps) {
 			role="region"
 			aria-label="Video Player"
 			tabIndex={0}
-			className="relative h-full w-full overflow-hidden rounded-lg bg-black"
+			className="relative h-full w-full rounded-lg bg-black"
 			onClick={togglePlay}
 			onKeyDown={(e) => {
 				if (e.key === "Enter" || e.key === " ") {
@@ -208,7 +208,7 @@ export function VideoPlayer({ src, autoPlay }: VideoPlayerProps) {
 					if (v) setDuration(v.duration);
 				}}
 				onEnded={() => setPlaying(false)}
-				className="h-full w-full object-contain"
+				className="h-full w-full object-contain rounded-lg overflow-hidden"
 			/>
 
 			{/* Controls overlay */}
@@ -282,7 +282,7 @@ export function VideoPlayer({ src, autoPlay }: VideoPlayerProps) {
 
 							{menuOpen && (
 								<div
-									className="absolute bottom-12 right-0 w-54 rounded-md border bg-popover text-popover-foreground shadow-md z-50 overflow-hidden"
+									className="absolute bottom-12 right-0 w-58 rounded-md border bg-popover text-popover-foreground shadow-md z-50 overflow-hidden"
 									onClick={(e) => e.stopPropagation()}
 								>
 									{menuView === "root" && (
