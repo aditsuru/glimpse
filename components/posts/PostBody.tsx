@@ -79,12 +79,11 @@ export function PostBody({ content }: { content: string | object }) {
 		let cutoff = segments.length;
 
 		for (let i = 0; i < segments.length; i++) {
-			// Check BEFORE accumulating — if already over limit, cut here
+			chars += visibleTextLength(segments[i]); // accumulate FIRST
 			if (chars > CHAR_LIMIT) {
-				cutoff = i;
+				cutoff = i; // hide segment i — it's the one that pushed us over
 				break;
 			}
-			chars += visibleTextLength(segments[i]);
 		}
 
 		return {

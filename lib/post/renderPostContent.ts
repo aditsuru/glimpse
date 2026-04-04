@@ -26,7 +26,7 @@ export type PostSegment =
 // Fresh instances per call — never module-level, avoids tiptap's
 // internal name-deduplication warning across generateHTML calls.
 function makeExtensions() {
-	return [
+	const exts = [
 		StarterKit,
 		Link.configure({
 			openOnClick: false,
@@ -46,6 +46,15 @@ function makeExtensions() {
 			},
 		}),
 	];
+
+	// tiptap's resolveExtensions walks all deps recursively — deduplicate
+	// by name to prevent the "Duplicate extension names found" warning.
+	const seen = new Set<string>();
+	return exts.filter((ext) => {
+		if (seen.has(ext.name)) return false;
+		seen.add(ext.name);
+		return true;
+	});
 }
 
 function getLinkOnlyUrl(node: TiptapNode): string | null {
