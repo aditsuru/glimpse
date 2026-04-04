@@ -38,7 +38,7 @@ export function UrlEmbed({ url }: UrlEmbedProps) {
 	// Reserve height immediately so the feed doesn't reflow when data loads.
 	// min-h matches roughly the tallest the card can be (image + text).
 	return (
-		<div className="my-2 min-h-[200px] flex flex-col justify-start">
+		<div className="my-2 flex flex-col justify-start">
 			{state === "failed" && (
 				<a
 					href={url}
@@ -51,7 +51,14 @@ export function UrlEmbed({ url }: UrlEmbedProps) {
 			)}
 
 			{state === "loading" && (
-				<Card className="h-[200px] animate-pulse bg-muted border" />
+				<Card className="w-full animate-pulse bg-muted border overflow-hidden">
+					<div className="w-full aspect-[1.91/1] bg-muted-foreground/10" />
+					<div className="p-3 flex flex-col gap-2">
+						<div className="h-3 w-1/4 rounded bg-muted-foreground/10" />
+						<div className="h-4 w-3/4 rounded bg-muted-foreground/10" />
+						<div className="h-3 w-2/3 rounded bg-muted-foreground/10" />
+					</div>
+				</Card>
 			)}
 
 			{state === "ready" && data && (
@@ -63,7 +70,7 @@ export function UrlEmbed({ url }: UrlEmbedProps) {
 				>
 					<Card className="overflow-hidden hover:bg-muted/50 transition-colors">
 						{data.image && (
-							<div className="relative w-full h-40">
+							<div className="relative w-full aspect-[1.91/1]">
 								<Image
 									src={data.image}
 									alt={data.title ?? ""}
