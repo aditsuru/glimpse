@@ -130,6 +130,14 @@
 		cursor: auto !important;
 	}
 
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+	.no-scrollbar {
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+	}
+
 	.mention {
 		@apply text-chart-2 font-medium hover:underline cursor-pointer;
 	}

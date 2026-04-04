@@ -1,18 +1,10 @@
 "use client";
 
-import {
-	BadgeCheck,
-	Bookmark,
-	ChartNoAxesColumn,
-	EllipsisVertical,
-	Heart,
-	MessageCircle,
-} from "lucide-react";
-import Link from "next/link";
+import { EllipsisVertical, Flag, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { authClient } from "@/lib/clients/auth-client";
 import { config } from "@/lib/config";
-import { initials, timeAgo } from "@/lib/utils";
 import type { PostOutput } from "@/server/shared/schemas/post";
 import { ImageCarousel } from "../media/ImageCarousel";
 import { VideoPlayer } from "../media/VideoPlayer";
@@ -27,8 +19,6 @@ import {
 	AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { AspectRatio } from "../ui/aspect-ratio";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import {
 	DropdownMenu,
@@ -36,177 +26,92 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { PostActions } from "./PostActions";
 import { PostBody } from "./PostBody";
+import { PostHeaderFeed } from "./PostHeader";
 
-function formatCount(n: number) {
-	if (n < 1000) return n.toString();
-	if (n < 1000000) return `${(n / 1000).toFixed(1)}k`;
-	return `${(n / 1000000).toFixed(1)}m`;
-}
-
-function PostCard({
-	id,
-	userId,
-	body,
-	hasAttachments,
-	createdAt,
-	attachments,
-	hasUserLiked,
-	hasUserBookmarked,
-	likes,
-	comments,
-	bookmarks,
-	views,
-	authorName,
-	authorUsername,
-	authorAvatarUrl,
-	authorIsVerified,
-}: PostOutput) {
+export default function PostCard(post: PostOutput) {
 	const { data: session } = authClient.useSession();
-	const isOwnPost = session?.user?.id === userId;
+	const isOwnPost = session?.user?.id === post.userId;
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
 	const images =
-		attachments?.filter(
+		post.attachments?.filter(
 			(a) => a.fileType === "image" || a.fileType === "gif"
 		) ?? [];
-	const video = attachments?.find((a) => a.fileType === "video");
+	const video = post.attachments?.find((a) => a.fileType === "video");
 
 	const handleShare = async () => {
+		toast.success("Link copied to clipboard!");
 		await navigator.clipboard.writeText(
-			`${config.NEXT_PUBLIC_APP_URL}/post/${id}`
+			`${config.NEXT_PUBLIC_APP_URL}/post/${post.id}`
 		);
-	};
-
-	const handleDelete = async () => {
-		// wire up your delete mutation / server action here
-		setShowDeleteDialog(false);
 	};
 
 	return (
 		<>
-			<Card className="w-lg bg-background flex flex-col gap-3 p-4">
-				{/* Header */}
-				<div className="flex gap-3 items-start">
-					<Link href={`/user/${authorUsername}`}>
-						<Avatar size="lg">
-							<AvatarImage src={authorAvatarUrl || ""} alt={authorName} />
-							<AvatarFallback>{initials(authorName)}</AvatarFallback>
-						</Avatar>
-					</Link>
+			<Card className="w-full bg-transparent ring-0 shadow-none flex flex-col gap-3 p-4">
+				<div className="flex-1 min-w-0 flex flex-col gap-1">
+					{/* Top row: Header + Menu */}
+					<div className="flex justify-between items-start">
+						<PostHeaderFeed {...post} />
 
-					<div className="flex flex-col gap-1 flex-1 min-w-0">
-						{/* Author row */}
-						<div className="flex items-center gap-2 flex-wrap">
-							<div className="flex items-center gap-1 flex-wrap">
-								<Link
-									className="font-semibold text-sm leading-none hover:underline"
-									href={`/user/${authorUsername}`}
-								>
-									{authorName}
-								</Link>
-								{authorIsVerified && (
-									<BadgeCheck size={20} className="text-chart-2 shrink-0" />
-								)}
-							</div>
-							<div className="flex items-center gap-1 flex-wrap">
-								<Link
-									className="text-muted-foreground text-sm hover:underline"
-									href={`/user/${authorUsername}`}
-								>
-									@{authorUsername}
-								</Link>
-								<span className="text-muted-foreground text-sm">·</span>
-								<span className="text-muted-foreground text-sm">
-									{timeAgo(createdAt)}
-								</span>
-							</div>
-						</div>
-
-						{/* Body */}
-						{body && (
-							<div className={hasAttachments ? "mb-2 text-sm" : "text-sm"}>
-								<PostBody content={body} />
-							</div>
-						)}
-
-						{/* Media */}
-						{hasAttachments && images.length > 0 && (
-							<ImageCarousel attachments={images} />
-						)}
-
-						{hasAttachments && video && (
-							<AspectRatio ratio={16 / 9}>
-								<VideoPlayer src={video.fileUrl} />
-							</AspectRatio>
-						)}
-
-						{/* Actions */}
-						<div className="flex items-center gap-1 mt-1 -ml-2 justify-between">
-							<Button
-								variant="ghost"
-								size="sm"
-								className="gap-1.5 text-muted-foreground hover:bg-transparent!"
-							>
-								<Heart
-									size={16}
-									className={
-										hasUserLiked ? "fill-destructive text-destructive" : ""
-									}
-								/>
-								<span className="text-xs">{formatCount(likes)}</span>
-							</Button>
-
-							<Button
-								variant="ghost"
-								size="sm"
-								className="gap-1.5 text-muted-foreground hover:bg-transparent!"
-							>
-								<MessageCircle size={16} />
-								<span className="text-xs">{formatCount(comments)}</span>
-							</Button>
-
-							<Button
-								variant="ghost"
-								size="sm"
-								className="gap-1.5 text-muted-foreground hover:bg-transparent!"
-							>
-								<Bookmark
-									size={16}
-									className={
-										hasUserBookmarked ? "fill-foreground text-foreground" : ""
-									}
-								/>
-								<span className="text-xs">{formatCount(bookmarks)}</span>
-							</Button>
-
-							<Button variant="ghost" size="sm" className="gap-1.5" disabled>
-								<ChartNoAxesColumn size={16} />
-								<span className="text-xs">{formatCount(views)}</span>
-							</Button>
-
-							<DropdownMenu>
-								<DropdownMenuTrigger className="inline-flex items-center justify-center gap-1.5 text-muted-foreground hover:bg-transparent rounded-md px-2 py-1 text-sm hover:text-foreground">
-									<EllipsisVertical size={16} />
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									<DropdownMenuItem onClick={handleShare}>
-										Share
+						<DropdownMenu>
+							<DropdownMenuTrigger className="text-muted-foreground hover:text-foreground p-1">
+								<EllipsisVertical size={18} />
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								{isOwnPost ? (
+									<DropdownMenuItem
+										className="text-destructive"
+										onClick={() => setShowDeleteDialog(true)}
+									>
+										<Trash2 />
+										Delete
 									</DropdownMenuItem>
-									{isOwnPost ? (
-										<DropdownMenuItem
-											onClick={() => setShowDeleteDialog(true)}
-											className="text-destructive focus:text-destructive"
-										>
-											Delete
-										</DropdownMenuItem>
-									) : (
-										<DropdownMenuItem>Report</DropdownMenuItem>
-									)}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</div>
+								) : (
+									<DropdownMenuItem>
+										<Flag />
+										Report
+									</DropdownMenuItem>
+								)}
+							</DropdownMenuContent>
+						</DropdownMenu>
 					</div>
+
+					<div
+						className={
+							post.hasAttachments ? "mb-2 mt-1 text-sm" : "mt-1 text-sm"
+						}
+					>
+						{post.body && <PostBody content={post.body} />}
+					</div>
+
+					{post.hasAttachments && (
+						<div className="mb-1">
+							{images.length > 0 && <ImageCarousel attachments={images} />}
+							{video && (
+								<AspectRatio ratio={16 / 9}>
+									<VideoPlayer src={video.fileUrl} />
+								</AspectRatio>
+							)}
+						</div>
+					)}
+
+					<PostActions
+						{...post}
+						className="-ml-2 mt-1"
+						onShare={handleShare}
+						onLike={() => {
+							/* mutation here */
+						}}
+						onBookmark={() => {
+							/* mutation here */
+						}}
+						onComment={() => {
+							/* mutation here */
+						}}
+					/>
 				</div>
 			</Card>
 
@@ -221,8 +126,10 @@ function PostCard({
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
 						<AlertDialogAction
-							onClick={handleDelete}
-							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+							onClick={() => {
+								/* actual delete logic */
+							}}
+							variant="destructive"
 						>
 							Delete
 						</AlertDialogAction>
@@ -232,5 +139,3 @@ function PostCard({
 		</>
 	);
 }
-
-export default PostCard;

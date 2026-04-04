@@ -194,8 +194,10 @@ const mockPost = {
 
 function Home() {
 	return (
-		<div className="h-full w-full flex justify-center items-start">
-			<PostCard {...mockPost} />
+		<div className="h-full flex justify-center items-start py-8">
+			<div className="w-lg">
+				<PostCard {...mockPost} />
+			</div>
 		</div>
 	);
 }

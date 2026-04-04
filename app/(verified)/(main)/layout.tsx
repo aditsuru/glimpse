@@ -11,7 +11,7 @@ export default function RootLayout({
 			</div>
 
 			{/* Col 2–3 — Main content */}
-			<div className="min-h-dvh lg:block h-full col-span-2 overflow-y-auto [overflow-anchor:none]">
+			<div className="min-h-dvh lg:block h-full col-span-2 overflow-y-auto [overflow-anchor:none] no-scrollbar">
 				{children}
 			</div>
 
