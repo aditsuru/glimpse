@@ -36,3 +36,6 @@ export const PostOutputSchema = BasePostSchema.extend({
 	authorAvatarUrl: z.string().nullable(),
 	authorIsVerified: z.boolean(),
 });
+
+export type Attachment = z.infer<typeof AttachmentSchema>;
+export type PostOutput = z.infer<typeof PostOutputSchema>;

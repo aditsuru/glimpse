@@ -1,4 +1,4 @@
-import { inArray } from "drizzle-orm";
+import { asc, inArray } from "drizzle-orm";
 import type { db as DBType } from "@/drizzle/db";
 import { attachmentsTable } from "@/drizzle/schema";
 import type { ATTACHMENT_TYPES } from "@/lib/constants";
@@ -28,7 +28,8 @@ export async function fetchAttachmentsMap(
 				attachmentsTable.postId,
 				postsWithAttachments.map((p) => p.id)
 			)
-		);
+		)
+		.orderBy(asc(attachmentsTable.createdAt));
 
 	for (const attachment of allAttachments) {
 		if (!map.has(attachment.postId)) map.set(attachment.postId, []);

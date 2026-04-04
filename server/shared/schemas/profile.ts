@@ -9,3 +9,5 @@ export const BaseProfileSchema = z.object({
 	isFollowingUser: z.boolean(),
 	isFollowedByUser: z.boolean(),
 });
+
+export type BaseProfile = z.infer<typeof BaseProfileSchema>;

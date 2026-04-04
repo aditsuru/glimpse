@@ -39,9 +39,7 @@ function SignOutButton() {
 			</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>
-						Are you sure you want to sign out?
-					</AlertDialogTitle>
+					<AlertDialogTitle>Are you sure?</AlertDialogTitle>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>

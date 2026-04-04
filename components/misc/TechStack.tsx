@@ -1,6 +1,5 @@
-import { LinkSquare02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -121,7 +120,7 @@ function TechStack() {
 					<Button variant="ghost" type="button" className="shrink-0">
 						<SiGithub className="size-5" />
 						GitHub
-						<HugeiconsIcon icon={LinkSquare02Icon} className="size-3.5" />
+						<ExternalLink className="size-3.5" />
 					</Button>
 				</Link>
 				<Separator className="flex-1" />
