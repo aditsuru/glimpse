@@ -1,6 +1,6 @@
 "use client";
 
-import { MediaCarousel } from "@/components/media/MediaCarousel";
+// import { MediaCarousel } from "@/components/media/MediaCarousel";
 import type { AttachmentType } from "@/lib/constants";
 
 type Attachment = {
@@ -33,7 +33,7 @@ function Home() {
 
 	return (
 		<div className="h-full w-full flex justify-center items-center">
-			<MediaCarousel attachments={mockAttachments} />
+			{/* <MediaCarousel attachments={mockAttachments} /> */}
 		</div>
 	);
 }
