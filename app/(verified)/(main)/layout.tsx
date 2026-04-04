@@ -4,18 +4,18 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="lg:grid lg:grid-cols-4 h-dvh w-dvw gap-4 px-16">
+		<div className="lg:grid lg:grid-cols-3 h-dvh w-dvw px-16">
 			{/* Col 1 — Profile card, desktop only */}
 			<div className="hidden lg:block h-full col-span-1 overflow-y-auto">
 				{/* <ProfileCard /> */}
 			</div>
 
-			{/* Col 2–3 — Main content */}
-			<div className="min-h-dvh lg:block h-full col-span-2 overflow-y-auto [overflow-anchor:none] no-scrollbar">
+			{/* Col 2 — Main content */}
+			<div className="min-h-dvh lg:block h-full col-span-1 overflow-y-auto [overflow-anchor:none] no-scrollbar border-r border-l border-accent">
 				{children}
 			</div>
 
-			{/* Col 4 — Search + nav, desktop only */}
+			{/* Col 3 — Search + nav, desktop only */}
 			<div className="hidden lg:block h-full col-span-1 overflow-y-auto">
 				{/* <SearchSidebar /> */}
 			</div>

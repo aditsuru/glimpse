@@ -39,7 +39,7 @@ export function UrlEmbed({ url }: UrlEmbedProps) {
 	// Reserve height immediately so the feed doesn't reflow when data loads.
 	// min-h matches roughly the tallest the card can be (image + text).
 	return (
-		<div className="my-2 flex flex-col justify-start">
+		<div className="my-3 flex flex-col justify-start">
 			{state === "failed" && (
 				<a
 					href={url}
