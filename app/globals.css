@@ -130,6 +130,14 @@
 		cursor: auto !important;
 	}
 
+	.mention {
+		@apply text-chart-2 font-medium hover:underline cursor-pointer;
+	}
+
+	.post-body a:not(.mention) {
+		@apply text-chart-2 underline underline-offset-4 break-all hover:text-chart-2/80;
+	}
+
 	* {
 		@apply border-border outline-ring/50;
 	}

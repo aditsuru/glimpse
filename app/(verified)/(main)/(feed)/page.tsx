@@ -8,65 +8,171 @@ const mockPost = {
 	body: JSON.stringify({
 		type: "doc",
 		content: [
+			// Plain paragraph with a mention and inline bold/italic
 			{
 				type: "paragraph",
 				content: [
-					{ type: "text", text: "Just shipped " },
-					{ type: "text", text: "v2.0", marks: [{ type: "bold" }] },
-					{ type: "text", text: " of our platform — here's what's new 🧵" },
-				],
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", text: "Big shoutout to " },
+					{ type: "text", text: "Hey " },
 					{
 						type: "mention",
-						attrs: { id: "user_456", label: "adityachandra" },
+						attrs: { id: "usr_abc123", label: "janedoe" },
 					},
-					{ type: "text", text: " and " },
-					{ type: "mention", attrs: { id: "user_789", label: "rahulsharma" } },
-					{ type: "text", text: " for pulling this off 🙌" },
-				],
-			},
-			{
-				type: "paragraph",
-				content: [
-					{ type: "text", text: "Performance is " },
-					{ type: "text", text: "3x faster", marks: [{ type: "bold" }] },
-					{ type: "text", text: " and the new " },
-					{ type: "text", text: "search", marks: [{ type: "italic" }] },
-					{ type: "text", text: " is finally " },
+					{ type: "text", text: " just shipped something wild — " },
 					{
 						type: "text",
-						text: "actually good",
+						text: "read this carefully",
 						marks: [{ type: "bold" }, { type: "italic" }],
 					},
 					{ type: "text", text: "." },
 				],
 			},
+
+			// Paragraph with a real link mark (what tiptap stores when Link extension is active)
 			{
 				type: "paragraph",
 				content: [
-					{ type: "text", text: "Check the full changelog at " },
+					{ type: "text", text: "Full writeup over at " },
 					{
 						type: "text",
-						text: "github.com/org/repo",
-						marks: [{ type: "link", attrs: { href: "https://github.com" } }],
+						text: "https://github.com/aditsuru/glimpse",
+						marks: [
+							{
+								type: "link",
+								attrs: {
+									href: "https://github.com/aditsuru/glimpse",
+									target: "_blank",
+									rel: "noopener noreferrer",
+								},
+							},
+						],
+					},
+					{ type: "text", text: " — worth a read." },
+				],
+			},
+
+			// Standalone URL — sole content node, text === href → becomes embed card
+			{
+				type: "paragraph",
+				content: [
+					{
+						type: "text",
+						text: "https://github.com/aditsuru/glimpse",
+						marks: [
+							{
+								type: "link",
+								attrs: {
+									href: "https://github.com/aditsuru/glimpse",
+									target: "_blank",
+									rel: "noopener noreferrer",
+								},
+							},
+						],
 					},
 				],
 			},
+
+			// Blockquote
 			{
-				type: "paragraph",
-				content: [{ type: "text", text: "Code snippet for the new API:" }],
+				type: "blockquote",
+				content: [
+					{
+						type: "paragraph",
+						content: [
+							{
+								type: "text",
+								text: "The best code is the code you never have to write.",
+							},
+						],
+					},
+				],
 			},
+
+			// First code block — triggers segment split
 			{
 				type: "codeBlock",
 				attrs: { language: "typescript" },
 				content: [
 					{
 						type: "text",
-						text: "const res = await fetch('/api/v2/posts')\nconst data = await res.json()",
+						text: 'import { z } from "zod";\n\nconst UserSchema = z.object({\n  id: z.string().cuid2(),\n  username: z.string().min(3).max(32),\n  email: z.string().email(),\n});\n\ntype User = z.infer<typeof UserSchema>;',
+					},
+				],
+			},
+
+			// Paragraph after code block — tests that html segment resumes correctly
+			{
+				type: "paragraph",
+				content: [
+					{ type: "text", text: "The schema above also works with " },
+					{
+						type: "text",
+						text: "trpc",
+						marks: [{ type: "code" }],
+					},
+					{ type: "text", text: " input validators directly. Shoutout to " },
+					{
+						type: "mention",
+						attrs: { id: "usr_xyz789", label: "colinhacks" },
+					},
+					{ type: "text", text: " for zod." },
+				],
+			},
+
+			// Bullet list
+			{
+				type: "bulletList",
+				content: [
+					{
+						type: "listItem",
+						content: [
+							{
+								type: "paragraph",
+								content: [{ type: "text", text: "Zero runtime overhead" }],
+							},
+						],
+					},
+					{
+						type: "listItem",
+						content: [
+							{
+								type: "paragraph",
+								content: [{ type: "text", text: "Full TypeScript inference" }],
+							},
+						],
+					},
+					{
+						type: "listItem",
+						content: [
+							{
+								type: "paragraph",
+								content: [
+									{ type: "text", text: "Composable and tree-shakeable" },
+								],
+							},
+						],
+					},
+				],
+			},
+
+			// Second code block — tests multiple segment splits
+			{
+				type: "codeBlock",
+				attrs: { language: "bash" },
+				content: [
+					{
+						type: "text",
+						text: "npm install zod\nnpx tsc --noEmit",
+					},
+				],
+			},
+
+			// Trailing paragraph — this is what gets cut by read-more
+			{
+				type: "paragraph",
+				content: [
+					{
+						type: "text",
+						text: "This trailing paragraph is intentionally long so the read-more threshold is crossed at a clean segment boundary. No code block should ever get sliced in half by the char limit logic — it always rounds up to the next complete segment before cutting.",
 					},
 				],
 			},
@@ -90,7 +196,7 @@ const mockPost = {
 
 function Home() {
 	return (
-		<div className="h-full w-full flex justify-center items-center">
+		<div className="h-full w-full flex justify-center items-center pt-240">
 			<PostCard {...mockPost} />
 		</div>
 	);
