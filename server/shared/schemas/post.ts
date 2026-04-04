@@ -38,4 +38,8 @@ export const PostOutputSchema = BasePostSchema.extend({
 });
 
 export type Attachment = z.infer<typeof AttachmentSchema>;
+export type AttachmentWithoutKey = Omit<
+	z.infer<typeof AttachmentSchema>,
+	"fileKey"
+>;
 export type PostOutput = z.infer<typeof PostOutputSchema>;
