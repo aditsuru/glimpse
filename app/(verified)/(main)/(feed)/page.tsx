@@ -185,10 +185,10 @@ const mockPost = {
 	comments: 38,
 	bookmarks: 21,
 	views: 4821,
-	authorName: "Aditya Chandra",
-	authorUsername: "adityachandra",
+	authorName: "Adi",
+	authorUsername: "aditsuru",
 	authorAvatarUrl:
-		"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg", // will fallback to initials
+		"https://i.pinimg.com/736x/ac/49/20/ac492039353e5db837ad6d8057fa9925.jpg", // will fallback to initials
 	authorIsVerified: true,
 };
 

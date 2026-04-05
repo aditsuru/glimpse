@@ -53,9 +53,15 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	const [menuView, setMenuView] = React.useState<MenuView>("root");
 	const [hasHydrated, setHasHydrated] = React.useState(false);
 
+	const playingRef = React.useRef(false);
+
 	React.useEffect(() => {
 		setHasHydrated(true);
 	}, []);
+
+	React.useEffect(() => {
+		playingRef.current = playing;
+	}, [playing]);
 
 	const closeMenu = React.useCallback(() => {
 		setMenuOpen(false);
@@ -76,23 +82,27 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 
 	// Pause if another video claims the global slot
 	React.useEffect(() => {
-		if (activeVideoId !== src && playing) {
+		if (activeVideoId !== src && playingRef.current) {
 			videoRef.current?.pause();
 			setPlaying(false);
 		}
-	}, [activeVideoId, src, playing]);
+	}, [activeVideoId, src]);
 
 	// Auto-pause when scrolled out of view
 	React.useEffect(() => {
 		const observer = new IntersectionObserver(
 			([entry]) => {
-				if (!entry.isIntersecting && playing) {
-					videoRef.current?.pause();
-					setPlaying(false);
-					if (activeVideoId === src) setActiveVideoId(null);
+				if (!entry.isIntersecting) {
+					if (playingRef.current) {
+						videoRef.current?.pause();
+						setPlaying(false);
+						if (useMediaStore.getState().activeVideoId === src) {
+							setActiveVideoId(null);
+						}
+					}
+					return;
 				}
-
-				if (entry.isIntersecting && autoPlay) {
+				if (autoPlay && !useMediaStore.getState().activeVideoId) {
 					setActiveVideoId(src);
 					videoRef.current?.play().catch(() => {});
 					setPlaying(true);
@@ -102,7 +112,7 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 		);
 		if (containerRef.current) observer.observe(containerRef.current);
 		return () => observer.disconnect();
-	}, [playing, activeVideoId, src, setActiveVideoId, autoPlay]);
+	}, [src, setActiveVideoId, autoPlay]);
 
 	// Catch cached metadata
 	React.useEffect(() => {

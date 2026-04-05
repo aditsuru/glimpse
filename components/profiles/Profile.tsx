@@ -177,7 +177,7 @@ const mockData: PostOutput[] = [
 		attachments: [
 			{
 				fileUrl:
-					"https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800",
+					"https://i.pinimg.com/originals/e4/1d/5e/e41d5e91c040869cb3d0c15e1e46c322.gif",
 				fileType: "image" as const,
 			},
 		],
@@ -214,7 +214,7 @@ const mockData: PostOutput[] = [
 			],
 		}),
 		hasAttachments: true,
-		attachments: [{ fileUrl: "/static/video.mp4", fileType: "video" as const }],
+		attachments: [{ fileUrl: "/static/grok.mp4", fileType: "video" as const }],
 		hasUserLiked: true,
 		hasUserBookmarked: false,
 		likes: 632,

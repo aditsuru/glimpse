@@ -25,7 +25,7 @@ export function ProfileTabs({ posts }: ProfileTabsProps) {
 		<Tabs
 			value={active}
 			onValueChange={(v) => setActive(v as TabValue)}
-			className="flex flex-col h-full overflow-hidden w-full *:data-[slot=tabs-content]:w-full"
+			className="flex flex-col h-full overflow-hidden w-full gap-0 *:data-[slot=tabs-content]:w-full"
 		>
 			<TabsList
 				variant="line"
@@ -46,7 +46,7 @@ export function ProfileTabs({ posts }: ProfileTabsProps) {
 				<TabsContent
 					key={value}
 					value={value}
-					className="flex-1 overflow-y-auto mt-0 w-full min-w-0"
+					className="flex-1 overflow-y-auto w-full min-w-0 no-scrollbar"
 				>
 					{value === "posts" && (
 						<div className="flex flex-col divide-y divide-border w-full">
