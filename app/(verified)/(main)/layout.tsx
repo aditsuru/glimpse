@@ -25,7 +25,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="lg:grid lg:grid-cols-3 h-dvh w-dvw px-16">
+		<div className="lg:grid lg:grid-cols-3 h-dvh w-dvw lg:px-16">
 			{/* Col 1 — Profile card, desktop only */}
 			<div className="hidden lg:block h-full col-span-1 border-l overflow-hidden">
 				<Profile {...mockProfile} />

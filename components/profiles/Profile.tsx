@@ -39,10 +39,10 @@ const mockData: PostOutput[] = [
 		bookmarks: 47,
 		views: 3200,
 		createdAt: new Date("2025-04-03T10:00:00Z"),
-		authorName: "Aditya Chandra",
-		authorUsername: "adityachandra",
+		authorName: "Adi",
+		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 
@@ -73,10 +73,10 @@ const mockData: PostOutput[] = [
 		bookmarks: 412,
 		views: 28000,
 		createdAt: new Date("2025-04-01T14:22:00Z"),
-		authorName: "Aditya Chandra",
-		authorUsername: "adityachandra",
+		authorName: "Adi",
+		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 
@@ -113,10 +113,10 @@ const mockData: PostOutput[] = [
 		bookmarks: 88,
 		views: 6100,
 		createdAt: new Date("2025-03-29T09:15:00Z"),
-		authorName: "Aditya Chandra",
-		authorUsername: "adityachandra",
+		authorName: "Adi",
+		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 
@@ -163,10 +163,10 @@ const mockData: PostOutput[] = [
 		bookmarks: 102,
 		views: 9400,
 		createdAt: new Date("2025-03-25T18:30:00Z"),
-		authorName: "Aditya Chandra",
-		authorUsername: "adityachandra",
+		authorName: "Adi",
+		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 
@@ -190,10 +190,10 @@ const mockData: PostOutput[] = [
 		bookmarks: 23,
 		views: 2100,
 		createdAt: new Date("2025-03-20T11:00:00Z"),
-		authorName: "Aditya Chandra",
-		authorUsername: "adityachandra",
+		authorName: "Adi",
+		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 
@@ -224,10 +224,10 @@ const mockData: PostOutput[] = [
 		bookmarks: 71,
 		views: 8800,
 		createdAt: new Date("2025-03-15T16:45:00Z"),
-		authorName: "Aditya Chandra",
-		authorUsername: "adityachandra",
+		authorName: "Adi",
+		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 ];

@@ -12,14 +12,14 @@ const mockPosts = [
 					content: [
 						{
 							type: "text",
-							text: "Just pushed a massive refactor to the video player. Autoplay, autopause, scroll-driven lifecycle — all working cleanly now. Feels good.",
+							text: "Idk why I love this trend.",
 						},
 					],
 				},
 			],
 		}),
 		hasAttachments: true,
-		createdAt: new Date("2025-04-04T08:30:00Z"),
+		createdAt: new Date("2024-04-04T08:30:00Z"),
 		attachments: [{ fileUrl: "/static/video.mp4", fileType: "video" as const }],
 		hasUserLiked: false,
 		hasUserBookmarked: true,
@@ -54,7 +54,7 @@ const mockPosts = [
 		attachments: [
 			{
 				fileUrl:
-					"https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800",
+					"https://i.pinimg.com/736x/8a/45/9a/8a459a682d6bfdcc22b41ec90bfb69a6.jpg",
 				fileType: "image" as const,
 			},
 		],
@@ -64,11 +64,48 @@ const mockPosts = [
 		comments: 34,
 		bookmarks: 88,
 		views: 6100,
-		createdAt: new Date("2025-03-29T09:15:00Z"),
-		authorName: "Aditya Chandra",
-		authorUsername: "adityachandra",
+		createdAt: new Date("2026-03-29T09:15:00Z"),
+		authorName: "Adi",
+		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
+		authorIsVerified: true,
+	},
+	{
+		id: "awdwaw",
+		userId: "user_123",
+		body: JSON.stringify({
+			type: "doc",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							text: "Kind Mita wants you",
+						},
+					],
+				},
+			],
+		}),
+		hasAttachments: true,
+		attachments: [
+			{
+				fileUrl: "https://i.redd.it/q5yjyt8ijmbf1.png",
+				fileType: "image" as const,
+			},
+		],
+		hasUserLiked: true,
+		hasUserBookmarked: true,
+		likes: 521,
+		comments: 34,
+		bookmarks: 88,
+		views: 6100,
+		createdAt: new Date("2026-02-29T09:15:00Z"),
+		authorName: "Adi",
+		authorUsername: "aditsuru",
+		authorAvatarUrl:
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 	{
@@ -82,7 +119,7 @@ const mockPosts = [
 					content: [
 						{
 							type: "text",
-							text: "Mita dropped something interesting. Worth watching if you're into generative stuff — short but dense.",
+							text: "Mita obsessed",
 						},
 					],
 				},
@@ -136,7 +173,7 @@ const mockPosts = [
 		authorIsVerified: true,
 	},
 	{
-		id: "post_4",
+		id: "post_awdadwada3",
 		userId: "user_123",
 		body: JSON.stringify({
 			type: "doc",
@@ -146,7 +183,7 @@ const mockPosts = [
 					content: [
 						{
 							type: "text",
-							text: "Grok's latest is wild. Not sure how I feel about the direction but the output quality is undeniably sharp.",
+							text: "New rice.",
 						},
 					],
 				},
@@ -154,7 +191,38 @@ const mockPosts = [
 		}),
 		hasAttachments: true,
 		createdAt: new Date("2025-04-02T09:15:00Z"),
-
+		attachments: [
+			{
+				fileUrl:
+					"https://preview.redd.it/aerospace-i-thought-id-miss-arch-v0-8bk9g5w3vowf1.png?width=1080&crop=smart&auto=webp&s=5262176261ac8c8744fff490216bc3b79bea5333",
+				fileType: "image" as const,
+			},
+			{
+				fileUrl:
+					"https://preview.redd.it/aerospace-i-thought-id-miss-arch-v0-hzbbczs4vowf1.png?width=1080&crop=smart&auto=webp&s=fa035ee99c67c171b2ef79577e4b18a97eafa671",
+				fileType: "image" as const,
+			},
+		],
+		hasUserLiked: false,
+		hasUserBookmarked: false,
+		likes: 301,
+		comments: 67,
+		bookmarks: 44,
+		views: 9230,
+		authorName: "Adi",
+		authorUsername: "aditsuru",
+		authorAvatarUrl:
+			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+		authorIsVerified: true,
+	},
+	{
+		id: "post_4",
+		userId: "user_123",
+		hasAttachments: true,
+		createdAt: new Date("2025-04-02T09:15:00Z"),
+		attachments: [
+			{ fileUrl: "/static/miside.mp4", fileType: "video" as const },
+		],
 		hasUserLiked: false,
 		hasUserBookmarked: false,
 		likes: 301,
