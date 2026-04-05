@@ -1,3 +1,4 @@
+// components/media/VideoPlayer.tsx
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: not given */
 /** biome-ignore-all lint/a11y/noNoninteractiveTabindex: not given */
 /** biome-ignore-all lint/a11y/useSemanticElements: not given */
@@ -103,15 +104,15 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 				inViewRef.current = entry.isIntersecting;
 
 				if (entry.isIntersecting) {
-					// Claim if nobody else is playing, user hasn't paused, and browser hasn't blocked us
+					// Only claim if nobody else is playing and user hasn't manually paused
 					if (
 						autoPlay &&
 						!useMediaStore.getState().activeVideoId &&
-						!userPaused.current &&
-						!autoplayFailed.current
+						!userPaused.current
 					) {
 						setActiveVideoId(src);
-						safePlay();
+						v.muted = useMediaStore.getState().isMuted; // Force hardware mute state instantly
+						v.play().catch(() => {});
 					}
 				} else {
 					// Leaving view: reset intents, release slot, stop
@@ -128,7 +129,7 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 
 		if (containerRef.current) observer.observe(containerRef.current);
 		return () => observer.disconnect();
-	}, [scrollRoot, src, autoPlay, setActiveVideoId, safePlay]);
+	}, [scrollRoot, src, autoPlay, setActiveVideoId]);
 
 	// ─── Engine 2: Store Subscription ─────────────────────────────────────────
 	// Reacts to another video claiming or releasing the active slot.
@@ -141,26 +142,29 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 			if (state.activeVideoId === src) {
 				// We are now active — play unless user intentionally paused
 				if (!userPaused.current && v.paused) {
-					safePlay();
+					v.muted = state.isMuted; // Force hardware mute state instantly
+					v.play().catch(() => {});
 				}
 			} else if (
 				state.activeVideoId === null &&
 				inViewRef.current &&
 				autoPlay &&
-				!userPaused.current &&
-				!autoplayFailed.current
+				!userPaused.current
 			) {
 				// Slot just freed — claim it if still in view.
+				// Re-read live state to prevent double-claim race when
+				// multiple videos are visible and both subscribers fire.
 				if (!useMediaStore.getState().activeVideoId) {
 					setActiveVideoId(src);
-					safePlay();
+					v.muted = state.isMuted; // Force hardware mute state instantly
+					v.play().catch(() => {});
 				}
 			} else if (!v.paused) {
 				// Someone else is active — yield
 				v.pause();
 			}
 		});
-	}, [src, autoPlay, setActiveVideoId, safePlay]);
+	}, [src, autoPlay, setActiveVideoId]);
 
 	React.useEffect(() => {
 		const v = videoRef.current;
@@ -178,9 +182,9 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 		if (!v) return;
 		if (v.paused) {
 			userPaused.current = false;
-			autoplayFailed.current = false; // User interaction clears the block
 			setActiveVideoId(src);
-			v.play().catch(console.warn);
+			v.muted = useMediaStore.getState().isMuted;
+			v.play().catch(() => {});
 		} else {
 			userPaused.current = true;
 			v.pause();
