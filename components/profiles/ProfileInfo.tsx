@@ -1,15 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { Link2 as LinkIcon } from "lucide-react";
+import Link from "next/link";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { formatCount } from "@/lib/utils";
 import { config } from "@/lib/config";
+import { formatCount } from "@/lib/utils";
 import { ProfileUserCard } from "./ProfileUserCard";
 
 const mockFollowers = [

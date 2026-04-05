@@ -26,7 +26,7 @@ export default function RootLayout({
 	return (
 		<div className="lg:grid lg:grid-cols-3 h-dvh w-dvw px-16">
 			{/* Col 1 — Profile card, desktop only */}
-			<div className="hidden lg:block h-full col-span-1 overflow-y-auto border-l">
+			<div className="hidden lg:block h-full col-span-1 border-l overflow-hidden">
 				<Profile {...mockProfile} />
 			</div>
 
