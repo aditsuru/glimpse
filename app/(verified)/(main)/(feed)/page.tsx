@@ -30,7 +30,45 @@ const mockPosts = [
 		authorName: "Adi",
 		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/736x/ac/49/20/ac492039353e5db837ad6d8057fa9925.jpg",
+			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+		authorIsVerified: true,
+	},
+	{
+		id: "adwa",
+		userId: "user_123",
+		body: JSON.stringify({
+			type: "doc",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							text: "New desk setup finally done. The monitor arms made all the difference.",
+						},
+					],
+				},
+			],
+		}),
+		hasAttachments: true,
+		attachments: [
+			{
+				fileUrl:
+					"https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800",
+				fileType: "image" as const,
+			},
+		],
+		hasUserLiked: true,
+		hasUserBookmarked: true,
+		likes: 521,
+		comments: 34,
+		bookmarks: 88,
+		views: 6100,
+		createdAt: new Date("2025-03-29T09:15:00Z"),
+		authorName: "Aditya Chandra",
+		authorUsername: "adityachandra",
+		authorAvatarUrl:
+			"https://i.pinimg.com/474x/5a/71/68/5a716836387145194b529e131e648acb.jpg",
 		authorIsVerified: true,
 	},
 	{
@@ -62,7 +100,7 @@ const mockPosts = [
 		authorName: "Adi",
 		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/736x/ac/49/20/ac492039353e5db837ad6d8057fa9925.jpg",
+			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
 		authorIsVerified: true,
 	},
 	{
@@ -94,7 +132,39 @@ const mockPosts = [
 		authorName: "Adi",
 		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/736x/ac/49/20/ac492039353e5db837ad6d8057fa9925.jpg",
+			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+		authorIsVerified: true,
+	},
+	{
+		id: "post_4",
+		userId: "user_123",
+		body: JSON.stringify({
+			type: "doc",
+			content: [
+				{
+					type: "paragraph",
+					content: [
+						{
+							type: "text",
+							text: "Grok's latest is wild. Not sure how I feel about the direction but the output quality is undeniably sharp.",
+						},
+					],
+				},
+			],
+		}),
+		hasAttachments: true,
+		createdAt: new Date("2025-04-02T09:15:00Z"),
+
+		hasUserLiked: false,
+		hasUserBookmarked: false,
+		likes: 301,
+		comments: 67,
+		bookmarks: 44,
+		views: 9230,
+		authorName: "Adi",
+		authorUsername: "aditsuru",
+		authorAvatarUrl:
+			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
 		authorIsVerified: true,
 	},
 ];

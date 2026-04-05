@@ -28,8 +28,10 @@ const mockData: PostOutput[] = [
 				},
 			],
 		}),
-		hasAttachments: false,
-		attachments: [],
+		hasAttachments: true,
+		attachments: [
+			{ fileUrl: "/static/miside.mp4", fileType: "video" as const },
+		],
 		hasUserLiked: true,
 		hasUserBookmarked: false,
 		likes: 284,

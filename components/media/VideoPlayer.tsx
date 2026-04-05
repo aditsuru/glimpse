@@ -36,15 +36,18 @@ type MenuView = "root" | "speed";
 export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	const videoRef = React.useRef<HTMLVideoElement>(null);
 	const containerRef = React.useRef<HTMLDivElement>(null);
+	// Refs — never cause re-renders, safe to read inside callbacks
+	const userPaused = React.useRef(false);
+	const inViewRef = React.useRef(false);
 
-	// --- GLOBAL STORE ---
-	const isMuted = useMediaStore((state) => state.isMuted);
-	const setMuted = useMediaStore((state) => state.setMuted);
-	const activeVideoId = useMediaStore((state) => state.activeVideoId);
-	const setActiveVideoId = useMediaStore((state) => state.setActiveVideoId);
 	const scrollRoot = React.useContext(ScrollRootContext);
 
-	// --- LOCAL STATE ---
+	// Only subscribe to isMuted from the store — it's the only store value that drives UI
+	const isMuted = useMediaStore((state) => state.isMuted);
+	const setMuted = useMediaStore((state) => state.setMuted);
+	const setActiveVideoId = useMediaStore((state) => state.setActiveVideoId);
+
+	// Pure UI state — nothing here affects play/pause logic
 	const [playing, setPlaying] = React.useState(false);
 	const [progress, setProgress] = React.useState(0);
 	const [duration, setDuration] = React.useState(0);
@@ -53,82 +56,95 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	const [speed, setSpeed] = React.useState<Speed>(1);
 	const [menuOpen, setMenuOpen] = React.useState(false);
 	const [menuView, setMenuView] = React.useState<MenuView>("root");
-	const [hasHydrated, setHasHydrated] = React.useState(false);
-	const [inView, setInView] = React.useState(false);
-	const userPaused = React.useRef(false); // Tracks if the user intentionally paused
-
-	React.useEffect(() => {
-		setHasHydrated(true);
-	}, []);
 
 	const closeMenu = React.useCallback(() => {
 		setMenuOpen(false);
 		setMenuView("root");
 	}, []);
 
-	// 1. Intersection Observer: Track visibility
+	// ─── Engine 1: Intersection Observer ──────────────────────────────────────
+	// Acts directly in the callback — no state intermediary, no render cycle lag.
 	React.useEffect(() => {
 		const observer = new IntersectionObserver(
 			([entry]) => {
-				setInView(entry.isIntersecting);
+				const v = videoRef.current;
+				if (!v) return;
+
+				inViewRef.current = entry.isIntersecting;
+
+				if (entry.isIntersecting) {
+					// Only claim if nobody else is playing and user hasn't manually paused
+					if (
+						autoPlay &&
+						!useMediaStore.getState().activeVideoId &&
+						!userPaused.current
+					) {
+						setActiveVideoId(src);
+						v.play().catch(() => {});
+					}
+				} else {
+					// Leaving view: reset pause intent, release slot, stop
+					userPaused.current = false;
+					if (useMediaStore.getState().activeVideoId === src) {
+						setActiveVideoId(null);
+					}
+					if (!v.paused) v.pause();
+				}
 			},
-			{
-				root: scrollRoot,
-				rootMargin: "-15% 0px",
-				threshold: 0.3,
-			}
+			{ root: scrollRoot, threshold: 0.6 }
 		);
+
 		if (containerRef.current) observer.observe(containerRef.current);
 		return () => observer.disconnect();
-	}, [scrollRoot]);
+	}, [scrollRoot, src, autoPlay, setActiveVideoId]);
 
-	// 2. Engine: Synchronize DOM with Global Store and Visibility
-	// Effect A: Intersection → claim or release the active slot
+	// ─── Engine 2: Store Subscription ─────────────────────────────────────────
+	// Reacts to another video claiming or releasing the active slot.
+	// Bypasses React render cycle entirely — runs imperatively on store change.
 	React.useEffect(() => {
-		if (!hasHydrated) return;
+		return useMediaStore.subscribe((state) => {
+			const v = videoRef.current;
+			if (!v) return;
+
+			if (state.activeVideoId === src) {
+				// We are now active — play unless user intentionally paused
+				if (!userPaused.current && v.paused) {
+					v.play().catch(() => {});
+				}
+			} else if (
+				state.activeVideoId === null &&
+				inViewRef.current &&
+				autoPlay &&
+				!userPaused.current
+			) {
+				// Slot just freed — claim it if still in view.
+				// Re-read live state to prevent double-claim race when
+				// multiple videos are visible and both subscribers fire.
+				if (!useMediaStore.getState().activeVideoId) {
+					setActiveVideoId(src);
+					v.play().catch(() => {});
+				}
+			} else if (!v.paused) {
+				// Someone else is active — yield
+				v.pause();
+			}
+		});
+	}, [src, autoPlay, setActiveVideoId]);
+
+	React.useEffect(() => {
 		const v = videoRef.current;
 		if (!v) return;
 
-		if (inView) {
-			// Read live store state — avoids stale closure when two videos race
-			const liveActive = useMediaStore.getState().activeVideoId;
-			if (autoPlay && !liveActive && !userPaused.current) {
-				setActiveVideoId(src);
-				v.play().catch(() => {});
-			}
-		} else {
-			// Leaving view: reset intent, release throne, ensure paused
-			userPaused.current = false;
-			if (useMediaStore.getState().activeVideoId === src) {
-				setActiveVideoId(null);
-			}
-			if (!v.paused) v.pause();
+		// If metadata is already loaded, sync duration immediately
+		if (v.readyState >= 1 && v.duration) {
+			setDuration(v.duration);
 		}
-	}, [inView, hasHydrated, autoPlay, src, setActiveVideoId]);
+	}, []);
 
-	// Effect B: Another video claimed/released the throne — sync this video accordingly
-	React.useEffect(() => {
-		if (!hasHydrated) return;
-		const v = videoRef.current;
-		if (!v) return;
-
-		if (activeVideoId === src) {
-			if (!userPaused.current && v.paused) {
-				v.play().catch(() => {});
-			}
-		} else if (!v.paused) {
-			v.pause();
-		}
-	}, [activeVideoId, src, hasHydrated]);
-	// 3. UI Sync: Listen to the actual Video Element events
-	// This ensures the Play/Pause icon always matches reality
-	const handlePlay = () => setPlaying(true);
-	const handlePause = () => setPlaying(false);
-
+	// ─── Manual controls ──────────────────────────────────────────────────────
 	const togglePlay = () => {
 		const v = videoRef.current;
 		if (!v) return;
-
 		if (v.paused) {
 			userPaused.current = false;
 			setActiveVideoId(src);
@@ -136,13 +152,13 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 		} else {
 			userPaused.current = true;
 			v.pause();
-			// If we manually pause, we stay active so others don't steal the slot
-			// while we are still staring at this post.
+			// Keep active slot claimed — prevents other videos from stealing
+			// the slot while the user is still looking at this post
 		}
 	};
 
 	const formatTime = (s: number) => {
-		if (Number.isNaN(s)) return "0:00";
+		if (Number.isNaN(s) || !Number.isFinite(s)) return "0:00";
 		const m = Math.floor(s / 60);
 		const sec = Math.floor(s % 60);
 		return `${m}:${sec.toString().padStart(2, "0")}`;
@@ -186,10 +202,6 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 		}
 	};
 
-	// --- RENDER ---
-	if (!hasHydrated)
-		return <div className="h-full w-full bg-black animate-pulse rounded-lg" />;
-
 	const showControls = hovering || !playing || menuOpen;
 
 	return (
@@ -217,12 +229,16 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 				muted={isMuted}
 				playsInline
 				preload="metadata"
-				onPlay={handlePlay}
-				onPause={handlePause}
+				onPlay={() => setPlaying(true)}
+				onPause={() => setPlaying(false)}
 				onTimeUpdate={handleTimeUpdate}
+				onDurationChange={() => {
+					const v = videoRef.current;
+					if (v && !Number.isNaN(v.duration)) setDuration(v.duration);
+				}}
 				onLoadedMetadata={() => {
 					const v = videoRef.current;
-					if (v) setDuration(v.duration);
+					if (v && !Number.isNaN(v.duration)) setDuration(v.duration);
 				}}
 				className="h-full w-full object-contain rounded-lg overflow-hidden"
 			/>
@@ -274,8 +290,6 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 							{isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
 						</Button>
 
-						{/* Custom settings menu — absolutely positioned inside the container,
-						    so it's always visible in fullscreen without any portal gymnastics */}
 						<div className="relative">
 							<Button
 								variant="ghost"
