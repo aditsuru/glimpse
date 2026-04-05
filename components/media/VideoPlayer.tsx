@@ -20,6 +20,7 @@ import * as React from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { ScrollRootContext } from "@/store/scroll-root-context";
 import { useMediaStore } from "@/store/use-media-store";
 
 const SPEEDS = [0.5, 1, 1.25, 1.5, 2] as const;
@@ -41,6 +42,7 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	const setMuted = useMediaStore((state) => state.setMuted);
 	const activeVideoId = useMediaStore((state) => state.activeVideoId);
 	const setActiveVideoId = useMediaStore((state) => state.setActiveVideoId);
+	const scrollRoot = React.useContext(ScrollRootContext);
 
 	// --- LOCAL STATE ---
 	const [playing, setPlaying] = React.useState(false);
@@ -52,95 +54,98 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	const [menuOpen, setMenuOpen] = React.useState(false);
 	const [menuView, setMenuView] = React.useState<MenuView>("root");
 	const [hasHydrated, setHasHydrated] = React.useState(false);
-
-	const playingRef = React.useRef(false);
+	const [inView, setInView] = React.useState(false);
+	const userPaused = React.useRef(false); // Tracks if the user intentionally paused
 
 	React.useEffect(() => {
 		setHasHydrated(true);
 	}, []);
-
-	React.useEffect(() => {
-		playingRef.current = playing;
-	}, [playing]);
 
 	const closeMenu = React.useCallback(() => {
 		setMenuOpen(false);
 		setMenuView("root");
 	}, []);
 
-	// Close menu on outside click
-	React.useEffect(() => {
-		if (!menuOpen) return;
-		const handler = (e: MouseEvent) => {
-			if (!containerRef.current?.contains(e.target as Node)) {
-				closeMenu();
-			}
-		};
-		document.addEventListener("mousedown", handler);
-		return () => document.removeEventListener("mousedown", handler);
-	}, [menuOpen, closeMenu]);
-
-	// Pause if another video claims the global slot
-	React.useEffect(() => {
-		if (activeVideoId !== src && playingRef.current) {
-			videoRef.current?.pause();
-			setPlaying(false);
-		}
-	}, [activeVideoId, src]);
-
-	// Auto-pause when scrolled out of view
+	// 1. Intersection Observer: Track visibility
 	React.useEffect(() => {
 		const observer = new IntersectionObserver(
 			([entry]) => {
-				if (!entry.isIntersecting) {
-					if (playingRef.current) {
-						videoRef.current?.pause();
-						setPlaying(false);
-						if (useMediaStore.getState().activeVideoId === src) {
-							setActiveVideoId(null);
-						}
-					}
-					return;
-				}
-				if (autoPlay && !useMediaStore.getState().activeVideoId) {
-					setActiveVideoId(src);
-					videoRef.current?.play().catch(() => {});
-					setPlaying(true);
-				}
+				setInView(entry.isIntersecting);
 			},
-			{ threshold: 0.6 }
+			{
+				root: scrollRoot,
+				rootMargin: "-15% 0px",
+				threshold: 0.3,
+			}
 		);
 		if (containerRef.current) observer.observe(containerRef.current);
 		return () => observer.disconnect();
-	}, [src, setActiveVideoId, autoPlay]);
+	}, [scrollRoot]);
 
-	// Catch cached metadata
+	// 2. Engine: Synchronize DOM with Global Store and Visibility
+	// Effect A: Intersection → claim or release the active slot
 	React.useEffect(() => {
+		if (!hasHydrated) return;
 		const v = videoRef.current;
-		if (v && v.readyState >= 1) setDuration(v.duration);
-	}, []);
+		if (!v) return;
 
-	// --- HELPERS ---
+		if (inView) {
+			// Read live store state — avoids stale closure when two videos race
+			const liveActive = useMediaStore.getState().activeVideoId;
+			if (autoPlay && !liveActive && !userPaused.current) {
+				setActiveVideoId(src);
+				v.play().catch(() => {});
+			}
+		} else {
+			// Leaving view: reset intent, release throne, ensure paused
+			userPaused.current = false;
+			if (useMediaStore.getState().activeVideoId === src) {
+				setActiveVideoId(null);
+			}
+			if (!v.paused) v.pause();
+		}
+	}, [inView, hasHydrated, autoPlay, src, setActiveVideoId]);
+
+	// Effect B: Another video claimed/released the throne — sync this video accordingly
+	React.useEffect(() => {
+		if (!hasHydrated) return;
+		const v = videoRef.current;
+		if (!v) return;
+
+		if (activeVideoId === src) {
+			if (!userPaused.current && v.paused) {
+				v.play().catch(() => {});
+			}
+		} else if (!v.paused) {
+			v.pause();
+		}
+	}, [activeVideoId, src, hasHydrated]);
+	// 3. UI Sync: Listen to the actual Video Element events
+	// This ensures the Play/Pause icon always matches reality
+	const handlePlay = () => setPlaying(true);
+	const handlePause = () => setPlaying(false);
+
+	const togglePlay = () => {
+		const v = videoRef.current;
+		if (!v) return;
+
+		if (v.paused) {
+			userPaused.current = false;
+			setActiveVideoId(src);
+			v.play();
+		} else {
+			userPaused.current = true;
+			v.pause();
+			// If we manually pause, we stay active so others don't steal the slot
+			// while we are still staring at this post.
+		}
+	};
 
 	const formatTime = (s: number) => {
 		if (Number.isNaN(s)) return "0:00";
 		const m = Math.floor(s / 60);
 		const sec = Math.floor(s % 60);
 		return `${m}:${sec.toString().padStart(2, "0")}`;
-	};
-
-	// --- HANDLERS ---
-	const togglePlay = () => {
-		const v = videoRef.current;
-		if (!v) return;
-		if (v.paused) {
-			setActiveVideoId(src);
-			v.play().catch(() => {});
-			setPlaying(true);
-		} else {
-			v.pause();
-			setPlaying(false);
-		}
 	};
 
 	const toggleMute = (e: React.MouseEvent) => {
@@ -212,12 +217,13 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 				muted={isMuted}
 				playsInline
 				preload="metadata"
+				onPlay={handlePlay}
+				onPause={handlePause}
 				onTimeUpdate={handleTimeUpdate}
 				onLoadedMetadata={() => {
 					const v = videoRef.current;
 					if (v) setDuration(v.duration);
 				}}
-				onEnded={() => setPlaying(false)}
 				className="h-full w-full object-contain rounded-lg overflow-hidden"
 			/>
 

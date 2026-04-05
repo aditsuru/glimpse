@@ -20,6 +20,10 @@ export const useMediaStore = create<MediaState>()(
 		{
 			name: LOCAL_STORAGE_KEYS.GLIMPSE_MEDIA_STORAGE,
 			partialize: (state) => ({ isMuted: state.isMuted }),
+			onRehydrateStorage: () => (state) => {
+				// Ensure activeVideoId is always null on refresh
+				state?.setActiveVideoId(null);
+			},
 		}
 	)
 );

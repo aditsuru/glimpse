@@ -214,7 +214,7 @@ const mockData: PostOutput[] = [
 			],
 		}),
 		hasAttachments: true,
-		attachments: [{ fileUrl: "/static/grok.mp4", fileType: "video" as const }],
+		// attachments: [{ fileUrl: "/static/grok.mp4", fileType: "video" as const }],
 		hasUserLiked: true,
 		hasUserBookmarked: false,
 		likes: 632,

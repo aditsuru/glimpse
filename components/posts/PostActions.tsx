@@ -43,12 +43,17 @@ export function PostActions({
 	onShare,
 	className,
 }: PostActionsProps) {
+	const wrapStop = (fn?: () => void) => (e: React.MouseEvent) => {
+		e.stopPropagation();
+		fn?.();
+	};
+
 	return (
 		<div className={cn("flex items-center gap-1 justify-between", className)}>
 			<Button
 				variant="ghost"
 				size="sm"
-				onClick={onLike}
+				onClick={wrapStop(onLike)}
 				className="gap-1.5 text-muted-foreground hover:bg-transparent!"
 			>
 				<Heart
@@ -61,7 +66,7 @@ export function PostActions({
 			<Button
 				variant="ghost"
 				size="sm"
-				onClick={onComment}
+				onClick={wrapStop(onComment)}
 				className="gap-1.5 text-muted-foreground hover:bg-transparent!"
 			>
 				<MessageCircle size={16} />
@@ -71,7 +76,7 @@ export function PostActions({
 			<Button
 				variant="ghost"
 				size="sm"
-				onClick={onBookmark}
+				onClick={wrapStop(onBookmark)}
 				className="gap-1.5 text-muted-foreground hover:bg-transparent!"
 			>
 				<Bookmark
@@ -89,7 +94,7 @@ export function PostActions({
 			<Button
 				variant="ghost"
 				size="sm"
-				onClick={onShare}
+				onClick={wrapStop(onShare)}
 				className="gap-1.5 text-muted-foreground hover:bg-transparent! px-2 py-1"
 			>
 				<Share2 size={16} />

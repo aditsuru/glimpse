@@ -92,7 +92,7 @@ export default function PostCard(post: PostOutput) {
 							{images.length > 0 && <ImageCarousel attachments={images} />}
 							{video && (
 								<AspectRatio ratio={16 / 9}>
-									<VideoPlayer src={video.fileUrl} />
+									<VideoPlayer src={video.fileUrl} autoPlay />
 								</AspectRatio>
 							)}
 						</div>

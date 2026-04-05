@@ -2,10 +2,30 @@
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: none */
 "use client";
 
+import { EllipsisVertical, Flag, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { authClient } from "@/lib/clients/auth-client";
+import { config } from "@/lib/config";
 import { extractPostText } from "@/lib/post/extractPostText";
 import { initials, timeAgo } from "@/lib/utils";
 import type { PostOutput } from "@/server/shared/schemas/post";
@@ -14,7 +34,6 @@ import { CompactPostMedia } from "./CompactPostMedia";
 import { PostActions } from "./PostActions";
 
 const COMPACT_CHAR_LIMIT = 180;
-
 function stopProp(e: React.MouseEvent) {
 	e.stopPropagation();
 }
@@ -35,10 +54,22 @@ export function PostCardCompact({
 	authorUsername,
 	authorAvatarUrl,
 	authorIsVerified,
+	userId,
 }: PostOutput) {
 	const router = useRouter();
 	const rawText = body ? extractPostText(body) : "";
 	const [expanded, setExpanded] = useState(false);
+
+	const { data: session } = authClient.useSession();
+	const isOwnPost = session?.user?.id === userId;
+	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+	const handleShare = async () => {
+		toast.success("Link copied to clipboard!");
+		await navigator.clipboard.writeText(
+			`${config.NEXT_PUBLIC_APP_URL}/post/${id}`
+		);
+	};
 
 	const needsTruncation = rawText.length > COMPACT_CHAR_LIMIT;
 	const displayText =
@@ -66,24 +97,50 @@ export function PostCardCompact({
 			<div className="flex flex-col gap-1.5 min-w-0 flex-1">
 				{/* Author row — one stopProp for the whole row */}
 				<div
-					className="flex items-center gap-1 text-sm flex-wrap"
+					className="flex items-center justify-between gap-1 text-sm flex-wrap w-full"
 					onClick={stopProp}
 				>
-					<Link
-						href={`/user/${authorUsername}`}
-						className="font-semibold hover:underline"
-					>
-						{authorName}
-					</Link>
-					{authorIsVerified && <VerifiedBadge size={14} />}
-					<Link
-						href={`/user/${authorUsername}`}
-						className="text-muted-foreground hover:underline"
-					>
-						@{authorUsername}
-					</Link>
-					<span className="text-muted-foreground">·</span>
-					<span className="text-muted-foreground">{timeAgo(createdAt)}</span>
+					<div className="flex items-center gap-1 flex-wrap min-w-0">
+						<Link
+							href={`/user/${authorUsername}`}
+							className="font-semibold hover:underline"
+						>
+							{authorName}
+						</Link>
+						{authorIsVerified && <VerifiedBadge size={14} />}
+						<Link
+							href={`/user/${authorUsername}`}
+							className="text-muted-foreground hover:underline truncate max-w-[120px]"
+						>
+							@{authorUsername}
+						</Link>
+						<span className="text-muted-foreground shrink-0">·</span>
+						<span className="text-muted-foreground shrink-0">
+							{timeAgo(createdAt)}
+						</span>
+					</div>
+
+					<DropdownMenu>
+						<DropdownMenuTrigger className="text-muted-foreground hover:text-foreground p-1 shrink-0">
+							<EllipsisVertical size={16} />
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" onClick={stopProp}>
+							{isOwnPost ? (
+								<DropdownMenuItem
+									className="text-destructive"
+									onClick={() => setShowDeleteDialog(true)}
+								>
+									<Trash2 />
+									Delete
+								</DropdownMenuItem>
+							) : (
+								<DropdownMenuItem>
+									<Flag />
+									Report
+								</DropdownMenuItem>
+							)}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 
 				{rawText && (
@@ -119,9 +176,32 @@ export function PostCardCompact({
 						hasUserLiked={hasUserLiked}
 						hasUserBookmarked={hasUserBookmarked}
 						className="-ml-2 mt-0.5"
+						onShare={handleShare}
 					/>
 				</div>
 			</div>
+
+			<AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+				<AlertDialogContent onClick={stopProp}>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Delete this post?</AlertDialogTitle>
+						<AlertDialogDescription>
+							This cannot be undone.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => {
+								/* actual delete logic */
+							}}
+							variant="destructive"
+						>
+							Delete
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

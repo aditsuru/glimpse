@@ -16,7 +16,7 @@ export function ProfileBanner({
 }: ProfileBannerProps) {
 	return (
 		<div className="relative mb-16">
-			<AspectRatio ratio={3 / 1} className="bg-muted">
+			<AspectRatio ratio={4 / 1} className="bg-muted">
 				<Image
 					src={bannerUrl}
 					alt="Banner"
@@ -27,7 +27,7 @@ export function ProfileBanner({
 			</AspectRatio>
 
 			<div className="absolute -bottom-14 px-4">
-				<Avatar className="h-28 w-28 border-4 border-background ring-1 ring-foreground/10">
+				<Avatar className="h-28 w-28 border-background ring-1 ring-foreground/10">
 					<AvatarImage src={avatarUrl} alt={name} />
 					<AvatarFallback className="text-2xl">{initials(name)}</AvatarFallback>
 				</Avatar>

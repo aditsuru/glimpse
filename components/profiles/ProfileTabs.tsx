@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PostOutput } from "@/server/shared/schemas/post";
+import { ScrollContainer } from "../layout/ScrollContainer";
 import { PostCardCompact } from "../posts/PostCardCompact";
 
 const TABS = [
@@ -46,15 +47,17 @@ export function ProfileTabs({ posts }: ProfileTabsProps) {
 				<TabsContent
 					key={value}
 					value={value}
-					className="flex-1 overflow-y-auto w-full min-w-0 no-scrollbar"
+					className="flex-1 w-full min-w-0 h-full"
 				>
-					{value === "posts" && (
-						<div className="flex flex-col divide-y divide-border w-full">
-							{posts.map((post) => (
-								<PostCardCompact key={post.id} {...post} />
-							))}
-						</div>
-					)}
+					<ScrollContainer className="h-full no-scrollbar">
+						{value === "posts" && (
+							<div className="flex flex-col divide-y divide-border w-full">
+								{posts.map((post) => (
+									<PostCardCompact key={post.id} {...post} />
+								))}
+							</div>
+						)}
+					</ScrollContainer>
 				</TabsContent>
 			))}
 		</Tabs>

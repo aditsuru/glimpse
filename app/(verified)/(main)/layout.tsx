@@ -1,3 +1,4 @@
+import { ScrollContainer } from "@/components/layout/ScrollContainer";
 import Profile from "@/components/profiles/Profile";
 import type { OutputProfile } from "@/server/shared/schemas/profile";
 
@@ -31,9 +32,9 @@ export default function RootLayout({
 			</div>
 
 			{/* Col 2 — Main content */}
-			<div className="min-h-dvh lg:block h-full col-span-1 overflow-y-auto [overflow-anchor:none] no-scrollbar border-r border-l border-accent">
+			<ScrollContainer className="min-h-dvh lg:block h-full col-span-1 overflow-y-auto [overflow-anchor:none] no-scrollbar border-r border-l border-accent">
 				{children}
-			</div>
+			</ScrollContainer>
 
 			{/* Col 3 — Search + nav, desktop only */}
 			<div className="hidden lg:block h-full col-span-1 overflow-y-auto border-r">
