@@ -1,24 +1,12 @@
 import * as z from "zod";
+import { OutputProfileSchema } from "@/server/shared/schemas/profile";
 
 export const profileSchema = {
 	get: {
 		input: z.object({
 			username: z.string(),
 		}),
-		output: z.object({
-			avatarUrl: z.string(),
-			bannerUrl: z.string(),
-			username: z.string(),
-			name: z.string(),
-			bio: z.string().nullable(),
-			website: z.string().nullable(),
-			isGlimpseVerified: z.boolean(),
-			followersCount: z.number(),
-			followingsCount: z.number(),
-			userId: z.string(),
-			isFollowingUser: z.boolean(),
-			isFollowedByUser: z.boolean(),
-		}),
+		output: OutputProfileSchema,
 	},
 
 	update: {

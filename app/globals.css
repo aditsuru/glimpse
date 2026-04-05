@@ -125,6 +125,16 @@
 		cursor: none !important;
 	}
 
+	::-webkit-scrollbar,
+	::-webkit-scrollbar-button,
+	::-webkit-scrollbar-thumb,
+	::-webkit-scrollbar-track,
+	::-webkit-scrollbar-track-piece,
+	::-webkit-scrollbar-corner,
+	::-webkit-resizer {
+		cursor: none !important;
+	}
+
 	:fullscreen,
 	:fullscreen * {
 		cursor: auto !important;

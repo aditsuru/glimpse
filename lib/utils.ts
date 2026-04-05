@@ -25,3 +25,10 @@ export function timeAgo(date: Date) {
 	if (seconds < 31536000) return `${Math.floor(seconds / 2592000)}mo`;
 	return `${Math.floor(seconds / 31536000)}y`;
 }
+
+export function formatCount(n: number) {
+	if (n < 1000) return `${n}`;
+	if (n < 1000000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
+	if (n < 1000000000) return `${(n / 1000000).toFixed(1).replace(/\.0$/, "")}M`;
+	return `${(n / 1000000000).toFixed(1).replace(/\.0$/, "")}B`;
+  }

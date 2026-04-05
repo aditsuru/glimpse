@@ -2,6 +2,7 @@ import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { initials, timeAgo } from "@/lib/utils";
+import { VerifiedBadge } from "../misc/VerifiedBadge";
 
 interface PostHeaderProps {
 	authorName: string;
@@ -35,9 +36,7 @@ export function PostHeaderFeed({
 					>
 						{authorName}
 					</Link>
-					{authorIsVerified && (
-						<BadgeCheck size={20} className="text-chart-2 shrink-0" />
-					)}
+					{authorIsVerified && <VerifiedBadge />}
 				</div>
 				<div className="flex items-center gap-1 flex-wrap text-muted-foreground text-sm">
 					<Link className="hover:underline" href={`/user/${authorUsername}`}>
