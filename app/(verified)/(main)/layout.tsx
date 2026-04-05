@@ -7,9 +7,9 @@ const mockProfile: OutputProfile = {
 	name: "Adi",
 	username: "aditsuru",
 	avatarUrl:
-		"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+		"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 	bannerUrl:
-		"https://i.pinimg.com/1200x/e2/0e/f8/e20ef817c48c3ab3002510625db21f2f.jpg",
+		"https://i.pinimg.com/736x/e2/6b/fd/e26bfdf90db9ac3fabc777a5c771c544.jpg",
 	bio: "Building something cool. Previously @google.\nPassionate about distributed systems and great UI.\n\nOpen to collabs 🤝",
 	website: "https://aditsuru.com",
 	isGlimpseVerified: true,

@@ -30,7 +30,7 @@ const mockPosts = [
 		authorName: "Adi",
 		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 	{
@@ -137,7 +137,7 @@ const mockPosts = [
 		authorName: "Adi",
 		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 	{
@@ -169,7 +169,7 @@ const mockPosts = [
 		authorName: "Adi",
 		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 	{
@@ -212,7 +212,7 @@ const mockPosts = [
 		authorName: "Adi",
 		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 	{
@@ -232,7 +232,7 @@ const mockPosts = [
 		authorName: "Adi",
 		authorUsername: "aditsuru",
 		authorAvatarUrl:
-			"https://i.pinimg.com/736x/34/70/7c/34707c611749ddab412cad6991f6f2ae.jpg",
+			"https://i.pinimg.com/736x/d8/02/12/d802123602dfec846c6a70416266fd27.jpg",
 		authorIsVerified: true,
 	},
 ];

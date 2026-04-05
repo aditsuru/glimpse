@@ -50,7 +50,7 @@ function CarouselControls({
 				<Button
 					variant="outline"
 					size="icon"
-					className="absolute right-2 top-1/2 rounded-full z-10 border-none bg-background/50 backdrop-blur-md"
+					className="absolute right-2 top-1/2 rounded-full z-10 border-none bg-background/50 backdrop-blur-sm"
 					onClick={(e) => {
 						e.stopPropagation();
 						scrollNext();
@@ -73,7 +73,9 @@ function CarouselControls({
 						}}
 						className={cn(
 							"h-1.5 rounded-full transition-all duration-300 shadow-xs",
-							i === current ? "w-4 bg-primary" : "w-1.5 bg-muted-foreground/30"
+							i === current
+								? "w-4 bg-foreground"
+								: "w-1.5 bg-muted-foreground/30"
 						)}
 						aria-label={`Go to slide ${i + 1}`}
 					/>

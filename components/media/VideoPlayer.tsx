@@ -75,18 +75,15 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	}, []);
 
 	// Safely plays the video, enforcing DOM sync to bypass React's render delay.
+	// safePlay — already sets autoplayFailed.current = true, good
 	const safePlay = React.useCallback(() => {
 		const v = videoRef.current;
-		if (!v) return;
+		if (!v || autoplayFailed.current) return;
 
-		// Force DOM to recognize mute state before playing.
-		// Fixes the "first render won't autoplay" browser policy block.
 		v.muted = useMediaStore.getState().isMuted;
-
 		v.play().catch((e) => {
-			console.warn("Autoplay blocked by browser:", e);
+			console.warn("Autoplay blocked:", e);
 			autoplayFailed.current = true;
-			// If we fail to play, we MUST release the lock so we don't stall the whole app
 			if (useMediaStore.getState().activeVideoId === src) {
 				useMediaStore.getState().setActiveVideoId(null);
 			}
@@ -133,29 +130,28 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	// ─── Engine 2: Store Subscription ─────────────────────────────────────────
 	// Reacts to another video claiming or releasing the active slot.
 	// Bypasses React render cycle entirely — runs imperatively on store change.
+	// Store subscription — the slot-freed branch is the loop trigger
 	React.useEffect(() => {
 		return useMediaStore.subscribe((state) => {
 			const v = videoRef.current;
 			if (!v) return;
 
 			if (state.activeVideoId === src) {
-				// We are now active — play unless user intentionally paused
 				if (!userPaused.current && v.paused) {
-					safePlay(); // Use the safe wrapper
+					safePlay();
 				}
 			} else if (
 				state.activeVideoId === null &&
 				inViewRef.current &&
 				autoPlay &&
-				!userPaused.current
+				!userPaused.current &&
+				!autoplayFailed.current // ✅ this prevents the loop, not the permanent flag
 			) {
-				// Slot just freed — claim it if still in view.
 				if (!useMediaStore.getState().activeVideoId) {
 					setActiveVideoId(src);
-					safePlay(); // Use the safe wrapper
+					safePlay();
 				}
 			} else if (!v.paused) {
-				// Someone else is active — yield
 				v.pause();
 			}
 		});
@@ -177,14 +173,12 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 		if (!v) return;
 		if (v.paused) {
 			userPaused.current = false;
-			autoplayFailed.current = false; // Reset block on manual interaction
+			autoplayFailed.current = false; // ✅ manual gesture unlocks autoplay
 			setActiveVideoId(src);
-			safePlay(); // Use the safe wrapper
+			safePlay();
 		} else {
 			userPaused.current = true;
 			v.pause();
-			// Keep active slot claimed — prevents other videos from stealing
-			// the slot while the user is still looking at this post
 		}
 	};
 
