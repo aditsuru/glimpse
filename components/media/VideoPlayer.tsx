@@ -39,8 +39,19 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 	// Refs — never cause re-renders, safe to read inside callbacks
 	const userPaused = React.useRef(false);
 	const inViewRef = React.useRef(false);
+	const autoplayFailed = React.useRef(false); // Tracks if browser strictly blocked autoplay
 
 	const scrollRoot = React.useContext(ScrollRootContext);
+
+	// CRITICAL: Release the global lock if this component unmounts while active.
+	// Fixes "no sync across scroll containers/pages" where a destroyed video holds the lock.
+	React.useEffect(() => {
+		return () => {
+			if (useMediaStore.getState().activeVideoId === src) {
+				useMediaStore.getState().setActiveVideoId(null);
+			}
+		};
+	}, [src]);
 
 	// Only subscribe to isMuted from the store — it's the only store value that drives UI
 	const isMuted = useMediaStore((state) => state.isMuted);
@@ -62,6 +73,25 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 		setMenuView("root");
 	}, []);
 
+	// Safely plays the video, enforcing DOM sync to bypass React's render delay.
+	const safePlay = React.useCallback(() => {
+		const v = videoRef.current;
+		if (!v) return;
+
+		// Force DOM to recognize mute state before playing.
+		// Fixes the "first render won't autoplay" browser policy block.
+		v.muted = useMediaStore.getState().isMuted;
+
+		v.play().catch((e) => {
+			console.warn("Autoplay blocked by browser:", e);
+			autoplayFailed.current = true;
+			// If we fail to play, we MUST release the lock so we don't stall the whole app
+			if (useMediaStore.getState().activeVideoId === src) {
+				useMediaStore.getState().setActiveVideoId(null);
+			}
+		});
+	}, [src]);
+
 	// ─── Engine 1: Intersection Observer ──────────────────────────────────────
 	// Acts directly in the callback — no state intermediary, no render cycle lag.
 	React.useEffect(() => {
@@ -73,18 +103,20 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 				inViewRef.current = entry.isIntersecting;
 
 				if (entry.isIntersecting) {
-					// Only claim if nobody else is playing and user hasn't manually paused
+					// Claim if nobody else is playing, user hasn't paused, and browser hasn't blocked us
 					if (
 						autoPlay &&
 						!useMediaStore.getState().activeVideoId &&
-						!userPaused.current
+						!userPaused.current &&
+						!autoplayFailed.current
 					) {
 						setActiveVideoId(src);
-						v.play().catch(() => {});
+						safePlay();
 					}
 				} else {
-					// Leaving view: reset pause intent, release slot, stop
+					// Leaving view: reset intents, release slot, stop
 					userPaused.current = false;
+					autoplayFailed.current = false; // Reset block status for next time it enters view
 					if (useMediaStore.getState().activeVideoId === src) {
 						setActiveVideoId(null);
 					}
@@ -96,7 +128,7 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 
 		if (containerRef.current) observer.observe(containerRef.current);
 		return () => observer.disconnect();
-	}, [scrollRoot, src, autoPlay, setActiveVideoId]);
+	}, [scrollRoot, src, autoPlay, setActiveVideoId, safePlay]);
 
 	// ─── Engine 2: Store Subscription ─────────────────────────────────────────
 	// Reacts to another video claiming or releasing the active slot.
@@ -109,27 +141,26 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 			if (state.activeVideoId === src) {
 				// We are now active — play unless user intentionally paused
 				if (!userPaused.current && v.paused) {
-					v.play().catch(() => {});
+					safePlay();
 				}
 			} else if (
 				state.activeVideoId === null &&
 				inViewRef.current &&
 				autoPlay &&
-				!userPaused.current
+				!userPaused.current &&
+				!autoplayFailed.current
 			) {
 				// Slot just freed — claim it if still in view.
-				// Re-read live state to prevent double-claim race when
-				// multiple videos are visible and both subscribers fire.
 				if (!useMediaStore.getState().activeVideoId) {
 					setActiveVideoId(src);
-					v.play().catch(() => {});
+					safePlay();
 				}
 			} else if (!v.paused) {
 				// Someone else is active — yield
 				v.pause();
 			}
 		});
-	}, [src, autoPlay, setActiveVideoId]);
+	}, [src, autoPlay, setActiveVideoId, safePlay]);
 
 	React.useEffect(() => {
 		const v = videoRef.current;
@@ -147,8 +178,9 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 		if (!v) return;
 		if (v.paused) {
 			userPaused.current = false;
+			autoplayFailed.current = false; // User interaction clears the block
 			setActiveVideoId(src);
-			v.play();
+			v.play().catch(console.warn);
 		} else {
 			userPaused.current = true;
 			v.pause();
