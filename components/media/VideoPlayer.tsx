@@ -111,8 +111,7 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 						!userPaused.current
 					) {
 						setActiveVideoId(src);
-						v.muted = useMediaStore.getState().isMuted; // Force hardware mute state instantly
-						v.play().catch(() => {});
+						safePlay(); // Use the safe wrapper
 					}
 				} else {
 					// Leaving view: reset intents, release slot, stop
@@ -129,7 +128,7 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 
 		if (containerRef.current) observer.observe(containerRef.current);
 		return () => observer.disconnect();
-	}, [scrollRoot, src, autoPlay, setActiveVideoId]);
+	}, [scrollRoot, src, autoPlay, setActiveVideoId, safePlay]);
 
 	// ─── Engine 2: Store Subscription ─────────────────────────────────────────
 	// Reacts to another video claiming or releasing the active slot.
@@ -142,8 +141,7 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 			if (state.activeVideoId === src) {
 				// We are now active — play unless user intentionally paused
 				if (!userPaused.current && v.paused) {
-					v.muted = state.isMuted; // Force hardware mute state instantly
-					v.play().catch(() => {});
+					safePlay(); // Use the safe wrapper
 				}
 			} else if (
 				state.activeVideoId === null &&
@@ -152,19 +150,16 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 				!userPaused.current
 			) {
 				// Slot just freed — claim it if still in view.
-				// Re-read live state to prevent double-claim race when
-				// multiple videos are visible and both subscribers fire.
 				if (!useMediaStore.getState().activeVideoId) {
 					setActiveVideoId(src);
-					v.muted = state.isMuted; // Force hardware mute state instantly
-					v.play().catch(() => {});
+					safePlay(); // Use the safe wrapper
 				}
 			} else if (!v.paused) {
 				// Someone else is active — yield
 				v.pause();
 			}
 		});
-	}, [src, autoPlay, setActiveVideoId]);
+	}, [src, autoPlay, setActiveVideoId, safePlay]);
 
 	React.useEffect(() => {
 		const v = videoRef.current;
@@ -182,9 +177,9 @@ export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
 		if (!v) return;
 		if (v.paused) {
 			userPaused.current = false;
+			autoplayFailed.current = false; // Reset block on manual interaction
 			setActiveVideoId(src);
-			v.muted = useMediaStore.getState().isMuted;
-			v.play().catch(() => {});
+			safePlay(); // Use the safe wrapper
 		} else {
 			userPaused.current = true;
 			v.pause();
