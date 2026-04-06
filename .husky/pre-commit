@@ -1,2 +1,0 @@
-#!/bin/sh
-bunx --bun @biomejs/biome check --staged --write
