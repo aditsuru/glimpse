@@ -5,7 +5,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
-import { getRequiredSession } from "@/lib/auth-utils";
+import { getRequiredSession } from "@/lib/server/auth-utils";
 import { ResendEmailButton } from "./ResendEmailButton";
 import SignOutButton from "./SignOutButton";
 

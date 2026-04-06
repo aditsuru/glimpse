@@ -2,8 +2,8 @@ import { ORPCError, onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { APIError } from "better-auth";
 import { db } from "@/db";
-import { auth } from "@/lib/auth";
-import { logger } from "@/lib/logger";
+import { logger } from "@/lib/server/logger";
+import { auth } from "@/lib/shared/auth";
 import type { Context } from "@/server/context";
 import { router } from "@/server/router";
 
