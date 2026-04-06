@@ -2,7 +2,7 @@ import "server-only";
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "../shared/auth";
+import { auth } from "./auth";
 
 export async function getRequiredSession() {
 	const session = await auth.api.getSession({

@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/shared/auth";
+import { auth } from "@/lib/server/auth";
 
 export default async function AuthGuard({
 	children,

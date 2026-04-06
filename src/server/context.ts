@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { db } from "@/db";
-import { auth } from "@/lib/shared/auth";
+import { auth } from "@/lib/server/auth";
 
 export async function createContext() {
 	const reqHeaders = await headers();
