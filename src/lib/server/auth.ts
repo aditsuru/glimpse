@@ -5,7 +5,7 @@ import { generateFromEmail } from "unique-username-generator";
 import { db } from "@/db";
 import { sendResetPasswordEmail, sendVerificationEmail } from "@/emails/email";
 import { config } from "@/lib/shared/config";
-import { redis } from "../server/redis";
+import { redis } from "./redis";
 
 export const auth = betterAuth({
 	user: {

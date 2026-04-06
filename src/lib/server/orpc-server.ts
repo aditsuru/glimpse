@@ -3,7 +3,7 @@ import "server-only";
 import { createRouterClient } from "@orpc/server";
 import { headers } from "next/headers";
 import { db } from "@/db";
-import { auth } from "@/lib/shared/auth";
+import { auth } from "@/lib/server/auth";
 import { router } from "@/server/router";
 
 export async function getServerCaller() {
