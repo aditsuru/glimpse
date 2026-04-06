@@ -1,5 +1,5 @@
 // components/ui/VerifiedBadge.tsx
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/client/utils";
 
 export function VerifiedBadge({
 	size = 20,

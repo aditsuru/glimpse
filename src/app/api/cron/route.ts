@@ -2,9 +2,9 @@ import { serve } from "@upstash/workflow/nextjs";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { postsTable } from "@/db/schema";
-import { REDIS_KEYS } from "@/lib/constants";
 import { logger } from "@/lib/logger";
 import { redis } from "@/lib/redis";
+import { REDIS_KEYS } from "@/lib/shared/constants";
 
 export const { POST } = serve(async (context) => {
 	// Step 1: Get the list of post ids from Redis

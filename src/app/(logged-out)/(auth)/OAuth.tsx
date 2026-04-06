@@ -2,7 +2,7 @@ import { SiGithub, SiGoogle } from "@icons-pack/react-simple-icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FieldSeparator } from "@/components/ui/field";
-import { authClient } from "@/lib/clients/auth-client";
+import { authClient } from "@/lib/client/auth-client";
 
 function OAuth({
 	context,

@@ -17,10 +17,10 @@ import {
 	FieldGroup,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/lib/clients/auth-client";
-import { config } from "@/lib/config";
-import { LOCAL_STORAGE_KEYS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/client/auth-client";
+import { cn } from "@/lib/client/utils";
+import { config } from "@/lib/shared/config";
+import { LOCAL_STORAGE_KEYS } from "@/lib/shared/constants";
 import OAuth from "../OAuth";
 import { SignUpSchema, type SignUpSchemaType } from "../schema";
 

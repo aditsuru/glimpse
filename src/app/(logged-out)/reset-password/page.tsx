@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/lib/clients/auth-client";
+import { authClient } from "@/lib/client/auth-client";
 
 const ResetPasswordSchema = z
 	.object({

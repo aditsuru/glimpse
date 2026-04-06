@@ -1,8 +1,8 @@
 import { ORPCError, os } from "@orpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
-import { config } from "@/lib/config";
-import { REDIS_KEYS } from "@/lib/constants";
 import { redis } from "@/lib/redis";
+import { config } from "@/lib/shared/config";
+import { REDIS_KEYS } from "@/lib/shared/constants";
 import type { Context } from "./context";
 
 const ratelimit = new Ratelimit({
