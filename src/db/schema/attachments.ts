@@ -7,7 +7,7 @@ import {
 	timestamp,
 	uuid,
 } from "drizzle-orm/pg-core";
-import { ATTACHMENT_TYPES } from "@/lib/constants";
+import { ATTACHMENT_TYPES } from "@/lib/shared/constants";
 import { postsTable } from "./posts";
 
 export const attachmentTypeEnum = pgEnum("attachment_type", ATTACHMENT_TYPES);

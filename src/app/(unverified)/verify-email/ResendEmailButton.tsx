@@ -4,9 +4,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { CooldownButton } from "@/components/form/CooldownButton";
 import { useCooldown } from "@/hooks/useCooldown";
-import { authClient } from "@/lib/clients/auth-client";
-import { config } from "@/lib/config";
-import { LOCAL_STORAGE_KEYS } from "@/lib/constants";
+import { authClient } from "@/lib/client/auth-client";
+import { config } from "@/lib/shared/config";
+import { LOCAL_STORAGE_KEYS } from "@/lib/shared/constants";
 
 export function ResendEmailButton({ className }: { className?: string }) {
 	const router = useRouter();

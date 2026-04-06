@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { useCooldown } from "@/hooks/useCooldown";
-import { authClient } from "@/lib/clients/auth-client";
-import { config } from "@/lib/config";
-import { LOCAL_STORAGE_KEYS } from "@/lib/constants";
+import { authClient } from "@/lib/client/auth-client";
+import { config } from "@/lib/shared/config";
+import { LOCAL_STORAGE_KEYS } from "@/lib/shared/constants";
 
 const ForgotPasswordSchema = z.object({
 	email: z.email("Please enter a valid email address"),

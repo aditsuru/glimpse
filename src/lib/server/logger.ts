@@ -1,5 +1,7 @@
+import "server-only";
+
 import pino from "pino";
-import { config } from "@/lib/config";
+import { config } from "@/lib/shared/config";
 
 export const logger = pino({
 	level: config.NODE_ENV === "production" ? "info" : "debug",

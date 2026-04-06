@@ -12,7 +12,7 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "@/components/ui/button";
-import { authClient } from "@/lib/clients/auth-client";
+import { authClient } from "@/lib/client/auth-client";
 
 function SignOutButton() {
 	const router = useRouter();

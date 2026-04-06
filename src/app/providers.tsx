@@ -5,7 +5,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { config } from "@/lib/config";
+import { config } from "@/lib/shared/config";
 
 export function Providers({ children }: { children: React.ReactNode }) {
 	const [queryClient] = useState(

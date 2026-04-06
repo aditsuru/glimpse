@@ -18,8 +18,8 @@ import {
 	FieldGroup,
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
-import { authClient } from "@/lib/clients/auth-client";
-import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/client/auth-client";
+import { cn } from "@/lib/client/utils";
 import OAuth from "../OAuth";
 import { SignInSchema, type SignInSchemaType } from "../schema";
 

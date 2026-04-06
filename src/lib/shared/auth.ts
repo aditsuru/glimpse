@@ -4,8 +4,8 @@ import { nextCookies } from "better-auth/next-js";
 import { generateFromEmail } from "unique-username-generator";
 import { db } from "@/db";
 import { sendResetPasswordEmail, sendVerificationEmail } from "@/emails/email";
-import { config } from "@/lib/config";
-import { redis } from "./redis";
+import { config } from "@/lib/shared/config";
+import { redis } from "../server/redis";
 
 export const auth = betterAuth({
 	user: {

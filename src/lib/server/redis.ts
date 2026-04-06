@@ -1,5 +1,7 @@
+import "server-only";
+
 import { Redis } from "@upstash/redis";
-import { config } from "@/lib/config";
+import { config } from "@/lib/shared/config";
 
 export const redis = new Redis({
 	url: config.UPSTASH_REDIS_REST_URL,

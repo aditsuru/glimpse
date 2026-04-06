@@ -1,7 +1,7 @@
 import "server-only";
 import { Resend } from "resend";
 import { GlimpseVerifyEmail } from "@/emails/VerifyEmail";
-import { config } from "@/lib/config";
+import { config } from "@/lib/shared/config";
 import GlimpseResetPasswordEmail from "./ResetPassword";
 
 const resend = new Resend(config.RESEND_API_KEY);
