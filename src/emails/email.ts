@@ -1,4 +1,3 @@
-import "server-only";
 import { Resend } from "resend";
 import { GlimpseVerifyEmail } from "@/emails/VerifyEmail";
 import { config } from "@/lib/shared/config";
