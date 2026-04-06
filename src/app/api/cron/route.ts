@@ -2,8 +2,8 @@ import { serve } from "@upstash/workflow/nextjs";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { postsTable } from "@/db/schema";
-import { logger } from "@/lib/logger";
-import { redis } from "@/lib/redis";
+import { logger } from "@/lib/server/logger";
+import { redis } from "@/lib/server/redis";
 import { REDIS_KEYS } from "@/lib/shared/constants";
 
 export const { POST } = serve(async (context) => {

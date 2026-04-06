@@ -7,24 +7,27 @@
 	// words - list of words to be always considered correct
 	"words": [
 		"adi",
-		"winget",
 		"biomejs",
 		"buildcache",
 		"buildx",
-		"pkgs",
 		"decrby",
 		"ilike",
+		"minioadmin",
+		"pkgs",
 		"QSTASH",
 		"sadd",
+		"shadcn",
 		"smembers",
 		"srem",
+		"winget",
 		"zadd",
 		"zrange",
-		"zremrangebyrank",
-		"shadcn"
+		"zremrangebyrank"
 	],
 	// flagWords - list of words to be always considered incorrect
 	// This is useful for offensive words and common spelling errors.
 	// For example "hte" should be "the"
-	"flagWords": ["hte"]
+	"flagWords": [
+		"hte"
+	]
 }
