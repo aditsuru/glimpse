@@ -14,7 +14,8 @@
 		"db:migrate": "drizzle-kit migrate",
 		"plop": "plop",
 		"prepare": "husky",
-		"email": "email dev --dir './src/emails'"
+		"email": "email dev --dir './src/emails'",
+		"auth:generate": "bunx @better-auth/cli generate --config src/lib/server/auth.ts --output src/db/schema/auth-schema.ts"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.1010.0",
