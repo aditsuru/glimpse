@@ -20,6 +20,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
+import { config } from "@/lib/shared/config";
 import OAuth from "../OAuth";
 import { SignInSchema, type SignInSchemaType } from "../schema";
 
@@ -75,7 +76,7 @@ export default function SignIn() {
 	};
 
 	return (
-		<div className={cn("flex flex-col gap-6")}>
+		<div className={cn("flex flex-col gap-6 px-4 sm:px-0")}>
 			<form onSubmit={form.handleSubmit(handleOnSubmit)}>
 				<FieldGroup>
 					<div className="flex flex-col items-center gap-2 text-center">
@@ -86,7 +87,7 @@ export default function SignIn() {
 							<div className="flex items-center justify-center rounded-md">
 								<Avatar size="lg">
 									<AvatarImage
-										src="/static/logo.png"
+										src={`${config.NEXT_PUBLIC_APP_URL}/static/logo.png`}
 										alt="Glimpse"
 										className="grayscale"
 									/>
@@ -96,7 +97,7 @@ export default function SignIn() {
 							<span className="sr-only">Glimpse</span>
 						</Link>
 
-						<h1 className="text-xl font-bold">Welcome to Glimpse</h1>
+						<h1 className="text-2xl font-bold">Welcome to Glimpse</h1>
 						<FieldDescription
 							className={`${isSubmitting || isRedirecting ? "pointer-events-none opacity-50" : ""}`}
 						>
@@ -166,7 +167,9 @@ export default function SignIn() {
 					/>
 				</FieldGroup>
 			</form>
-			<TechStack />
+			<div className="hidden sm:block">
+				<TechStack />
+			</div>
 		</div>
 	);
 }

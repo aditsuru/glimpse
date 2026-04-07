@@ -1,5 +1,3 @@
-import { config } from "./config";
-
 export const ALLOWED_FILES_TYPES = [
 	"image/jpeg",
 	"image/png",
@@ -11,14 +9,6 @@ export const ALLOWED_FILES_TYPES = [
 
 export const ATTACHMENT_TYPES = ["image", "gif", "video"] as const;
 export type AttachmentType = (typeof ATTACHMENT_TYPES)[number];
-
-export const REDIS_KEYS = {
-	POST_SEEN: (userId: string) => `${config.REDIS_PREFIX}:post:seen:${userId}`,
-	VIEWS_COUNT: (postId: string) =>
-		`${config.REDIS_PREFIX}:post:views:${postId}`,
-	SYNC_PENDING_VIEWS_LIST: () => `${config.REDIS_PREFIX}:sync:pending:views`,
-	RATE_LIMIT: (ip: string) => `${config.REDIS_PREFIX}:ratelimit:auth:${ip}`,
-};
 
 export const RESERVED_USERNAMES = new Set([
 	"admin",

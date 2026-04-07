@@ -13,6 +13,7 @@
 		"decrby",
 		"ilike",
 		"minioadmin",
+		"partialize",
 		"pkgs",
 		"QSTASH",
 		"sadd",
