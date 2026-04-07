@@ -128,19 +128,22 @@ export function ImageCarousel({
 				<Carousel setApi={setApi} className="w-full h-full">
 					<CarouselContent className="h-full ml-0">
 						{images.map((image, index) => (
-							<CarouselItem key={image.fileUrl} className="pl-0 h-full">
+							<CarouselItem
+								key={image.fileUrl}
+								className="relative pl-0 h-full"
+							>
 								<Image
 									src={image.fileUrl}
 									alt="Post content"
-									width={1280}
-									height={720}
+									width={0}
+									height={0}
+									sizes="100vw"
 									priority={index === 0}
-									className="w-full h-full object-cover"
+									className="w-full h-full object-cover transition-[filter] duration-300 ease-in-out"
 									style={{
 										filter: showSpoiler
 											? "blur(40px) brightness(0.6) saturate(0.6)"
 											: "none",
-										transition: "filter 0.3s ease",
 									}}
 									unoptimized={image.fileType === "gif"}
 								/>
