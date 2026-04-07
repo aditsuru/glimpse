@@ -3,8 +3,7 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { postsTable } from "@/db/schema";
 import { logger } from "@/lib/server/logger";
-import { redis } from "@/lib/server/redis";
-import { REDIS_KEYS } from "@/lib/shared/constants";
+import { REDIS_KEYS, redis } from "@/lib/server/redis";
 
 export const { POST } = serve(async (context) => {
 	// Step 1: Get the list of post ids from Redis
