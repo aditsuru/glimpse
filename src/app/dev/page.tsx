@@ -27,11 +27,11 @@ const imagesPair2 = [
 		},
 		{
 			fileUrl: "/static/temp/image6.gif",
-			fileType: "image" as const,
+			fileType: "gif" as const,
 		},
 		{
 			fileUrl: "/static/temp/image5.gif",
-			fileType: "image" as const,
+			fileType: "gif" as const,
 		},
 	],
 ];
