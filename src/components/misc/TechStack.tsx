@@ -99,6 +99,7 @@ function TechStack() {
 										width={iconSize}
 										height={iconSize}
 										alt={item.label}
+										priority
 									/>
 								}
 							/>
