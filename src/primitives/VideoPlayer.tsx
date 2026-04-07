@@ -660,7 +660,7 @@ export function VideoPlayer({
 					filter: showSpoiler
 						? "blur(40px) brightness(0.6) saturate(0.6)"
 						: "none",
-					transition: "filter 0.5s ease",
+					transition: "filter 0.3s ease",
 				}}
 				onPlay={() => setPlaying(true)}
 				onPause={() => setPlaying(false)}
