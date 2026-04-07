@@ -30,7 +30,6 @@ export const useMediaStore = create<MediaState>()(
 			name: LOCAL_STORAGE_KEYS.GLIMPSE_MEDIA_STORAGE,
 			// Only persist user preferences, never runtime state
 			partialize: (state) => ({
-				isMuted: state.isMuted,
 				volume: state.volume,
 			}),
 			onRehydrateStorage: () => (state) => {
