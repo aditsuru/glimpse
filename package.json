@@ -74,7 +74,7 @@
 		"@biomejs/biome": "^2.4.10",
 		"@react-email/preview-server": "^5.2.10",
 		"@tailwindcss/postcss": "^4",
-		"@types/node": "^20",
+		"@types/node": "^25.0.0",
 		"@types/pg": "^8.20.0",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
