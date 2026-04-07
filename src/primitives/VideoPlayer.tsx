@@ -36,6 +36,7 @@ import {
 	ChevronRight,
 	Download,
 	Eye,
+	EyeOff,
 	Gauge,
 	Maximize,
 	Minimize,
@@ -62,6 +63,7 @@ export interface VideoPlayerProps {
 	spoiler?: boolean;
 	aspectRatio?: number;
 	className?: string;
+	autoPlayThreshold?: number;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -290,6 +292,7 @@ export function VideoPlayer({
 	spoiler = false,
 	aspectRatio,
 	className = "",
+	autoPlayThreshold = 0.8,
 }: VideoPlayerProps) {
 	// ── Refs (never trigger re-renders) ─────────────────────────────────────────
 	const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -458,7 +461,7 @@ export function VideoPlayer({
 			},
 			{
 				root: scrollRoot, // null = viewport (works fine for top-level scroll)
-				threshold: 0.6, // 60% visible triggers autoplay
+				threshold: autoPlayThreshold, // 60% visible triggers autoplay
 			}
 		);
 
@@ -471,6 +474,7 @@ export function VideoPlayer({
 		spoilerRevealed,
 		setActiveVideoId,
 		safePlay,
+		autoPlayThreshold,
 	]);
 
 	// ── Engine 2: Store subscription ─────────────────────────────────────────────
@@ -701,6 +705,27 @@ export function VideoPlayer({
 				>
 					{/* Gradient scrim — fades from transparent to dark at the bottom */}
 					<div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/15 to-transparent" />
+
+					{/* Spoiler re-hide button — top left, only when spoiler prop is true */}
+					{spoiler && spoilerRevealed && !isFullscreen && (
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								setSpoilerRevealed(false);
+								userPaused.current = true;
+								const v = videoRef.current;
+								if (v && !v.paused) v.pause();
+								if (useMediaStore.getState().activeVideoId === videoId) {
+									useMediaStore.getState().setActiveVideoId(null);
+								}
+							}}
+							className="absolute top-2 left-2 z-10 text-white p-1.5 rounded-full hover:bg-white/10 transition-colors pointer-events-auto"
+							aria-label="Hide spoiler"
+						>
+							<EyeOff size={15} />
+						</button>
+					)}
 
 					{/* Control bar — re-enable pointer events here only */}
 					<div

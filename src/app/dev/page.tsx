@@ -22,7 +22,7 @@ function Dev() {
 						aspectRatio={16 / 9}
 						className="my-8"
 						autoPlay
-						spoiler
+						autoPlayThreshold={0.8}
 					/>
 				))}
 			</ScrollContainer>
