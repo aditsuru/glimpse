@@ -25,7 +25,7 @@ function OAuth({
 	return (
 		<>
 			<FieldSeparator>Or continue with</FieldSeparator>
-			<Field className="grid gap-4 sm:grid-cols-2">
+			<Field className="grid gap-4 grid-cols-2">
 				<Button
 					variant="outline"
 					type="button"
