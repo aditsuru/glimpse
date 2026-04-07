@@ -31,6 +31,7 @@
  *     when another video claims the slot and this one must pause immediately.
  */
 
+import { Slider } from "@base-ui/react/slider";
 import {
 	Check,
 	ChevronRight,
@@ -75,57 +76,62 @@ function formatTime(s: number): string {
 	return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
-function clamp(val: number, min: number, max: number): number {
-	return Math.min(Math.max(val, min), max);
-}
-
-/** Returns a CSS linear-gradient string for a filled range input track. */
-function trackFill(
-	value: number,
-	max: number,
-	color = "white",
-	trackColor = "rgba(255,255,255,0.25)"
-): string {
-	const pct = max > 0 ? clamp((value / max) * 100, 0, 100) : 0;
-	return `linear-gradient(to right, ${color} ${pct}%, ${trackColor} ${pct}%)`;
-}
-
-// ─── Shared range input styles ─────────────────────────────────────────────────
-// Applied via className — Tailwind's arbitrary selector support (v4+)
-const RANGE_CLASS =
-	"appearance-none bg-transparent cursor-pointer " +
-	"[&::-webkit-slider-thumb]:appearance-none " +
-	"[&::-webkit-slider-thumb]:rounded-full " +
-	"[&::-webkit-slider-thumb]:bg-white " +
-	"[&::-webkit-slider-thumb]:shadow-sm " +
-	"[&::-webkit-slider-runnable-track]:rounded-full " +
-	"[&::-moz-range-thumb]:border-0 " +
-	"[&::-moz-range-thumb]:rounded-full " +
-	"[&::-moz-range-thumb]:bg-white";
-
 // ─── Sub-components ───────────────────────────────────────────────────────────
+interface VideoSliderProps {
+	value: number;
+	max: number;
+	step: number;
+	onValueChange: (val: number) => void;
+	className?: string;
+}
+
+function VideoSlider({
+	value,
+	max,
+	step,
+	onValueChange,
+	className,
+}: VideoSliderProps) {
+	return (
+		<Slider.Root
+			className={`relative flex touch-none select-none items-center ${className ?? ""}`}
+			min={0}
+			max={max}
+			step={step}
+			value={value} // ← plain number
+			onValueChange={(val) => {
+				onValueChange(Array.isArray(val) ? (val[0] ?? 0) : val); // ← handle both
+			}}
+		>
+			<Slider.Control className="w-full flex items-center">
+				{" "}
+				<Slider.Track className="relative h-[5px] w-full grow overflow-hidden rounded-full bg-white/25">
+					<Slider.Indicator className="absolute h-full rounded-full bg-white" />
+					<Slider.Thumb
+						aria-label="Slider"
+						className="block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform hover:scale-125 focus-visible:outline-none disabled:pointer-events-none"
+					/>
+				</Slider.Track>
+			</Slider.Control>
+		</Slider.Root>
+	);
+}
 
 interface ScrubberProps {
 	value: number;
 	max: number;
-	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	onValueChange: (val: number) => void;
 }
 
-function Scrubber({ value, max, onChange }: ScrubberProps) {
+function Scrubber({ value, max, onValueChange }: ScrubberProps) {
 	return (
-		// stopPropagation on pointerDown is CRITICAL — without it,
-		// dragging the scrubber inside a carousel will drag the carousel instead.
 		<div onPointerDown={(e) => e.stopPropagation()} className="w-full px-0.5">
-			<input
-				type="range"
-				min={0}
+			<VideoSlider
+				value={value}
 				max={max || 1}
 				step={0.05}
-				value={value}
-				onChange={onChange}
-				aria-label="Seek"
-				className={`${RANGE_CLASS} w-full h-1 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 hover:[&::-webkit-slider-thumb]:scale-125 transition-all`}
-				style={{ background: trackFill(value, max || 1) }}
+				onValueChange={onValueChange}
+				className="w-full"
 			/>
 		</div>
 	);
@@ -134,7 +140,7 @@ function Scrubber({ value, max, onChange }: ScrubberProps) {
 interface VolumeControlProps {
 	volume: number;
 	isMuted: boolean;
-	onVolumeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	onVolumeChange: (val: number) => void;
 	onToggleMute: () => void;
 }
 
@@ -162,23 +168,17 @@ function VolumeControl({
 				className="text-white p-1.5 rounded-full hover:bg-white/10 transition-colors shrink-0"
 				aria-label={isMuted ? "Unmute" : "Mute"}
 			>
-				<Icon size={16} />
+				<Icon size={20} />
 			</button>
 
 			{/* Expands on group hover — width transition via Tailwind */}
-			<div className="overflow-hidden w-0 group-hover/volume:w-18 transition-all duration-200">
-				<input
-					type="range"
-					min={0}
+			<div className="overflow-hidden w-0 group-hover/volume:w-18 transition-all duration-200 flex items-center">
+				<VideoSlider
+					value={volume}
 					max={1}
 					step={0.02}
-					// Volume slider always shows raw volume (not zeroed when muted)
-					// so the user can see where it'll snap back to on unmute
-					value={volume}
-					onChange={onVolumeChange}
-					aria-label="Volume"
-					className={`${RANGE_CLASS} w-18 h-1 [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:h-2.5 [&::-moz-range-thumb]:w-2.5 [&::-moz-range-thumb]:h-2.5`}
-					style={{ background: trackFill(volume, 1) }}
+					onValueChange={onVolumeChange}
+					className="w-18"
 				/>
 			</div>
 		</div>
@@ -216,7 +216,7 @@ function SettingsMenu({
 				aria-label="Settings"
 				aria-expanded={open}
 			>
-				<Settings size={16} />
+				<Settings size={20} />
 			</button>
 
 			{open && (
@@ -382,7 +382,7 @@ export function VideoPlayer({
 	}, []);
 
 	// ── Reset speed when src changes ─────────────────────────────────────────────
-	// biome-ignore lint/correctness/useExhaustiveDependencies: none
+	// biome-ignore lint/correctness/useExhaustiveDependencies: src is a trigger dep, not used inside
 	React.useEffect(() => {
 		const v = videoRef.current;
 		if (!v) return;
@@ -429,6 +429,8 @@ export function VideoPlayer({
 				const v = videoRef.current;
 				if (!v) return;
 
+				if (document.fullscreenElement) return;
+
 				inViewRef.current = entry.isIntersecting;
 
 				if (entry.isIntersecting) {
@@ -461,7 +463,7 @@ export function VideoPlayer({
 			},
 			{
 				root: scrollRoot, // null = viewport (works fine for top-level scroll)
-				threshold: autoPlayThreshold, // 60% visible triggers autoplay
+				threshold: autoPlayThreshold,
 			}
 		);
 
@@ -538,16 +540,14 @@ export function VideoPlayer({
 		setCurrentTime(v.currentTime);
 	};
 
-	const handleScrub = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleScrub = (val: number) => {
 		const v = videoRef.current;
 		if (!v) return;
-		const val = Number(e.target.value);
 		v.currentTime = val;
 		setCurrentTime(val);
 	};
 
-	const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const val = Number(e.target.value);
+	const handleVolumeChange = (val: number) => {
 		setVolume(val);
 		// Auto-mute when dragged to 0, auto-unmute when dragged above 0
 		if (val === 0) setMuted(true);
@@ -555,9 +555,14 @@ export function VideoPlayer({
 	};
 
 	const handleToggleMute = () => {
-		// If muting would leave volume at 0, restore to a sensible default
-		if (!isMuted && volume === 0) setVolume(0.5);
-		setMuted(!isMuted);
+		if (isMuted) {
+			// We are UNMUTING — restore volume if it was dragged to zero
+			if (volume === 0) setVolume(0.5);
+			setMuted(false);
+		} else {
+			// We are MUTING — just mute, leave volume alone
+			setMuted(true);
+		}
 	};
 
 	const handleSpeedChange = (s: Speed) => {
@@ -723,7 +728,7 @@ export function VideoPlayer({
 							className="absolute top-2 left-2 z-10 text-white p-1.5 rounded-full hover:bg-white/10 transition-colors pointer-events-auto"
 							aria-label="Hide spoiler"
 						>
-							<EyeOff size={15} />
+							<EyeOff size={20} />
 						</button>
 					)}
 
@@ -733,11 +738,13 @@ export function VideoPlayer({
 						onClick={(e) => e.stopPropagation()}
 					>
 						{/* Scrubber */}
-						<Scrubber
-							value={currentTime}
-							max={duration}
-							onChange={handleScrub}
-						/>
+						<div className="mb-1">
+							<Scrubber
+								value={currentTime}
+								max={duration}
+								onValueChange={handleScrub}
+							/>
+						</div>
 
 						{/* Bottom row */}
 						<div className="flex items-center justify-between gap-1">
@@ -753,9 +760,9 @@ export function VideoPlayer({
 									aria-label={playing ? "Pause" : "Play"}
 								>
 									{playing ? (
-										<Pause size={17} fill="white" strokeWidth={0} />
+										<Pause size={20} fill="white" strokeWidth={0} />
 									) : (
-										<Play size={17} fill="white" strokeWidth={0} />
+										<Play size={20} fill="white" strokeWidth={0} />
 									)}
 								</button>
 
@@ -766,7 +773,7 @@ export function VideoPlayer({
 									onToggleMute={handleToggleMute}
 								/>
 
-								<span className="text-white/80 text-xs tabular-nums ml-1.5 shrink-0 font-medium">
+								<span className="text-white/80 tabular-nums ml-1.5 shrink-0 font-medium">
 									{formatTime(currentTime)}
 									<span className="text-white/40 mx-0.5">/</span>
 									{formatTime(duration)}
@@ -797,9 +804,9 @@ export function VideoPlayer({
 									}
 								>
 									{isFullscreen ? (
-										<Minimize size={15} />
+										<Minimize size={20} />
 									) : (
-										<Maximize size={15} />
+										<Maximize size={20} />
 									)}
 								</button>
 							</div>

@@ -14,7 +14,7 @@ const Videos = [
 function Dev() {
 	return (
 		<div className="w-screen h-screen flex justify-center">
-			<ScrollContainer className="min-h-screen overflow-y-auto w-lg pt-4 border no-scrollbar">
+			<ScrollContainer className="min-h-screen overflow-y-auto w-xl pt-4 border no-scrollbar">
 				{Videos.map((src) => (
 					<VideoPlayer
 						key={src}
@@ -23,6 +23,7 @@ function Dev() {
 						className="my-8"
 						autoPlay
 						autoPlayThreshold={0.8}
+						spoiler
 					/>
 				))}
 			</ScrollContainer>
