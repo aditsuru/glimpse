@@ -14,6 +14,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
+import { PaginationPrevious } from "@/components/ui/pagination";
 import { useCooldown } from "@/hooks/useCooldown";
 import { authClient } from "@/lib/client/auth-client";
 import { config } from "@/lib/shared/config";
@@ -61,8 +62,15 @@ export default function ForgotPassword() {
 	return (
 		<div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
 			<div className="w-full max-w-sm">
-				<Card>
+				<Card className="pt-3">
 					<CardHeader>
+						<div className="flex flex-start w-full">
+							<PaginationPrevious
+								text="Return"
+								href="/sign-in"
+								className="hover:bg-transparent! hover:opacity-75 p-0! mb-1"
+							/>
+						</div>
 						<CardTitle>Reset Password</CardTitle>
 						<CardDescription>
 							Enter your email to receive a password reset link.
