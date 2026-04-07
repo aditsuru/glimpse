@@ -21,7 +21,9 @@ const msSec = z
 export const config = createEnv({
 	server: {
 		// ── Runtime ───────────────────────────────────────────────────
-		NODE_ENV: z.enum(["production", "development", "test"]),
+		NODE_ENV: z
+			.enum(["production", "development", "test"])
+			.default("development"),
 
 		// ── Database ──────────────────────────────────────────────────
 		DATABASE_URL: z.url(),
