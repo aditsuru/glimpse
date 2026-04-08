@@ -22,24 +22,12 @@ const imagesPair1 = [
 const imagesPair2 = [
 	[
 		{
-			fileUrl: "/static/temp/image1.jpg",
-			fileType: "image" as const,
-		},
-		{
 			fileUrl: "/static/temp/image6.gif",
 			fileType: "gif" as const,
 		},
 		{
 			fileUrl: "/static/temp/image5.gif",
 			fileType: "gif" as const,
-		},
-	],
-];
-const imagesPair3 = [
-	[
-		{
-			fileUrl: "/static/temp/image4.jpg",
-			fileType: "image" as const,
 		},
 	],
 ];
@@ -90,9 +78,6 @@ function Dev() {
 						autoPlay
 						autoPlayThreshold={0.8}
 					/>
-				))}
-				{imagesPair3.map((item) => (
-					<ImageCarousel images={item} key={item[0].fileUrl} />
 				))}
 			</ScrollContainer>
 		</div>
