@@ -148,13 +148,104 @@
 		scrollbar-width: none; /* Firefox */
 	}
 
-	.mention {
-		@apply text-chart-2 font-medium hover:underline cursor-pointer;
+	/* TipTap Start */
+	.tiptap-mention {
+		@apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium no-underline;
+		@apply bg-primary/10 text-primary hover:bg-primary/20 transition-colors;
+		cursor: pointer;
 	}
 
-	.post-body a:not(.mention) {
-		@apply text-chart-2 underline underline-offset-4 break-all hover:text-chart-2/80;
+	/* ── Link ─────────────────────────────────────────────────────────────────── */
+	.tiptap-link {
+		@apply text-primary underline underline-offset-2 hover:text-primary/80 transition-colors;
 	}
+
+	/* ── Code block wrapper ───────────────────────────────────────────────────── */
+	.tiptap-code-block {
+		@apply relative rounded-lg overflow-hidden my-3;
+		background: hsl(224 16% 14%); /* Catppuccin Macchiato base */
+	}
+
+	.tiptap-code-block code {
+		@apply block p-4 text-sm leading-relaxed font-mono overflow-x-auto;
+		background: transparent !important;
+		color: hsl(220 23% 95%); /* default text */
+	}
+
+	/* ── Syntax token colors (Catppuccin Macchiato palette) ───────────────────── */
+	.hljs-comment,
+	.hljs-quote {
+		color: hsl(228 17% 52%); /* overlay2 */
+		font-style: italic;
+	}
+
+	.hljs-keyword,
+	.hljs-selector-tag,
+	.hljs-meta .hljs-keyword {
+		color: hsl(267 84% 81%); /* mauve */
+	}
+
+	.hljs-string,
+	.hljs-attr,
+	.hljs-template-variable,
+	.hljs-variable {
+		color: hsl(115 54% 76%); /* green */
+	}
+
+	.hljs-number,
+	.hljs-literal,
+	.hljs-type {
+		color: hsl(21 86% 76%); /* peach */
+	}
+
+	.hljs-built_in,
+	.hljs-builtin-name {
+		color: hsl(189 71% 73%); /* sky */
+	}
+
+	.hljs-title,
+	.hljs-title.class_,
+	.hljs-title.function_ {
+		color: hsl(42 100% 82%); /* yellow */
+	}
+
+	.hljs-tag,
+	.hljs-name {
+		color: hsl(234 82% 85%); /* lavender */
+	}
+
+	.hljs-attribute {
+		color: hsl(198 76% 69%); /* sapphire */
+	}
+
+	.hljs-symbol,
+	.hljs-bullet,
+	.hljs-addition {
+		color: hsl(115 54% 76%); /* green */
+	}
+
+	.hljs-deletion {
+		color: hsl(347 87% 78%); /* red */
+	}
+
+	.hljs-emphasis {
+		font-style: italic;
+	}
+
+	.hljs-strong {
+		font-weight: bold;
+	}
+
+	/* ── Placeholder text ─────────────────────────────────────────────────────── */
+	.tiptap p.is-editor-empty:first-child::before {
+		content: attr(data-placeholder);
+		@apply text-muted-foreground;
+		float: left;
+		height: 0;
+		pointer-events: none;
+	}
+
+	/* TipTap End */
 
 	* {
 		@apply border-border outline-ring/50;
