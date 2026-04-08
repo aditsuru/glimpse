@@ -221,7 +221,7 @@ function SettingsMenu({
 
 			{open && (
 				<div
-					className="absolute bottom-10 right-0 w-52 rounded-xl border border-white/10 bg-black/90 backdrop-blur-xl text-white text-sm shadow-2xl z-50 overflow-hidden"
+					className="absolute bottom-10 right-0 w-64 rounded-xl border border-white/10 bg-black/90 backdrop-blur-xl text-white text-sm shadow-2xl z-50 overflow-hidden"
 					onClick={(e) => e.stopPropagation()}
 				>
 					{view === "root" && (
