@@ -1,85 +1,39 @@
-import { ScrollContainer } from "@/components/layout/ScrollContainer";
-import { ImageCarousel } from "@/primitives/ImageCarousel";
-import { VideoPlayer } from "@/primitives/VideoPlayer";
+/** biome-ignore-all lint/suspicious/noExplicitAny: none */
+"use client";
 
-const videosPair1 = ["video1", "video2", "video3"];
-const videosPair2 = ["video4", "video5", "video6"];
-const videosPair3 = ["video7"];
-
-const imagesPair1 = [
-	[
-		{
-			fileUrl: "/static/temp/image2.jpg",
-			fileType: "image" as const,
-		},
-		{
-			fileUrl: "/static/temp/image3.jpg",
-			fileType: "image" as const,
-		},
-	],
-];
-
-const imagesPair2 = [
-	[
-		{
-			fileUrl: "/static/temp/image6.gif",
-			fileType: "gif" as const,
-		},
-		{
-			fileUrl: "/static/temp/image5.gif",
-			fileType: "gif" as const,
-		},
-	],
-];
+import { useState } from "react";
+import { RichEditor } from "@/primitives/editor/RichEditor";
+import { RichRenderer } from "@/primitives/editor/RichRenderer";
 
 function Dev() {
-	return (
-		<div className="w-screen h-screen flex justify-center">
-			<ScrollContainer className="min-h-screen overflow-y-auto w-xl pt-4 border no-scrollbar">
-				{videosPair1.map((src) => (
-					<VideoPlayer
-						key={src}
-						src={`/static/temp/${src}.mp4`}
-						aspectRatio={16 / 9}
-						className="my-8"
-						autoPlay
-						autoPlayThreshold={0.8}
-					/>
-				))}
-				{imagesPair1.map((item) => (
-					<ImageCarousel
-						images={item}
-						key={item[0].fileUrl}
-						spoiler
-						aspectRatio={16 / 9}
-					/>
-				))}
-				{videosPair3.map((src) => (
-					<VideoPlayer
-						key={src}
-						src={`/static/temp/${src}.mp4`}
-						aspectRatio={16 / 9}
-						className="my-8"
-						autoPlay
-						autoPlayThreshold={0.8}
-						spoiler
-					/>
-				))}
+	const [editorJson, setEditorJson] = useState<any>(null);
 
-				{imagesPair2.map((item) => (
-					<ImageCarousel images={item} key={item[0].fileUrl} spoiler />
-				))}
-				{videosPair2.map((src) => (
-					<VideoPlayer
-						key={src}
-						src={`/static/temp/${src}.mp4`}
-						aspectRatio={16 / 9}
-						className="my-8"
-						autoPlay
-						autoPlayThreshold={0.8}
-					/>
-				))}
-			</ScrollContainer>
+	const handleUpdate = (output: { json: any; html: string; text: string }) => {
+		// This is where you get your JSON
+		console.log("JSON Output:", output.json);
+
+		// Update your state
+		setEditorJson(output.json);
+	};
+
+	return (
+		<div className="w-screen h-screen flex justify-center gap-4 py-4">
+			<RichEditor
+				fetchMentionUsers={async () => [
+					{
+						id: "awd",
+						username: "aditsuru",
+						displayName: "Adi",
+						avatarUrL: "/static/default-pfp.png",
+					},
+				]}
+				onUpdate={handleUpdate}
+			/>
+			{editorJson && (
+				<div className="max-w-lg">
+					<RichRenderer content={editorJson} />
+				</div>
+			)}
 		</div>
 	);
 }
