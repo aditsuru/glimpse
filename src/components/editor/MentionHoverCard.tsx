@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	HoverCard,
@@ -23,36 +23,59 @@ export function MentionHoverCard({
 	const [user, setUser] = useState<MentionUser | null>(null);
 	const [loadState, setLoadState] = useState<LoadState>("idle");
 
-	const handleOpenChange = async (open: boolean) => {
-		// Only fetch once, only when opening, only when a fetcher is provided
-		if (!open || loadState !== "idle" || !fetchUser) return;
+	// Use a ref for the load state so handleOpenChange's dependency array stays
+	// stable. If we put `loadState` in the useCallback deps, every state transition
+	// creates a new function reference, which causes HoverCard to re-attach its
+	// event listener and can race with the open/close animation.
+	const loadStateRef = useRef<LoadState>("idle");
 
-		setLoadState("loading");
-		try {
-			const data = await fetchUser(id);
-			setUser(data);
-		} finally {
-			setLoadState("done");
-		}
-	};
+	// Guard against the literal string "undefined" that appears when
+	// options.suggestion.char was undefined during renderHTML (the root bug is
+	// fixed in extensions.ts, but this is a second line of defence for any
+	// already-persisted content in the DB).
+	const safeLabel = label && label !== "undefined" ? label : id;
 
-	const displayName = user?.displayName ?? label;
-	const username = user?.username ?? label;
+	const handleOpenChange = useCallback(
+		(open: boolean) => {
+			// Only fetch on first open, and only if a fetcher was provided.
+			if (!open || loadStateRef.current !== "idle" || !fetchUser) return;
+
+			// Update both ref (for guard) and state (for re-render) synchronously.
+			loadStateRef.current = "loading";
+			setLoadState("loading");
+
+			// Fire-and-forget: keep the handler synchronous so HoverCard doesn't
+			// receive a Promise return value (it ignores it anyway, and async
+			// handlers can cause subtle state ordering bugs with React batching).
+			fetchUser(id)
+				.then((data) => setUser(data))
+				.catch(() => setUser(null))
+				.finally(() => {
+					loadStateRef.current = "done";
+					setLoadState("done");
+				});
+		},
+		[id, fetchUser] // ← loadState intentionally omitted; we use loadStateRef instead
+	);
+
+	const displayName = user?.displayName ?? safeLabel;
+	const username = user?.username ?? safeLabel;
 	const initial = displayName[0]?.toUpperCase() ?? "?";
 
 	return (
 		<HoverCard onOpenChange={handleOpenChange}>
-			<HoverCardTrigger>
-				{/* Rendered as a plain <a> so it works inside both RSC and client trees */}
-				<a
-					href={`/u/${id}`}
-					className="tiptap-mention"
-					data-mention-id={id}
-					data-mention-label={label}
-				>
-					@{label}
-				</a>
-			</HoverCardTrigger>
+			<HoverCardTrigger
+				render={
+					<a
+						href={`/u/${id}`}
+						className="tiptap-mention"
+						data-mention-id={id}
+						data-mention-label={safeLabel}
+					>
+						@{safeLabel}
+					</a>
+				}
+			/>
 
 			<HoverCardContent
 				className="w-64 p-3"
@@ -61,7 +84,6 @@ export function MentionHoverCard({
 				sideOffset={6}
 			>
 				{loadState === "loading" ? (
-					/* Skeleton while fetching */
 					<div className="flex items-center gap-3">
 						<Skeleton className="h-10 w-10 rounded-full shrink-0" />
 						<div className="flex flex-col gap-1.5 flex-1">

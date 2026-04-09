@@ -1,11 +1,3 @@
-/**
- * RichEditor
- *
- * Requires these CSS additions in globals.css — see code-highlight.css.
- * Headings: type # / ## / ### or use the toolbar.
- * Code blocks: type ``` or ```js, or use the toolbar.
- * Mentions: type @<query> to trigger the suggestion dropdown.
- */
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: editor wrapper needs click capture */
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: link interception is pointer-only */
 "use client";
@@ -24,7 +16,6 @@ export function RichEditor({
 	fetchMentionUsers,
 	readOnly = false,
 }: RichEditorProps) {
-	// Memoize extensions — fetchMentionUsers must be stable at the call site (useCallback)
 	const extensions = useMemo(
 		() => buildEditorExtensions(fetchMentionUsers, placeholder),
 		[fetchMentionUsers, placeholder]
@@ -34,8 +25,7 @@ export function RichEditor({
 		extensions,
 		content: initialContent,
 		editable: !readOnly,
-		immediatelyRender: false, // prevents Next.js SSR hydration mismatch
-
+		immediatelyRender: false,
 		onUpdate: ({ editor: e }) => {
 			onUpdate?.({
 				json: e.getJSON(),
@@ -45,20 +35,15 @@ export function RichEditor({
 		},
 	});
 
-	// Reactive reads via useEditorState — avoids unnecessary re-renders
 	const { characterCount, isOverLimit } = useEditorState({
 		editor,
 		selector: (ctx) => {
 			if (!ctx.editor) return { characterCount: 0, isOverLimit: false };
 			const count = ctx.editor.storage.characterCount.characters() as number;
-			return {
-				characterCount: count,
-				isOverLimit: count > CHARACTER_LIMIT,
-			};
+			return { characterCount: count, isOverLimit: count > CHARACTER_LIMIT };
 		},
 	}) ?? { characterCount: 0, isOverLimit: false };
 
-	// Open links on click in edit mode without navigating away
 	const handleLinkClick = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
 			if (readOnly) return;
@@ -86,10 +71,8 @@ export function RichEditor({
 				isOverLimit && "border-destructive"
 			)}
 		>
-			{/* Toolbar — hidden in readOnly mode */}
 			{!readOnly && <Toolbar editor={editor} />}
 
-			{/* Editor content area */}
 			<div onClick={handleLinkClick} className="flex-1">
 				<EditorContent
 					editor={editor}
@@ -97,12 +80,29 @@ export function RichEditor({
 						"prose prose-sm dark:prose-invert max-w-none",
 						"min-h-[100px] max-h-[400px] overflow-y-auto",
 						"px-4 py-3",
-						// Reset outline on the inner .tiptap div
 						"[&_.tiptap]:outline-none",
-						// Paragraph spacing
+						// Paragraphs
 						"[&_.tiptap_p]:my-1 [&_.tiptap_p:first-child]:mt-0 [&_.tiptap_p:last-child]:mb-0",
-						// Lists
-						"[&_.tiptap_ul]:pl-5 [&_.tiptap_ol]:pl-5",
+						// ── Lists ─────────────────────────────────────────────
+						// FIX: Tailwind prose resets list-style-type to none.
+						// Restore bullet/number markers explicitly.
+						"[&_.tiptap_ul]:list-disc [&_.tiptap_ul]:pl-5",
+						"[&_.tiptap_ol]:list-decimal [&_.tiptap_ol]:pl-5",
+						// FIX: "content overlaps the empty list item" bug.
+						//
+						// When a list item contains an empty <p>, the <p>'s my-1 margin
+						// collapses and the <li> shrinks to near-zero height. The list
+						// marker still renders at the top-left of that zero-height box,
+						// and the next block element's text flows right under the marker.
+						//
+						// Solution:
+						//  1. Zero-out paragraph margins INSIDE list items (the li itself
+						//     provides the vertical rhythm via mb-1).
+						//  2. Give each li a min-height equal to one line so the marker
+						//     always has visible space even when the paragraph is empty.
+						"[&_.tiptap_li]:mb-1 [&_.tiptap_li]:min-h-[1.4em]",
+						"[&_.tiptap_li_>_p]:my-0",
+						// ──────────────────────────────────────────────────────
 						// Blockquote
 						"[&_.tiptap_blockquote]:border-l-2 [&_.tiptap_blockquote]:border-border",
 						"[&_.tiptap_blockquote]:pl-3 [&_.tiptap_blockquote]:text-muted-foreground",
@@ -117,7 +117,6 @@ export function RichEditor({
 				/>
 			</div>
 
-			{/* Footer — character count (edit mode only) */}
 			{!readOnly && (
 				<div className="flex items-center justify-end px-4 py-2 border-t bg-muted/20">
 					<span

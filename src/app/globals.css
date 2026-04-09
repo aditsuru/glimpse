@@ -150,7 +150,7 @@
 
 	/* TipTap Start */
 	.tiptap-mention {
-		@apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium no-underline;
+		@apply inline-flex items-center rounded-full px-2 py-0.5 text-sm font-medium no-underline;
 		@apply bg-primary/10 text-primary hover:bg-primary/20 transition-colors;
 		cursor: pointer;
 	}
