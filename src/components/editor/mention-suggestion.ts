@@ -5,19 +5,53 @@ import type { MentionUser } from "@/primitives/editor/types";
 import MentionList, { type MentionListHandle } from "./MentionList";
 
 // ─────────────────────────────────────────────
+// Debounce helper
+// ─────────────────────────────────────────────
+
+/**
+ * Returns a debounced version of `fn` that delays execution by `ms`.
+ * The returned function returns a Promise that resolves with fn's result.
+ *
+ * WHY: The suggestion `items()` hook fires on every keystroke. Without
+ * debouncing, every character typed triggers a network call to fetchUsers.
+ * Debouncing at the factory level (not inside `items`) means the single
+ * timer persists across successive `items()` calls — i.e. it resets
+ * correctly as the user types.
+ */
+function makeDebouncedFetch(
+	fn: (query: string) => Promise<MentionUser[]>,
+	ms: number
+) {
+	let timer: ReturnType<typeof setTimeout>;
+
+	return (query: string): Promise<MentionUser[]> =>
+		new Promise((resolve) => {
+			clearTimeout(timer);
+			timer = setTimeout(() => {
+				fn(query)
+					.then(resolve)
+					.catch(() => resolve([]));
+			}, ms);
+		});
+}
+
+// ─────────────────────────────────────────────
 // buildMentionSuggestion
 // ─────────────────────────────────────────────
 
 export function buildMentionSuggestion(
 	fetchUsers: (query: string) => Promise<MentionUser[]>
 ): Omit<SuggestionOptions, "editor"> {
+	// Create the debounced fetcher once per factory call so the timer is shared
+	// across all `items()` invocations within the same editor instance.
+	const debouncedFetch = makeDebouncedFetch(fetchUsers, 300);
+
 	return {
 		char: "@",
 
-		// Return empty array for empty queries to avoid noisy network calls
 		items: async ({ query }): Promise<MentionUser[]> => {
 			if (query.trim().length === 0) return [];
-			return fetchUsers(query);
+			return debouncedFetch(query);
 		},
 
 		render: () => {
@@ -39,7 +73,6 @@ export function buildMentionSuggestion(
 						editor: props.editor,
 					});
 
-					// pointer-events back on the actual content
 					(renderer.element as HTMLElement).style.pointerEvents = "auto";
 					container.appendChild(renderer.element);
 
