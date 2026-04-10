@@ -1,16 +1,13 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: none */
 import type { JSONContent } from "@tiptap/core";
 import { generateHTML } from "@tiptap/core";
-import parse, { type DOMNode, domToReact, Element } from "html-react-parser";
+import parse from "html-react-parser";
 import { MentionHoverCard } from "@/components/editor/MentionHoverCard";
 import { cn } from "@/lib/client/utils";
 import type { RichRendererProps } from "@/primitives/editor/types";
 import { CodeBlockRendered } from "./CodeBlockRendered";
 import { baseExtensions } from "./extensions";
 import { LinkPreview } from "./LinkPreview";
-
-// ─────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────
 
 function extractFirstLink(node: JSONContent): string | null {
 	if (node.marks) {
@@ -29,29 +26,17 @@ function extractFirstLink(node: JSONContent): string | null {
 	return null;
 }
 
-/** Extract plain text from a parsed DOMNode tree (used for clipboard copy). */
-function extractText(nodes: DOMNode[]): string {
+// Safely extract text without relying on instanceof Element
+function extractText(nodes: any[]): string {
 	return nodes
 		.map((node) => {
-			// Text node: has a `data` string property
-			if (
-				"data" in node &&
-				typeof (node as { data: unknown }).data === "string"
-			) {
-				return (node as { data: string }).data;
-			}
-			// Element node: recurse into children
-			if (node instanceof Element) {
-				return extractText(node.children as DOMNode[]);
-			}
+			if (node.type === "text") return node.data || "";
+			if (node.type === "tag" && node.children)
+				return extractText(node.children);
 			return "";
 		})
 		.join("");
 }
-
-// ─────────────────────────────────────────────
-// Component
-// ─────────────────────────────────────────────
 
 export function RichRenderer({ content, fetchMentionUser }: RichRendererProps) {
 	const json = content as JSONContent;
@@ -59,61 +44,58 @@ export function RichRenderer({ content, fetchMentionUser }: RichRendererProps) {
 	const html = generateHTML(json, baseExtensions);
 
 	const rendered = parse(html, {
-		replace(domNode: DOMNode) {
-			if (!(domNode instanceof Element)) return undefined;
+		replace(domNode: any) {
+			// CRITICAL FIX: Do not use `instanceof Element`. Use `type === 'tag'`
+			if (domNode.type !== "tag") return;
 
-			// ── Code block replacement ────────────────────────────────────────
-			// generateHTML emits <pre class="tiptap-code-block not-prose"><code ...>
-			// We replace it with CodeBlockRendered to add the copy button + header bar,
-			// matching the editor's CodeBlockView node view exactly.
+			// ── Code block ────────────────────────────────────────────────────
 			if (
 				domNode.name === "pre" &&
-				(domNode.attribs.class ?? "").includes("tiptap-code-block")
+				(domNode.attribs?.class || "").includes("tiptap-code-block")
 			) {
-				const codeEl = domNode.children.find(
-					(c): c is Element => c instanceof Element && c.name === "code"
+				const codeEl = domNode.children?.find(
+					(c: any) => c.type === "tag" && c.name === "code"
 				);
 
-				const langMatch = (codeEl?.attribs.class ?? "").match(/language-(\w+)/);
-				const language = langMatch?.[1] ?? "plaintext";
-				const codeText = codeEl
-					? extractText(codeEl.children as DOMNode[])
-					: "";
-				const codeContent = codeEl
-					? domToReact(codeEl.children as DOMNode[])
-					: null;
+				const langMatch = (codeEl?.attribs?.class || "").match(
+					/language-(\w+)/
+				);
+				const language = langMatch?.[1] || "plaintext";
+				const codeText = codeEl ? extractText(codeEl.children) : "";
 
 				return (
-					<CodeBlockRendered language={language} codeText={codeText}>
-						{codeContent}
-					</CodeBlockRendered>
+					<CodeBlockRendered
+						key={Math.random()}
+						language={language}
+						codeText={codeText}
+					/>
 				);
 			}
 
-			// ── Mention replacement ───────────────────────────────────────────
-			const mentionId = domNode.attribs["data-mention-id"];
-			if (!mentionId) return undefined;
+			// ── Mention ───────────────────────────────────────────────────────
+			if (
+				domNode.name === "a" &&
+				(domNode.attribs?.["data-mention-id"] ||
+					(domNode.attribs?.class || "").includes("tiptap-mention"))
+			) {
+				const mentionId = domNode.attribs["data-mention-id"] || "unknown";
+				const raw = domNode.attribs["data-mention-label"];
+				const mentionLabel = raw && raw !== "undefined" ? raw : mentionId;
 
-			const raw = domNode.attribs["data-mention-label"];
-			const mentionLabel = raw && raw !== "undefined" ? raw : mentionId;
-
-			return (
-				<MentionHoverCard
-					id={mentionId}
-					label={mentionLabel}
-					fetchUser={fetchMentionUser}
-				/>
-			);
+				return (
+					<MentionHoverCard
+						key={Math.random()}
+						id={mentionId}
+						label={mentionLabel}
+						fetchUser={fetchMentionUser}
+					/>
+				);
+			}
 		},
 	});
 
 	return (
 		<div>
-			{/*
-			 * .tiptap-content is the renderer's counterpart to .tiptap (editor div).
-			 * List styles, li fixes, etc. in globals.css target both classes so the
-			 * editor and renderer always look identical without duplicating CSS.
-			 */}
 			<div
 				className={cn(
 					"tiptap-content prose prose-sm dark:prose-invert max-w-none"
@@ -121,7 +103,6 @@ export function RichRenderer({ content, fetchMentionUser }: RichRendererProps) {
 			>
 				{rendered}
 			</div>
-
 			{firstLink && <LinkPreview url={firstLink} />}
 		</div>
 	);

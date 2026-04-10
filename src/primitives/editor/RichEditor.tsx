@@ -56,7 +56,9 @@ export function RichEditor({
 			// click target is *outside* the .tiptap div and focusing manually when
 			// it is. If it's already inside .tiptap, the browser handled it natively
 			// so we don't interfere.
-			const tiptapEl = (e.currentTarget as HTMLElement).querySelector(".tiptap");
+			const tiptapEl = (e.currentTarget as HTMLElement).querySelector(
+				".tiptap"
+			);
 			if (tiptapEl && !tiptapEl.contains(e.target as Node)) {
 				editor.commands.focus("end");
 				return;
