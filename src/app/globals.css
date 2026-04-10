@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/complexity/noImportantStyles: none */
+/** biome-ignore-all lint/style/noDescendingSpecificity: none */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -82,6 +83,13 @@
 	--sidebar-ring: oklch(0.708 0 0);
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.145 0 0);
+
+	/* ── TipTap code block palette (tweak here to change the code theme) ─────── */
+	--code-bg: hsl(224 16% 14%); /* block background                  */
+	--code-header-bg: hsl(224 16% 17%); /* header bar (slightly lighter)      */
+	--code-border: hsl(224 16% 22%); /* header bottom border               */
+	--code-text: hsl(220 23% 95%); /* default token colour               */
+	--code-muted: hsl(220 13% 52%); /* language label + copy icon colour  */
 }
 
 .dark {
@@ -144,15 +152,21 @@
 		display: none;
 	}
 	.no-scrollbar {
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
+		-ms-overflow-style: none;
+		scrollbar-width: none;
 	}
 
-	/* TipTap Start */
+	/* ═══════════════════════════════════════════════════════════════════════════
+	   TipTap — all editor + renderer styles
+	   Targets:
+	     .tiptap          → the editable div inside <EditorContent> (editor)
+	     .tiptap-content  → the wrapper div in <RichRenderer>       (renderer)
+	   ═══════════════════════════════════════════════════════════════════════════ */
+
+	/* ── Mention chip ─────────────────────────────────────────────────────────── */
 	.tiptap-mention {
 		@apply inline-flex items-center rounded-full px-2 py-0.5 text-sm font-medium no-underline;
 		@apply bg-primary/10 text-primary hover:bg-primary/20 transition-colors;
-		cursor: pointer;
 	}
 
 	/* ── Link ─────────────────────────────────────────────────────────────────── */
@@ -160,19 +174,163 @@
 		@apply text-primary underline underline-offset-2 hover:text-primary/80 transition-colors;
 	}
 
-	/* ── Code block wrapper ───────────────────────────────────────────────────── */
-	.tiptap-code-block {
-		@apply relative rounded-lg overflow-hidden my-3;
-		background: hsl(224 16% 14%); /* Catppuccin Macchiato base */
+	/* ── Lists ────────────────────────────────────────────────────────────────── */
+	/*
+	 * Tailwind v4's preflight resets list-style to none on all ul/ol.
+	 * We restore markers here for TipTap content.
+	 *
+	 * The !important overrides any Tailwind utility that the parent prose class
+	 * might inject (the project doesn't use @tailwindcss/typography but this
+	 * makes it robust if they ever add it).
+	 */
+	.tiptap ul,
+	.tiptap-content ul {
+		list-style-type: disc !important;
+		padding-left: 1.25rem !important;
 	}
 
-	.tiptap-code-block code {
-		@apply block p-4 text-sm leading-relaxed font-mono overflow-x-auto;
+	.tiptap ol,
+	.tiptap-content ol {
+		list-style-type: decimal !important;
+		padding-left: 1.25rem !important;
+	}
+
+	/*
+	 * Empty list item overlap fix:
+	 *
+	 * When <li> contains an empty <p>, the paragraph collapses to zero height
+	 * and the <li> shrinks. The bullet/number marker renders at the top of that
+	 * zero-height box, and the next block's text overlaps the marker.
+	 *
+	 * min-height: 1.4em ensures every <li> occupies at least one line of height.
+	 * my-0 on the inner <p> stops double vertical margin from accumulating.
+	 */
+	.tiptap li,
+	.tiptap-content li {
+		min-height: 1.4em !important;
+		margin-bottom: 0.25rem !important;
+	}
+
+	.tiptap li > p,
+	.tiptap-content li > p {
+		margin-top: 0 !important;
+		margin-bottom: 0 !important;
+	}
+
+	/* ── Code block wrapper (.tiptap-code-block-wrapper) ─────────────────────── */
+	/*
+	 * Used by:
+	 *   - CodeBlockView (NodeViewWrapper)  — editor
+	 *   - CodeBlockRendered                — renderer (via html-react-parser)
+	 *
+	 * Change --code-bg / --code-header-bg / --code-text in :root above to
+	 * restyle the entire code block without touching component files.
+	 */
+	.tiptap-code-block-wrapper {
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		margin-top: 0.75rem;
+		margin-bottom: 0.75rem;
+		background: var(--code-bg);
+		border: 1px solid color-mix(in oklch, var(--code-border) 60%, transparent);
+	}
+
+	/* ── Code block header bar ────────────────────────────────────────────────── */
+	.tiptap-code-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.375rem 0.75rem;
+		background: var(--code-header-bg);
+		border-bottom: 1px solid var(--code-border);
+	}
+
+	/* Language label (e.g. "javascript", "python") */
+	.tiptap-code-language {
+		font-family: var(--font-mono);
+		font-size: 0.6875rem; /* 11px */
+		line-height: 1;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--code-muted);
+		user-select: none;
+	}
+
+	/* Copy button */
+	.tiptap-copy-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.6875rem; /* 11px */
+		color: var(--code-muted);
+		background: none;
+		border: none;
+		padding: 0;
+		transition: color 0.15s;
+		user-select: none;
+	}
+	.tiptap-copy-btn:hover {
+		color: var(--code-text);
+	}
+
+	/* ── Code block body (<pre> + <code>) ─────────────────────────────────────── */
+	.tiptap-code-block-wrapper pre,
+	.tiptap-code-block-pre {
+		margin: 0 !important;
 		background: transparent !important;
-		color: hsl(220 23% 95%); /* default text */
+		border-radius: 0;
 	}
 
-	/* ── Syntax token colors (Catppuccin Macchiato palette) ───────────────────── */
+	.tiptap-code-block-wrapper pre code,
+	.tiptap-code-block-pre code {
+		display: block;
+		padding: 0.875rem 1rem;
+		font-family: var(--font-mono);
+		font-size: 0.875rem;
+		line-height: 1.7;
+		background: transparent !important;
+		color: var(--code-text);
+		/* Scroll long lines but hide the scrollbar track */
+		overflow-x: auto;
+		scrollbar-width: none; /* Firefox */
+		-ms-overflow-style: none; /* IE / Edge legacy */
+	}
+	.tiptap-code-block-wrapper pre code::-webkit-scrollbar,
+	.tiptap-code-block-pre code::-webkit-scrollbar {
+		display: none; /* Chrome / Safari / new Edge */
+	}
+
+	/*
+	 * Fallback: if the <pre class="tiptap-code-block"> is rendered raw
+	 * (e.g. generateHTML output displayed directly without html-react-parser),
+	 * still apply decent styling.
+	 */
+	pre.tiptap-code-block {
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		margin: 0.75rem 0;
+		background: var(--code-bg);
+		border: 1px solid color-mix(in oklch, var(--code-border) 60%, transparent);
+	}
+	pre.tiptap-code-block code {
+		display: block;
+		padding: 0.875rem 1rem;
+		font-family: var(--font-mono);
+		font-size: 0.875rem;
+		line-height: 1.7;
+		background: transparent !important;
+		color: var(--code-text);
+		overflow-x: auto;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+	pre.tiptap-code-block code::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* ── Syntax token colours (Catppuccin Macchiato) ──────────────────────────── */
+	/* Change these to switch highlight themes without touching any .tsx file.     */
+
 	.hljs-comment,
 	.hljs-quote {
 		color: hsl(228 17% 52%); /* overlay2 */
@@ -245,8 +403,9 @@
 		pointer-events: none;
 	}
 
-	/* TipTap End */
-
+	/* ═══════════════════════════════════════════════════════════════════════════
+	   Base resets
+	   ═══════════════════════════════════════════════════════════════════════════ */
 	* {
 		@apply border-border outline-ring/50;
 	}

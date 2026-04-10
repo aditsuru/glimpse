@@ -44,11 +44,27 @@ export function RichEditor({
 		},
 	}) ?? { characterCount: 0, isOverLimit: false };
 
-	const handleLinkClick = useCallback(
+	const handleAreaClick = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
-			if (readOnly) return;
-			const target = e.target as HTMLElement;
-			const link = target.closest("a.tiptap-link");
+			if (readOnly || !editor) return;
+
+			// ── Click-anywhere-to-focus ────────────────────────────────────────
+			// EditorContent only renders the .tiptap contenteditable div over the
+			// area that contains document nodes. Clicking the padding around the
+			// text (the flex-1 wrapper below) doesn't land inside .tiptap so the
+			// browser never focuses the editor. We fix this by checking whether the
+			// click target is *outside* the .tiptap div and focusing manually when
+			// it is. If it's already inside .tiptap, the browser handled it natively
+			// so we don't interfere.
+			const tiptapEl = (e.currentTarget as HTMLElement).querySelector(".tiptap");
+			if (tiptapEl && !tiptapEl.contains(e.target as Node)) {
+				editor.commands.focus("end");
+				return;
+			}
+
+			// ── Link interception in edit mode ────────────────────────────────
+			// Open links without navigating away when the editor is editable.
+			const link = (e.target as HTMLElement).closest("a.tiptap-link");
 			if (link) {
 				e.preventDefault();
 				window.open(
@@ -58,7 +74,7 @@ export function RichEditor({
 				);
 			}
 		},
-		[readOnly]
+		[readOnly, editor]
 	);
 
 	if (!editor) return null;
@@ -73,36 +89,25 @@ export function RichEditor({
 		>
 			{!readOnly && <Toolbar editor={editor} />}
 
-			<div onClick={handleLinkClick} className="flex-1">
+			{/*
+			 * This wrapper fills the card height. Clicking anywhere inside it
+			 * (including the empty space below the last paragraph) triggers
+			 * handleAreaClick which focuses the editor at the end.
+			 */}
+			<div
+				onClick={handleAreaClick}
+				className="flex-1 min-h-[100px] cursor-text"
+			>
 				<EditorContent
 					editor={editor}
 					className={cn(
 						"prose prose-sm dark:prose-invert max-w-none",
-						"min-h-[100px] max-h-[400px] overflow-y-auto",
+						"max-h-[400px] overflow-y-auto",
 						"px-4 py-3",
-						"[&_.tiptap]:outline-none",
+						"[&_.tiptap]:outline-none [&_.tiptap]:min-h-[76px]",
 						// Paragraphs
 						"[&_.tiptap_p]:my-1 [&_.tiptap_p:first-child]:mt-0 [&_.tiptap_p:last-child]:mb-0",
-						// ── Lists ─────────────────────────────────────────────
-						// FIX: Tailwind prose resets list-style-type to none.
-						// Restore bullet/number markers explicitly.
-						"[&_.tiptap_ul]:list-disc [&_.tiptap_ul]:pl-5",
-						"[&_.tiptap_ol]:list-decimal [&_.tiptap_ol]:pl-5",
-						// FIX: "content overlaps the empty list item" bug.
-						//
-						// When a list item contains an empty <p>, the <p>'s my-1 margin
-						// collapses and the <li> shrinks to near-zero height. The list
-						// marker still renders at the top-left of that zero-height box,
-						// and the next block element's text flows right under the marker.
-						//
-						// Solution:
-						//  1. Zero-out paragraph margins INSIDE list items (the li itself
-						//     provides the vertical rhythm via mb-1).
-						//  2. Give each li a min-height equal to one line so the marker
-						//     always has visible space even when the paragraph is empty.
-						"[&_.tiptap_li]:mb-1 [&_.tiptap_li]:min-h-[1.4em]",
-						"[&_.tiptap_li_>_p]:my-0",
-						// ──────────────────────────────────────────────────────
+						// Lists: marker + overlap fix come from globals.css
 						// Blockquote
 						"[&_.tiptap_blockquote]:border-l-2 [&_.tiptap_blockquote]:border-border",
 						"[&_.tiptap_blockquote]:pl-3 [&_.tiptap_blockquote]:text-muted-foreground",

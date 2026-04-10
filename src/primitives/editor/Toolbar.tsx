@@ -51,10 +51,10 @@ function ToolbarButton({
 	return (
 		<Tooltip>
 			{/*
-			 * Base UI's TooltipTrigger does NOT support `asChild` (that's a Radix pattern).
-			 * Base UI uses `render` prop to replace the host element — forwarding its
-			 * internal ref + event props onto the Toggle's <button>, so only ONE
-			 * <button> exists in the DOM (fixes the hydration "button in button" error).
+			 * Base UI's TooltipTrigger does NOT support `asChild` (Radix pattern).
+			 * Base UI uses a `render` prop to replace the host element, forwarding
+			 * its internal ref + event handlers onto the Toggle's <button>.
+			 * Result: ONE <button> in the DOM — fixes the hydration error.
 			 */}
 			<TooltipTrigger
 				render={
@@ -85,63 +85,20 @@ export function Toolbar({ editor }: ToolbarProps) {
 	const [linkDialogOpen, setLinkDialogOpen] = useState(false);
 
 	// ─────────────────────────────────────────
-	// FIX: Toolbar not aware of cursor position
+	// FIX: Toolbar not aware of cursor position / mark state
 	//
-	// In Tiptap v3, `shouldRerenderOnTransaction` is OFF by default, so the
-	// editor object doesn't trigger React re-renders on selection changes.
-	// Reading `editor.isActive(...)` directly in JSX only reflects the state
-	// at the last render — not after the user moves their cursor.
+	// Tiptap v3 disables shouldRerenderOnTransaction by default. Reading
+	// editor.isActive() / editor.can() directly in JSX only reflects state at
+	// the last render, not after the cursor moves.
 	//
-	// `useEditorState` subscribes to editor transactions and re-renders this
-	// component whenever any of the selected values change. This makes the
-	// toolbar instantly responsive to cursor position, entering/leaving code
-	// blocks, toggling marks, etc.
+	// useEditorState subscribes to editor transactions and re-renders ONLY when
+	// the selected values change, making the toolbar instantly reactive.
 	// ─────────────────────────────────────────
-	const {
-		isBold,
-		isItalic,
-		isStrike,
-		isCode,
-		isCodeBlock,
-		isLink,
-		isBulletList,
-		isOrderedList,
-		isBlockquote,
-		isH1,
-		isH2,
-		isH3,
-		canBold,
-		canItalic,
-		canStrike,
-		canCode,
-		canUndo,
-		canRedo,
-	} = useEditorState({
+	const state = useEditorState({
 		editor,
 		selector: (ctx) => {
 			const e = ctx.editor;
-			if (!e) {
-				return {
-					isBold: false,
-					isItalic: false,
-					isStrike: false,
-					isCode: false,
-					isCodeBlock: false,
-					isLink: false,
-					isBulletList: false,
-					isOrderedList: false,
-					isBlockquote: false,
-					isH1: false,
-					isH2: false,
-					isH3: false,
-					canBold: false,
-					canItalic: false,
-					canStrike: false,
-					canCode: false,
-					canUndo: false,
-					canRedo: false,
-				};
-			}
+			if (!e) return null;
 			return {
 				isBold: e.isActive("bold"),
 				isItalic: e.isActive("italic"),
@@ -155,7 +112,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				isH1: e.isActive("heading", { level: 1 }),
 				isH2: e.isActive("heading", { level: 2 }),
 				isH3: e.isActive("heading", { level: 3 }),
-				// can() checks are also cursor-dependent (e.g. can't bold inside a code block)
 				canBold: e.can().toggleBold(),
 				canItalic: e.can().toggleItalic(),
 				canStrike: e.can().toggleStrike(),
@@ -164,38 +120,37 @@ export function Toolbar({ editor }: ToolbarProps) {
 				canRedo: e.can().redo(),
 			};
 		},
-	}) ?? {
-		isBold: false,
-		isItalic: false,
-		isStrike: false,
-		isCode: false,
-		isCodeBlock: false,
-		isLink: false,
-		isBulletList: false,
-		isOrderedList: false,
-		isBlockquote: false,
-		isH1: false,
-		isH2: false,
-		isH3: false,
-		canBold: false,
-		canItalic: false,
-		canStrike: false,
-		canCode: false,
-		canUndo: false,
-		canRedo: false,
-	};
+	});
 
-	// FIX: Replace window.prompt with a proper Dialog — see LinkDialog.tsx
-	const openLinkDialog = useCallback(() => {
-		setLinkDialogOpen(true);
-	}, []);
+	// Fallback so destructuring is safe before the editor initialises
+	const {
+		isBold = false,
+		isItalic = false,
+		isStrike = false,
+		isCode = false,
+		isCodeBlock = false,
+		isLink = false,
+		isBulletList = false,
+		isOrderedList = false,
+		isBlockquote = false,
+		isH1 = false,
+		isH2 = false,
+		isH3 = false,
+		canBold = false,
+		canItalic = false,
+		canStrike = false,
+		canCode = false,
+		canUndo = false,
+		canRedo = false,
+	} = state ?? {};
+
+	const openLinkDialog = useCallback(() => setLinkDialogOpen(true), []);
 
 	return (
 		<>
 			{/*
-			 * Outer TooltipProvider removed — providers.tsx already wraps the whole
-			 * app in one. Double-provider shows as two nested <TooltipProvider>
-			 * elements in the error log.
+			 * No <TooltipProvider> here — providers.tsx already wraps the whole
+			 * app in one. Double-wrapping caused two nested providers in the tree.
 			 */}
 			<div className="flex items-center gap-0.5 flex-wrap p-1.5 border-b bg-muted/30">
 				{/* ── Headings ── */}
@@ -208,7 +163,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<Heading1 className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() =>
 						editor.chain().focus().toggleHeading({ level: 2 }).run()
@@ -218,7 +172,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<Heading2 className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() =>
 						editor.chain().focus().toggleHeading({ level: 3 }).run()
@@ -240,7 +193,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<Bold className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() => editor.chain().focus().toggleItalic().run()}
 					isActive={isItalic}
@@ -249,7 +201,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<Italic className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() => editor.chain().focus().toggleStrike().run()}
 					isActive={isStrike}
@@ -258,7 +209,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<Strikethrough className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() => editor.chain().focus().toggleCode().run()}
 					isActive={isCode}
@@ -267,7 +217,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<Code className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() => editor.chain().focus().toggleCodeBlock().run()}
 					isActive={isCodeBlock}
@@ -278,7 +227,7 @@ export function Toolbar({ editor }: ToolbarProps) {
 
 				<Separator orientation="vertical" className="mx-1 h-6" />
 
-				{/* ── Link ── */}
+				{/* ── Link — opens Dialog instead of window.prompt ── */}
 				<ToolbarButton
 					onClick={openLinkDialog}
 					isActive={isLink}
@@ -301,7 +250,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<List className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() => editor.chain().focus().toggleOrderedList().run()}
 					isActive={isOrderedList}
@@ -309,7 +257,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<ListOrdered className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() => editor.chain().focus().toggleBlockquote().run()}
 					isActive={isBlockquote}
@@ -328,7 +275,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				>
 					<Undo2 className="h-3.5 w-3.5" />
 				</ToolbarButton>
-
 				<ToolbarButton
 					onClick={() => editor.chain().focus().redo().run()}
 					disabled={!canRedo}
@@ -338,7 +284,6 @@ export function Toolbar({ editor }: ToolbarProps) {
 				</ToolbarButton>
 			</div>
 
-			{/* Link dialog — rendered outside the toolbar div to avoid stacking issues */}
 			<LinkDialog
 				editor={editor}
 				open={linkDialogOpen}
