@@ -18,10 +18,6 @@ import { buildMentionSuggestion } from "@/components/editor/mention-suggestion";
 import type { MentionUser } from "@/primitives/editor/types";
 import { CodeBlockView } from "./CodeBlockView";
 
-// ─────────────────────────────────────────────
-// Constants
-// ─────────────────────────────────────────────
-
 export const CHARACTER_LIMIT = 500;
 
 const lowlight = createLowlight(common);
@@ -30,13 +26,13 @@ const lowlight = createLowlight(common);
 // StarterKit
 //
 // FIX: Tiptap v3 bundles Link inside StarterKit by default.
-// Duplicate extension names → "Duplicate extension names found: ['link']" warning.
-// Disable it so our custom linkConfig is the only Link extension.
+// Adding Link separately → "Duplicate extension names found: ['link']".
+// Disable the bundled one so our custom linkConfig is the only instance.
 // ─────────────────────────────────────────────
 
 const starterKitConfig = StarterKit.configure({
 	heading: false, // added separately with levels config
-	codeBlock: false, // added separately with lowlight + node view
+	codeBlock: false, // added separately with lowlight + React node view
 	link: false, // v3 includes Link in StarterKit; we use our own below
 });
 
@@ -57,21 +53,19 @@ const linkConfig = Link.configure({
 // Code block — two variants
 // ─────────────────────────────────────────────
 
-/** Server-safe: no React node view. Used in baseExtensions → generateHTML. */
+/** Server-safe: no React node view. Used by baseExtensions → generateHTML (SSR). */
 const codeBlockBaseConfig = CodeBlockLowlight.configure({
 	lowlight,
 	defaultLanguage: "plaintext",
+	// Note: these HTMLAttributes end up on the <pre> emitted by generateHTML.
+	// RichRenderer replaces that <pre> via html-react-parser, so the class is
+	// used as a selector for the replace rule, not for visual styling.
 	HTMLAttributes: { class: "tiptap-code-block not-prose" },
 });
 
 /**
- * Editor variant: extends CodeBlockLowlight with a React node view that adds
- * a copy button and a language label bar. Client-only.
- *
- * Syntax colours require a highlight.js CSS theme. Add ONE of these to layout.tsx:
- *   import "highlight.js/styles/github-dark.css"   // dark
- *   import "highlight.js/styles/github.css"         // light
- * highlight.js is already a transitive dep of lowlight — no extra install needed.
+ * Editor variant: extends CodeBlockLowlight with the React node view that
+ * renders the copy button + language label. CLIENT-ONLY.
  */
 const codeBlockEditorConfig = CodeBlockLowlight.extend({
 	addNodeView() {
@@ -84,26 +78,24 @@ const codeBlockEditorConfig = CodeBlockLowlight.extend({
 });
 
 // ─────────────────────────────────────────────
-// Mention render helper
+// Mention renderHTML — shared between editor and base (SSR)
 //
-// FIX: "undefinedaditsuru" bug root cause:
+// ROOT BUG FIX: "@undefinedaditsuru"
 //
-// In baseExtensions, Mention is used without a `suggestion` config.
-// For generateHTML (SSR), the Suggestion ProseMirror plugin never
-// initialises — so options.suggestion is a raw partial object whose
-// .char may be undefined. Doing `options.suggestion.char` gives undefined,
-// and `undefined + "aditsuru"` → the literal string "undefinedaditsuru".
+// In baseExtensions (used by generateHTML / SSR), Mention is configured
+// WITHOUT a suggestion plugin. In that context, options.suggestion may be a
+// partial object whose `.char` property is undefined. Concatenating:
+//   undefined + "aditsuru" → "undefinedaditsuru"
 //
 // Fix: options.suggestion?.char ?? "@"
-// Also guard node.attrs.label which can be undefined if the node was
-// inserted before the label attribute was populated.
+// Also guard node.attrs.label which can be undefined for legacy stored content.
 // ─────────────────────────────────────────────
 
-// biome-ignore lint/suspicious/noExplicitAny: TipTap renderHTML typing is complex
+// biome-ignore lint/suspicious/noExplicitAny: TipTap renderHTML typing is opaque
 function mentionRenderHTML({ options, node }: { options: any; node: any }) {
 	const id = (node.attrs.id as string) ?? "";
-	const label = (node.attrs.label as string | undefined) ?? id; // guard undefined label
-	const char = options.suggestion?.char ?? "@"; // guard SSR context
+	const label = (node.attrs.label as string | undefined) ?? id; // guard undefined
+	const char = options?.suggestion?.char ?? "@"; // guard SSR context
 
 	return [
 		"a",
@@ -118,13 +110,14 @@ function mentionRenderHTML({ options, node }: { options: any; node: any }) {
 }
 
 // ─────────────────────────────────────────────
-// baseExtensions — server-safe, no node views, no suggestion plugin
-// Used by RichRenderer → generateHTML
+// baseExtensions — SERVER-SAFE
+// No node views, no suggestion plugin, no DOM dependency.
+// Used by RichRenderer → generateHTML.
 // ─────────────────────────────────────────────
 
 export const mentionBaseConfig = Mention.configure({
 	HTMLAttributes: { class: "tiptap-mention" },
-	// biome-ignore lint/suspicious/noExplicitAny: see mentionRenderHTML above
+	// biome-ignore lint/suspicious/noExplicitAny: see mentionRenderHTML
 	renderHTML: mentionRenderHTML as any,
 });
 
@@ -138,7 +131,7 @@ export const baseExtensions = [
 
 // ─────────────────────────────────────────────
 // buildEditorExtensions — CLIENT-ONLY
-// Adds: mention suggestion, placeholder, character count, node views
+// Adds: code block node view, mention suggestion, placeholder, char count.
 // ─────────────────────────────────────────────
 
 export function buildEditorExtensions(
@@ -148,12 +141,12 @@ export function buildEditorExtensions(
 	return [
 		starterKitConfig,
 		headingConfig,
-		codeBlockEditorConfig, // ← with copy button + language header
+		codeBlockEditorConfig,
 		linkConfig,
 
 		Mention.configure({
 			HTMLAttributes: { class: "tiptap-mention" },
-			// biome-ignore lint/suspicious/noExplicitAny: see mentionRenderHTML above
+			// biome-ignore lint/suspicious/noExplicitAny: see mentionRenderHTML
 			renderHTML: mentionRenderHTML as any,
 			suggestion: buildMentionSuggestion(fetchUsers),
 		}),
