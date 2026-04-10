@@ -5,20 +5,6 @@ import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
-/**
- * CodeBlockView — TipTap React node view for the editor.
- *
- * All visual styles are driven by globals.css (.tiptap-code-block-wrapper,
- * .tiptap-code-header, etc.) so you can tweak colors, spacing, and fonts
- * from one place.
- *
- * For syntax highlighting colours, add ONE of these imports to layout.tsx:
- *   import "highlight.js/styles/github-dark.css"
- *   import "highlight.js/styles/atom-one-dark.css"
- * highlight.js is a transitive dep of lowlight — no extra install needed.
- * OR define your own .hljs-* token rules in globals.css (Catppuccin palette
- * is already there).
- */
 export function CodeBlockView({ node }: NodeViewProps) {
 	const [copied, setCopied] = useState(false);
 
