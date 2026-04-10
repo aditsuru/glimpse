@@ -8,82 +8,57 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { MentionHoverCardProps, MentionUser } from "@/primitives/editor/types";
+import type {
+	MentionHoverCardProps,
+	MentionUser,
+} from "@/primitives/editor/types";
 
-/*
- * WHY onMouseEnter and NOT onOpenChange:
- *
- * shadcn's Base UI HoverCard does NOT have an onOpenChange prop on the root.
- * The Base UI API is:
- *
- *   <HoverCard>
- *     <HoverCardTrigger delay={300} closeDelay={100}>trigger</HoverCardTrigger>
- *     <HoverCardContent side="top" align="start">content</HoverCardContent>
- *   </HoverCard>
- *
- * There is no lifecycle callback to hook into open/close events from the root.
- * Solution: fire the fetch on onMouseEnter of the trigger element — the user
- * has to hover before the card opens anyway (delay=300ms), so by the time the
- * popup appears the fetch is already in flight or done.
- */
-
-type LoadState = "idle" | "loading" | "done";
-
-export function MentionHoverCard({ id, label, fetchUser }: MentionHoverCardProps) {
+export function MentionHoverCard({
+	id,
+	label,
+	fetchUser,
+}: MentionHoverCardProps) {
 	const [user, setUser] = useState<MentionUser | null>(null);
-	const loadStateRef = useRef<LoadState>("idle");
+	const [isLoading, setIsLoading] = useState(false);
+	const hasFetched = useRef(false);
 
-	// Guard: literal "undefined" can leak from legacy stored content
 	const safeLabel = label && label !== "undefined" ? label : id;
 
-	const handleMouseEnter = () => {
-		// Only fetch once, only if a loader was provided
-		if (loadStateRef.current !== "idle" || !fetchUser) return;
-		loadStateRef.current = "loading";
+	const handleOpenChange = (open: boolean) => {
+		if (!open || hasFetched.current || !fetchUser) return;
+		hasFetched.current = true;
+		setIsLoading(true);
 		fetchUser(id)
-			.then((data) => {
-				setUser(data);
-				loadStateRef.current = "done";
-			})
-			.catch(() => {
-				loadStateRef.current = "done";
-			});
+			.then((data) => setUser(data))
+			.catch(() => {})
+			.finally(() => setIsLoading(false));
 	};
 
 	const displayName = user?.displayName ?? safeLabel;
 	const username = user?.username ?? safeLabel;
 	const initial = displayName[0]?.toUpperCase() ?? "?";
-	const isLoading = !user && loadStateRef.current === "loading";
 
 	return (
-		<HoverCard>
-			{/*
-			 * Base UI HoverCard uses the `render` prop (not `asChild`) to replace
-			 * the host element. This forwards all trigger event handlers onto our
-			 * <a> so ONE element exists in the DOM.
-			 *
-			 * delay: 300ms before opening — gives the fetch time to start.
-			 * closeDelay: 150ms before closing — prevents flicker when cursor
-			 *             moves from trigger to card content.
-			 */}
+		<HoverCard onOpenChange={handleOpenChange}>
 			<HoverCardTrigger
-				delay={300}
-				closeDelay={150}
-				render={
+				delay={400}
+				closeDelay={200}
+				render={(props) => (
 					<a
+						{...props}
 						href={`/u/${id}`}
-						className="tiptap-mention"
+						className="tiptap-mention cursor-pointer"
 						data-mention-id={id}
 						data-mention-label={safeLabel}
-						onMouseEnter={handleMouseEnter}
 						onClick={(e) => e.preventDefault()}
 					>
 						@{safeLabel}
 					</a>
-				}
+				)}
 			/>
 
-			<HoverCardContent side="top" align="start" className="w-64 p-3">
+			{/* Added z-[100] to ensure it shows over the prose block */}
+			<HoverCardContent side="top" align="start" className="w-64 p-3 z-[100]">
 				{isLoading ? (
 					<div className="flex items-center gap-3">
 						<Skeleton className="h-10 w-10 rounded-full shrink-0" />
