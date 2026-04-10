@@ -98,6 +98,7 @@ function Dev() {
 				<RichEditor
 					fetchMentionUsers={fetchMentionUsers}
 					onUpdate={handleUpdate}
+					maxChars={800}
 					placeholder="Write something… type @ to mention someone"
 				/>
 			</div>
@@ -110,6 +111,7 @@ function Dev() {
 					<RichRenderer
 						content={editorJson}
 						fetchMentionUser={mockFetchMentionUser}
+						readMore
 					/>
 				</div>
 			)}
