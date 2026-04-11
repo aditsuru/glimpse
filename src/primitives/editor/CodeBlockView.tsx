@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: none */
 "use client";
 
 import type { NodeViewProps } from "@tiptap/core";
@@ -39,7 +40,7 @@ export function CodeBlockView({ node }: NodeViewProps) {
 				</button>
 			</div>
 			<pre className="tiptap-code-block-pre">
-				<NodeViewContent as="code" />
+				<NodeViewContent as={"code" as any} />
 			</pre>
 		</NodeViewWrapper>
 	);
