@@ -9,22 +9,6 @@ export const SignInSchema = z.object({
 
 export const SignUpSchema = z
 	.object({
-		name: z
-			.string({ error: "Name is required" })
-			.min(1, "Name is required")
-			.min(3, "Name is too short")
-			.max(32, "Name is too long")
-			.regex(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces"),
-		username: z
-			.string({ error: "Username is required" })
-			.min(1, "Username is required")
-			.min(6, "Username is too short")
-			.max(32, "Username is too long")
-			.regex(/^[a-zA-Z]/, "Username must start with a letter")
-			.regex(
-				/^[a-zA-Z0-9_.]+$/,
-				"Username can only contain letters, numbers, underscores, and periods"
-			),
 		email: z.email("Email must be valid"),
 		password: z
 			.string({ error: "Password is required" })

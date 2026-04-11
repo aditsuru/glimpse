@@ -8,13 +8,13 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 
-export const followersTable = pgTable(
-	"followers",
+export const blocksTable = pgTable(
+	"blocks",
 	{
-		followerId: text("follower_id")
+		blockerId: text("blocker_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		followingId: text("following_id")
+		blockedId: text("blocked_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		createdAt: timestamp("created_at", { withTimezone: true })
@@ -22,11 +22,11 @@ export const followersTable = pgTable(
 			.notNull(),
 	},
 	(table) => [
-		primaryKey({ columns: [table.followerId, table.followingId] }),
-		index("followers_follower_id_idx").on(table.followerId),
-		index("followers_following_id_idx").on(table.followingId),
+		primaryKey({ columns: [table.blockerId, table.blockedId] }),
+		index("blockers_blocker_id_idx").on(table.blockerId),
+		index("blockers_blocked_id_idx").on(table.blockedId),
 	]
 );
 
-export type Follower = InferSelectModel<typeof followersTable>;
-export type NewFollower = InferInsertModel<typeof followersTable>;
+export type Block = InferSelectModel<typeof blocksTable>;
+export type NewBlock = InferInsertModel<typeof blocksTable>;
