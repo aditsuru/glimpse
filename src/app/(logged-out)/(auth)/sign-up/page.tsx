@@ -95,11 +95,10 @@ export default function SignUp() {
 							className="flex flex-col items-center gap-2 font-medium"
 						>
 							<div className="flex items-center justify-center rounded-md">
-								<Avatar size="lg">
+								<Avatar className="after:border-none! size-12">
 									<AvatarImage
 										src={`${config.NEXT_PUBLIC_APP_URL}/static/logo.png`}
 										alt="Glimpse"
-										className="grayscale"
 									/>
 									<AvatarFallback>G</AvatarFallback>
 								</Avatar>
