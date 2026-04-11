@@ -1,6 +1,7 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
 	index,
+	integer,
 	pgEnum,
 	pgTable,
 	text,
@@ -20,6 +21,7 @@ export const attachmentsTable = pgTable(
 			.notNull()
 			.references(() => postsTable.id, { onDelete: "cascade" }),
 		fileType: attachmentTypeEnum("type").notNull(),
+		position: integer("position").default(1).notNull(),
 		fileUrl: text("file_url").notNull(),
 		fileKey: text("file_key").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })

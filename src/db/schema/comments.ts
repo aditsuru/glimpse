@@ -16,7 +16,7 @@ export const commentsTable = pgTable(
 		id: text("id")
 			.$defaultFn(() => nanoid(10))
 			.primaryKey(),
-		userId: text("user_id")
+		authorId: text("author_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		postId: text("post_id")
@@ -36,7 +36,7 @@ export const commentsTable = pgTable(
 			.notNull(),
 	},
 	(table) => [
-		index("comments_user_id_idx").on(table.userId),
+		index("comments_user_id_idx").on(table.authorId),
 		index("comments_post_id_idx").on(table.postId),
 		index("comments_parent_comment_id_idx").on(table.parentCommentId),
 	]

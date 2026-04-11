@@ -33,7 +33,6 @@ export default function SignUp() {
 		const errorParam = searchParams.get("error");
 		if (errorParam) {
 			toast.error("Authentication failed. Please try again.");
-
 			pageRouter.replace("/sign-up");
 		}
 	}, [searchParams, pageRouter]);
@@ -44,8 +43,6 @@ export default function SignUp() {
 			email: "",
 			password: "",
 			confirmPassword: "",
-			username: "",
-			name: "",
 		},
 		mode: "onTouched",
 		reValidateMode: "onChange",
@@ -61,8 +58,7 @@ export default function SignUp() {
 		const { error, data } = await authClient.signUp.email({
 			email: formData.email,
 			password: formData.password,
-			name: formData.name,
-			username: formData.username,
+			name: formData.email.split("@")[0],
 		});
 
 		if (error) {
@@ -114,20 +110,6 @@ export default function SignUp() {
 						</FieldDescription>
 					</div>
 					<FieldGroup onFocusCapture={() => clearErrors("root")}>
-						<InputController
-							control={form.control}
-							name="name"
-							type="text"
-							formState={form.formState}
-							label="Your Name"
-						/>
-						<InputController
-							control={form.control}
-							name="username"
-							type="text"
-							formState={form.formState}
-							label="Username"
-						/>
 						<InputController
 							control={form.control}
 							name="email"

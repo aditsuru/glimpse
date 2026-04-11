@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import InputController from "@/components/form/InputController";
-import TechStack from "@/components/misc/TechStack";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -166,9 +165,6 @@ export default function SignIn() {
 					/>
 				</FieldGroup>
 			</form>
-			<div className="hidden sm:block">
-				<TechStack />
-			</div>
 		</div>
 	);
 }
