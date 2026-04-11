@@ -1,12 +1,5 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import {
-	boolean,
-	index,
-	integer,
-	pgTable,
-	text,
-	timestamp,
-} from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { user } from "./auth-schema";
 
@@ -16,12 +9,11 @@ export const postsTable = pgTable(
 		id: text("id")
 			.$defaultFn(() => nanoid(10))
 			.primaryKey(),
-		userId: text("user_id")
+		authorId: text("author_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		body: text("body"),
 		hasAttachments: boolean("has_attachments").default(false).notNull(),
-		views: integer("views").default(0).notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),
@@ -30,7 +22,7 @@ export const postsTable = pgTable(
 			.$onUpdate(() => new Date())
 			.notNull(),
 	},
-	(table) => [index("posts_user_id_idx").on(table.userId)]
+	(table) => [index("posts_user_id_idx").on(table.authorId)]
 );
 
 export type Post = InferSelectModel<typeof postsTable>;

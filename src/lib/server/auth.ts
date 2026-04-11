@@ -1,23 +1,14 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { generateFromEmail } from "unique-username-generator";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
+import { profilesTable } from "@/db/schema";
 import { sendResetPasswordEmail, sendVerificationEmail } from "@/emails/email";
 import { config } from "@/lib/shared/config";
 import { redis } from "./redis";
 
 export const auth = betterAuth({
-	user: {
-		additionalFields: {
-			username: {
-				type: "string",
-				required: true,
-				unique: true,
-			},
-		},
-	},
-
 	rateLimit: {
 		window: config.AUTH_RATE_LIMIT_WINDOW,
 		max: config.AUTH_RATE_LIMIT_MAX,
@@ -42,8 +33,16 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		sendResetPassword: async ({ user, url }) => {
+			const profile = await db
+				.select({
+					username: profilesTable.username,
+				})
+				.from(profilesTable)
+				.where(eq(profilesTable.userId, user.id))
+				.limit(1);
+
 			await sendResetPasswordEmail({
-				username: user.name,
+				username: profile[0].username,
 				to: user.email,
 				resetPasswordUrl: url,
 			});
@@ -55,7 +54,6 @@ export const auth = betterAuth({
 		autoSignInAfterVerification: true,
 		sendVerificationEmail: async ({ user, url }) => {
 			sendVerificationEmail({
-				username: user.name,
 				to: user.email,
 				verificationUrl: url,
 			});
@@ -66,16 +64,10 @@ export const auth = betterAuth({
 		github: {
 			clientId: config.GITHUB_CLIENT_ID,
 			clientSecret: config.GITHUB_CLIENT_SECRET,
-			mapProfileToUser: (profile) => ({
-				username: generateFromEmail(profile.email, 3),
-			}),
 		},
 		google: {
 			clientId: config.GOOGLE_CLIENT_ID,
 			clientSecret: config.GOOGLE_CLIENT_SECRET,
-			mapProfileToUser: (profile) => ({
-				username: generateFromEmail(profile.email, 3),
-			}),
 		},
 	},
 

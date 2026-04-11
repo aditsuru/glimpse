@@ -16,7 +16,6 @@ import {
 } from "@react-email/components";
 
 interface GlimpseVerifyEmailProps {
-	username: string;
 	userEmail: string;
 	verificationUrl: string;
 }
@@ -24,7 +23,6 @@ interface GlimpseVerifyEmailProps {
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const GlimpseVerifyEmail = ({
-	username,
 	userEmail,
 	verificationUrl,
 }: GlimpseVerifyEmailProps) => {
@@ -54,7 +52,7 @@ export const GlimpseVerifyEmail = ({
 							Verify your account on <strong>Glimpse</strong>
 						</Heading>
 						<Text className="text-[14px] text-black leading-[24px]">
-							Hello {username},
+							Hello,
 						</Text>
 						<Text className="text-[14px] text-black leading-[24px]">
 							We're thrilled to have you on <strong>Glimpse</strong>. Before you
@@ -98,7 +96,6 @@ export const GlimpseVerifyEmail = ({
 };
 
 GlimpseVerifyEmail.PreviewProps = {
-	username: "alanturing",
 	userEmail: "alan.turing@example.com",
 	verificationUrl: "https://glimpse.app/verify",
 } as GlimpseVerifyEmailProps;
