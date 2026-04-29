@@ -26,7 +26,7 @@ export async function sendResetPasswordEmail({
 	resetPasswordUrl,
 }: {
 	to: string;
-	username: string;
+	username?: string;
 	resetPasswordUrl: string;
 }) {
 	await resend.emails.send({

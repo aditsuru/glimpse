@@ -32,7 +32,7 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		sendResetPassword: async ({ user, url }) => {
-			const profile = await db
+			const [profile] = await db
 				.select({
 					username: profilesTable.username,
 				})
@@ -41,7 +41,7 @@ export const auth = betterAuth({
 				.limit(1);
 
 			await sendResetPasswordEmail({
-				username: profile[0].username,
+				username: profile?.username,
 				to: user.email,
 				resetPasswordUrl: url,
 			});
