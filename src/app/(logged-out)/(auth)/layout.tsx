@@ -2,7 +2,7 @@ import Link from "next/link";
 import TechStack from "@/components/misc/TechStack";
 import { FieldDescription, FieldGroup } from "@/components/ui/field";
 
-function AuthLayout({
+async function AuthLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;

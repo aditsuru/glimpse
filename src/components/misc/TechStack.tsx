@@ -21,7 +21,6 @@ const techStack: TechItem[] = [
 	{
 		label: "TypeScript",
 		url: "typescript",
-		size: 34,
 	},
 	{
 		label: "Next.js",
@@ -34,7 +33,6 @@ const techStack: TechItem[] = [
 	{
 		label: "shadcn/ui",
 		url: "dark/shadcn-ui",
-		size: 34,
 	},
 	{
 		label: "TanStack",
@@ -51,12 +49,10 @@ const techStack: TechItem[] = [
 	{
 		label: "Better-Auth",
 		url: "dark/better-auth",
-		size: 34,
 	},
 	{
 		label: "Neon",
 		url: "neon",
-		size: 34,
 	},
 
 	{
@@ -78,7 +74,6 @@ const techStack: TechItem[] = [
 	{
 		label: "Upstash",
 		url: "upstash",
-		size: 34,
 	},
 ];
 
@@ -86,18 +81,16 @@ function TechStack() {
 	return (
 		<div>
 			<FieldSeparator>Built with</FieldSeparator>
-			<div className="flex flex-wrap items-center justify-between py-6 gap-4">
+			<div className="flex flex-wrap items-center justify-between my-6 gap-4">
 				{techStack.map((item) => {
-					const iconSize = item.size ?? 38;
-
 					return (
 						<Tooltip key={item.label}>
 							<TooltipTrigger
 								render={
 									<Image
 										src={`https://assets.aditsuru.com/icons/${item.url}.svg`}
-										width={iconSize}
-										height={iconSize}
+										width={38}
+										height={38}
 										alt={item.label}
 										priority
 										className="w-[38px] h-[38px]"

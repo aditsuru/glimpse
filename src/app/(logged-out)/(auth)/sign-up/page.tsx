@@ -17,14 +17,24 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/client/utils";
 import OAuth from "../OAuth";
 
-const FormSchema = z.object({
-	email: z.email("Email must be valid"),
-	password: z
-		.string({ error: "Password is required" })
-		.nonempty("Password is required"),
-});
+const FormSchema = z
+	.object({
+		email: z.email("Email must be valid"),
+		password: z
+			.string({ error: "Password is required" })
+			.min(8, "Password must be 8 characters long")
+			.regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+			.regex(/[0-9]/, "Password must contain at least one number"),
+		confirmPassword: z
+			.string({ error: "Confirm password is required" })
+			.min(1, "Confirm password is required"),
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords don't match",
+		path: ["confirmPassword"],
+	});
 
-const SignIn = () => {
+const SignUp = () => {
 	const { formState, handleSubmit, control } = useForm<
 		z.infer<typeof FormSchema>
 	>({
@@ -34,6 +44,7 @@ const SignIn = () => {
 		defaultValues: {
 			email: "",
 			password: "",
+			confirmPassword: "",
 		},
 	});
 
@@ -57,12 +68,12 @@ const SignIn = () => {
 							formState.isSubmitting,
 					})}
 				>
-					Don't have an account?{" "}
+					Already have an account?{" "}
 					<Link
-						href="/sign-up"
+						href="/sign-in"
 						className="underline underline-offset-4 hover:text-primary"
 					>
-						Sign up
+						Sign in
 					</Link>
 				</p>
 			</div>
@@ -94,41 +105,50 @@ const SignIn = () => {
 									</Field>
 								)}
 							/>
-							{/* Password */}
-							<Controller
-								name="password"
-								control={control}
-								render={({ field, fieldState }) => (
-									<Field data-invalid={fieldState.invalid}>
-										<div className="flex justify-between">
+							<FieldGroup className="flex flex-row gap-4">
+								{/* Password */}
+								<Controller
+									name="password"
+									control={control}
+									render={({ field, fieldState }) => (
+										<Field data-invalid={fieldState.invalid}>
 											<FieldLabel htmlFor={field.name}>Password</FieldLabel>
 
-											<Link
-												className={cn(
-													"text-sm text-muted-foreground underline underline-offset-4 hover:text-primary",
-													{
-														"pointer-events-none text-muted-foreground/60":
-															formState.isSubmitting,
-													}
-												)}
-												href="/forgot-password"
-											>
-												Forgot password?
-											</Link>
-										</div>
+											<Input
+												{...field}
+												id={field.name}
+												aria-invalid={fieldState.invalid}
+												type="password"
+												autoComplete="password"
+											/>
 
-										<Input
-											{...field}
-											id={field.name}
-											aria-invalid={fieldState.invalid}
-											type="password"
-											autoComplete="password"
-										/>
+											<FieldError errors={[fieldState.error]} />
+										</Field>
+									)}
+								/>
+								{/* Confirm Password */}
+								<Controller
+									name="confirmPassword"
+									control={control}
+									render={({ field, fieldState }) => (
+										<Field data-invalid={fieldState.invalid}>
+											<FieldLabel htmlFor={field.name}>
+												Confirm Password
+											</FieldLabel>
 
-										<FieldError errors={[fieldState.error]} />
-									</Field>
-								)}
-							/>
+											<Input
+												{...field}
+												id={field.name}
+												aria-invalid={fieldState.invalid}
+												type="password"
+												autoComplete="password"
+											/>
+
+											<FieldError errors={[fieldState.error]} />
+										</Field>
+									)}
+								/>
+							</FieldGroup>
 							<Button type="submit" disabled={formState.isSubmitting}>
 								{formState.isSubmitting ? <Spinner /> : "Sign In"}
 							</Button>
@@ -141,4 +161,4 @@ const SignIn = () => {
 	);
 };
 
-export default SignIn;
+export default SignUp;
