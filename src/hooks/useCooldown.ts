@@ -10,7 +10,14 @@ export function useCooldown(storageKey: string, cooldownMs: number) {
 			return;
 		}
 
-		const remaining = Math.ceil((parseInt(stored, 10) - Date.now()) / 1000);
+		const parsed = parseInt(stored, 10);
+		if (Number.isNaN(parsed)) {
+			localStorage.removeItem(storageKey);
+			setSecondsLeft(0);
+			return;
+		}
+
+		const remaining = Math.ceil((parsed - Date.now()) / 1000);
 		if (remaining <= 0) {
 			localStorage.removeItem(storageKey);
 			setSecondsLeft(0);
