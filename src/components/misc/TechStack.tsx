@@ -1,4 +1,3 @@
-import { SiGithub } from "@icons-pack/react-simple-icons";
 import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -113,7 +112,13 @@ function TechStack() {
 					rel="noopener noreferrer"
 				>
 					<Button variant="ghost" type="button" className="shrink-0">
-						<SiGithub className="size-5" />
+						<Image
+							src={"https://assets.aditsuru.com/icons/dark/github.svg"}
+							width={18}
+							height={18}
+							alt="Github icon"
+							priority
+						/>
 						GitHub
 						<ExternalLink className="size-3.5" />
 					</Button>

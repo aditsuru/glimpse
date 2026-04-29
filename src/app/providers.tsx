@@ -34,7 +34,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
 				disableTransitionOnChange
 			>
 				<TooltipProvider>{children}</TooltipProvider>
-				<Toaster className="z-100!" />
+				<Toaster
+					className="z-100!"
+					toastOptions={{
+						className: "bg-background!",
+						classNames: {
+							error: "text-destructive! border-destructive/40!",
+							success: "text-success! border-success/40!",
+						},
+					}}
+				/>
 			</NextThemesProvider>
 		</QueryClientProvider>
 	);
