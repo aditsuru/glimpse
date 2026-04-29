@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ScrollRootContext } from "@/store/scroll-root-context";
+import { ScrollRootContext } from "./scroll-root-context";
 
 interface ScrollContainerProps {
 	children: React.ReactNode;

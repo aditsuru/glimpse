@@ -44,14 +44,15 @@ export const GlimpseResetPasswordEmail = ({
 						<Section className="mt-[32px]">
 							<Img
 								src={`${baseUrl}/static/logo.png`}
-								width="40"
-								height="37"
+								width="80"
+								height="80"
 								alt="Glimpse Logo"
 								className="mx-auto my-0"
 							/>
 						</Section>
-						<Heading className="mx-0 my-[30px] p-0 text-center font-normal text-[24px] text-black">
-							Reset your password for <strong>Glimpse</strong>
+						<Heading className="mx-0 my-[30px] p-0 text-center font-semibold text-[24px] text-black">
+							Reset your password for{" "}
+							<strong className="text-primary">Glimpse</strong>
 						</Heading>
 						<Text className="text-[14px] text-black leading-[24px]">
 							Hello {username},

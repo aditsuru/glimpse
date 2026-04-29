@@ -7,9 +7,9 @@ export const redis = new Redis({
 });
 
 export const REDIS_KEYS = {
-	POST_SEEN: (userId: string) => `${config.REDIS_PREFIX}:post:seen:${userId}`,
-	VIEWS_COUNT: (postId: string) =>
-		`${config.REDIS_PREFIX}:post:views:${postId}`,
-	SYNC_PENDING_VIEWS_LIST: () => `${config.REDIS_PREFIX}:sync:pending:views`,
-	RATE_LIMIT: (ip: string) => `${config.REDIS_PREFIX}:ratelimit:auth:${ip}`,
+	FROM_KEY: (key: string) => `${config.NODE_ENV}:${key}`,
+	POST_SEEN: (userId: string) => `${config.NODE_ENV}:post:seen:${userId}`,
+	VIEWS_COUNT: (postId: string) => `${config.NODE_ENV}:post:views:${postId}`,
+	SYNC_PENDING_VIEWS_LIST: () => `${config.NODE_ENV}:sync:pending:views`,
+	RATE_LIMIT: (ip: string) => `${config.NODE_ENV}:ratelimit:auth:${ip}`,
 };

@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { profilesTable } from "@/db/schema";
 import { sendResetPasswordEmail, sendVerificationEmail } from "@/emails/email";
 import { config } from "@/lib/shared/config";
-import { redis } from "./redis";
+import { REDIS_KEYS, redis } from "./redis";
 
 export const auth = betterAuth({
 	rateLimit: {
@@ -16,17 +16,16 @@ export const auth = betterAuth({
 
 	secondaryStorage: {
 		get: async (key) => {
-			const value = await redis.get(`${config.REDIS_PREFIX}:${key}`);
+			const value = await redis.get(REDIS_KEYS.FROM_KEY(key));
 			if (!value) return null;
 			return typeof value === "object" ? JSON.stringify(value) : String(value);
 		},
 		set: async (key, value, ttl) => {
-			if (ttl)
-				await redis.set(`${config.REDIS_PREFIX}:${key}`, value, { ex: ttl });
-			else await redis.set(`${config.REDIS_PREFIX}:${key}`, value);
+			if (ttl) await redis.set(REDIS_KEYS.FROM_KEY(key), value, { ex: ttl });
+			else await redis.set(REDIS_KEYS.FROM_KEY(key), value);
 		},
 		delete: async (key) => {
-			await redis.del(`${config.REDIS_PREFIX}:${key}`);
+			await redis.del(REDIS_KEYS.FROM_KEY(key));
 		},
 	},
 

@@ -16,12 +16,16 @@ import {
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/client/utils";
 
-interface ImageInterface {
-	fileUrl: string;
-	fileType: "image" | "gif";
+export interface CarouselImage {
+	src: string;
+	alt?: string;
+	unoptimized?: boolean; // pass true for GIFs
+	width?: number; // defaults to 0 (CSS-sized via className)
+	height?: number; // defaults to 0 (CSS-sized via className)
 }
+
 interface CarouselControlsProps {
-	images: ImageInterface[];
+	images: CarouselImage[];
 	current: number;
 	scrollTo: (index: number) => void;
 }
@@ -36,12 +40,11 @@ function CarouselControls({
 
 	return (
 		<>
-			{/* Navigation Buttons */}
 			{canScrollPrev && (
 				<Button
 					variant="outline"
 					size="icon"
-					className="absolute left-2 top-1/2 rounded-full z-10 border-none bg-white! text-black! backdrop-blur-sm"
+					className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full z-10 border-none bg-black/30 text-white backdrop-blur-md hover:bg-black/50"
 					onClick={(e) => {
 						e.stopPropagation();
 						scrollPrev();
@@ -55,7 +58,7 @@ function CarouselControls({
 				<Button
 					variant="outline"
 					size="icon"
-					className="absolute right-2 top-1/2 rounded-full z-10 border-none bg-white! text-black! backdrop-blur-sm"
+					className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full z-10 border-none bg-black/30 text-white backdrop-blur-md hover:bg-black/50"
 					onClick={(e) => {
 						e.stopPropagation();
 						scrollNext();
@@ -66,12 +69,12 @@ function CarouselControls({
 				</Button>
 			)}
 
-			{/* Pagination Dots - Inside Aspect Ratio */}
+			{/* Pagination dots */}
 			<div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
 				{images.map((image, i) => (
 					<button
 						type="button"
-						key={image.fileUrl}
+						key={image.src}
 						onClick={(e) => {
 							e.stopPropagation();
 							scrollTo(i);
@@ -89,29 +92,30 @@ function CarouselControls({
 }
 
 interface ImageCarouselProps {
-	images: ImageInterface[];
+	images: CarouselImage[];
 	spoiler?: boolean;
-	aspectRatio?: number;
+	ratio?: number;
+	className?: string;
+	imageClassName?: string;
 }
 
 export function ImageCarousel({
 	images,
 	spoiler = false,
-	aspectRatio = 16 / 9,
+	ratio = 16 / 9,
+	className,
+	imageClassName,
 }: ImageCarouselProps) {
 	const [current, setCurrent] = React.useState(0);
 	const [api, setApi] = React.useState<CarouselApi>();
-
 	const [spoilerRevealed, setSpoilerRevealed] = React.useState(!spoiler);
+
 	const showSpoiler = spoiler && !spoilerRevealed;
 
 	React.useEffect(() => {
 		if (!api) return;
 		const onSelect = () => setCurrent(api.selectedScrollSnap());
-		api.on("select", () => {
-			setCurrent(api.selectedScrollSnap());
-		});
-
+		api.on("select", onSelect);
 		return () => {
 			api.off("select", onSelect);
 		};
@@ -122,36 +126,39 @@ export function ImageCarousel({
 	return (
 		<div className="w-full group/carousel">
 			<AspectRatio
-				ratio={aspectRatio}
-				className="relative overflow-hidden rounded-lg border bg-muted"
+				ratio={ratio}
+				className={cn(
+					"relative overflow-hidden rounded-lg border bg-muted",
+					className
+				)}
 			>
 				<Carousel setApi={setApi} className="w-full h-full">
 					<CarouselContent className="h-full ml-0">
 						{images.map((image, index) => (
-							<CarouselItem
-								key={image.fileUrl}
-								className="relative pl-0 h-full"
-							>
+							<CarouselItem key={image.src} className="relative pl-0 h-full">
 								<Image
-									src={image.fileUrl}
-									alt="Post content"
-									width={0}
-									height={0}
+									src={image.src}
+									alt={image.alt ?? ""}
+									width={image.width ?? 1600}
+									height={image.height ?? Math.round(1600 / ratio)}
 									sizes="100vw"
 									priority={index === 0}
-									className="w-full h-full object-cover transition-[filter] duration-300 ease-in-out"
+									unoptimized={image.unoptimized}
+									className={cn(
+										"w-full h-full object-cover transition-[filter] duration-300 ease-in-out",
+										imageClassName
+									)}
 									style={{
 										filter: showSpoiler
 											? "blur(40px) brightness(0.6) saturate(0.6)"
 											: "none",
 									}}
-									unoptimized={image.fileType === "gif"}
 								/>
 							</CarouselItem>
 						))}
 					</CarouselContent>
 
-					{/* ── Spoiler overlay ───────────────────────────────────────────────────── */}
+					{/* Spoiler overlay */}
 					{showSpoiler && (
 						<div
 							className="absolute inset-0 z-20 flex items-center justify-center"
@@ -173,7 +180,7 @@ export function ImageCarousel({
 						</div>
 					)}
 
-					{/* ── Spoiler re-hide button ────────────────────────────────────────────── */}
+					{/* Spoiler re-hide button */}
 					{spoiler && spoilerRevealed && (
 						<button
 							type="button"
@@ -181,14 +188,13 @@ export function ImageCarousel({
 								e.stopPropagation();
 								setSpoilerRevealed(false);
 							}}
-							className="absolute top-2 left-2 z-20 text-white p-1.5 rounded-full hover:bg-white/10 transition-colors pointer-events-auto"
+							className="absolute top-2 left-2 z-20 text-white p-1.5 rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 transition-colors pointer-events-auto"
 							aria-label="Hide spoiler"
 						>
 							<EyeOff size={20} />
 						</button>
 					)}
 
-					{/* Only show carousel controls if the spoiler is revealed/inactive */}
 					{images.length > 1 && !showSpoiler && (
 						<CarouselControls
 							images={images}
