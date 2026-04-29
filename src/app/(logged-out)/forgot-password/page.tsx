@@ -81,7 +81,7 @@ const ForgotPassword = () => {
 						</Button>
 					</div>
 					<CardTitle className={cn({ "text-muted-foreground": isLoading })}>
-						Reset Password
+						Forgot your password?
 					</CardTitle>
 					<CardDescription
 						className={cn({ "text-muted-foreground/60": isLoading })}
