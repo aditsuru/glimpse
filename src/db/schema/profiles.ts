@@ -11,7 +11,7 @@ import {
 import { PROFILE_TYPES } from "@/lib/shared/constants";
 import { user } from "./auth-schema";
 
-const profileTypeEnum = pgEnum("profile_type", PROFILE_TYPES);
+export const profileTypeEnum = pgEnum("profile_type", PROFILE_TYPES);
 
 export const profilesTable = pgTable(
 	"profiles",
