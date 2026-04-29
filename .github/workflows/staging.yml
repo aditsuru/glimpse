@@ -7,6 +7,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Define Vercel IDs at the job level so all Vercel CLI steps inherit them
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.STAGING_VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -29,13 +33,15 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
           NODE_OPTIONS: "--experimental-vm-modules"
 
-      - name: Deploy to Vercel Staging
-        run: |
-          bunx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-          bunx vercel env pull .env --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-          cat .env >> $GITHUB_ENV
-          bunx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-          bunx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.STAGING_VERCEL_PROJECT_ID }}
+      # --- START OF VERCEL ARTICLE PATTERN ---
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
