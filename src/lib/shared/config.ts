@@ -3,30 +3,20 @@ import ms, { type StringValue } from "ms";
 import { z } from "zod";
 
 /** Parse a human-readable time string (e.g. "5m", "10s") into milliseconds */
-const msMs = z.string().transform((val, ctx) => {
-	const result = ms(val as StringValue);
-	if (result === undefined || Number.isNaN(result)) {
-		ctx.addIssue({
-			code: "custom",
-			message: "Invalid time string (e.g. '5m', '10s')",
-		});
-		return z.NEVER;
-	}
-	return result;
-});
+const msMs = z
+	.string()
+	.transform((val) => ms(val as StringValue))
+	.refine((val) => !Number.isNaN(val), {
+		message: "Invalid time string (e.g. '5m', '10s')",
+	});
 
 /** Same but outputs seconds (for Better Auth which wants seconds) */
-const msSec = z.string().transform((val, ctx) => {
-	const result = ms(val as StringValue);
-	if (result === undefined || Number.isNaN(result)) {
-		ctx.addIssue({
-			code: "custom",
-			message: "Invalid time string (e.g. '5m', '10s')",
-		});
-		return z.NEVER;
-	}
-	return result / 1000;
-});
+const msSec = z
+	.string()
+	.transform((val) => ms(val as StringValue) / 1000)
+	.refine((val) => !Number.isNaN(val), {
+		message: "Invalid time string (e.g. '5m', '10s')",
+	});
 
 export const config = createEnv({
 	server: {
