@@ -100,6 +100,7 @@ function TechStack() {
 										height={iconSize}
 										alt={item.label}
 										priority
+										className="w-[38px] h-[38px]"
 									/>
 								}
 							/>

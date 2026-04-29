@@ -32,7 +32,6 @@ export const config = createEnv({
 		UPSTASH_REDIS_REST_URL: z.url(),
 		UPSTASH_REDIS_REST_TOKEN: z.string(),
 		REDIS_FEED_SEEN_MAX_ITEMS: z.coerce.number().positive().default(500),
-		REDIS_PREFIX: z.string().default("dev"),
 
 		// ── Storage ───────────────────────────────────────────────────
 		// Local dev: set S3_ENDPOINT to MinIO URL (http://localhost:9000)

@@ -1,22 +1,21 @@
-import { ScrollContainer } from "@/components/layout/ScrollContainer";
-import { ImageCarousel } from "@/primitives/ImageCarousel";
-import { VideoPlayer } from "@/primitives/VideoPlayer";
+import { type CarouselImage, ImageCarousel } from "@/components/ImageCarousel";
+import { ScrollContainer, VideoPlayer } from "@/components/VideoPlayer";
 
 const videosPair1 = ["video4", "video2", "video8"];
 const videosPair2 = ["video7", "video5", "video6"];
 const videosPair3 = ["video3", "video9", "video10", "video1"];
 
-const imagesPair2 = [
-	[
-		{
-			fileUrl: "/static/temp/image6.gif",
-			fileType: "gif" as const,
-		},
-		{
-			fileUrl: "/static/temp/image5.gif",
-			fileType: "gif" as const,
-		},
-	],
+const imagesPair2: CarouselImage[] = [
+	{
+		src: "/static/temp/image6.gif",
+		unoptimized: true,
+		alt: "image6",
+	},
+	{
+		src: "/static/temp/image5.gif",
+		unoptimized: true,
+		alt: "image6",
+	},
 ];
 
 function Dev() {
@@ -55,9 +54,8 @@ function Dev() {
 						autoPlayThreshold={0.8}
 					/>
 				))}
-				{imagesPair2.map((item) => (
-					<ImageCarousel images={item} key={item[0].fileUrl} />
-				))}
+
+				<ImageCarousel images={imagesPair2} />
 			</ScrollContainer>
 		</div>
 	);

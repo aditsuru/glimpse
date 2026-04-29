@@ -49,7 +49,7 @@ import {
 	VolumeX,
 } from "lucide-react";
 import * as React from "react";
-import { ScrollRootContext } from "@/store/scroll-root-context";
+import { cn } from "@/lib/client/utils";
 import { useMediaStore } from "@/store/use-media-store";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -77,6 +77,16 @@ function formatTime(s: number): string {
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
+
+/**
+ * Provides the scroll container element to VideoPlayer's IntersectionObserver.
+ * Without this, IO uses the viewport as root — videos inside overflow containers
+ * will autoplay/autopause at the wrong time.
+ *
+ * Usage: wrap every scrollable container with <ScrollContainer>.
+ */
+export const ScrollRootContext = React.createContext<HTMLElement | null>(null);
+
 interface VideoSliderProps {
 	value: number;
 	max: number;
@@ -608,13 +618,16 @@ export function VideoPlayer({
 	// ── Render ────────────────────────────────────────────────────────────────────
 
 	const wrapperStyle: React.CSSProperties = aspectRatio
-		? { aspectRatio: String(aspectRatio) }
+		? { aspectRatio: aspectRatio }
 		: {};
 
 	return (
 		<section
 			ref={containerRef}
-			className={`relative w-full bg-black rounded-lg overflow-hidden select-none ${className}`}
+			className={cn(
+				"relative w-full bg-black rounded-lg overflow-hidden select-none",
+				className
+			)}
 			style={wrapperStyle}
 			aria-label="Video player"
 			tabIndex={0}

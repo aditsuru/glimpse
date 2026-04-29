@@ -44,3 +44,6 @@ next-env.d.ts
 # Media
 *.mp4
 /public/static/temp
+
+# Scratchpad
+_scratchpad.md
