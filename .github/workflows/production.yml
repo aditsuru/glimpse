@@ -8,20 +8,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - uses: actions/cache@v5
+      - uses: actions/cache@v4
         with:
           path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -36,6 +32,7 @@ jobs:
       - name: Deploy to Vercel production
         run: |
           bunx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          bunx vercel env pull .env.production.local --environment=production --token=${{ secrets.VERCEL_TOKEN }}
           bunx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
           bunx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
