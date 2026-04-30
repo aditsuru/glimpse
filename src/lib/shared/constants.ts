@@ -11,6 +11,8 @@ export const ALLOWED_MIME_TYPES = {
 	],
 } as const;
 
+export const ALLOWED_FILE_TYPES = ["avatar", "banner", "attachment"];
+
 export const VIDEO_MIME_TYPES: string[] = ["video/mp4", "video/webm"];
 export const GIF_MIME_TYPE = "image/gif";
 

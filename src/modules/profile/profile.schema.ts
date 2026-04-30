@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { VisibilityEnum } from "@/db/schema";
+import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 
 export const profileSchema = {
 	get: {
@@ -27,6 +28,59 @@ export const profileSchema = {
 		}),
 		output: z.object({
 			available: z.boolean(),
+		}),
+	},
+
+	update: {
+		input: z.object({
+			username: z.string().optional(),
+			displayName: z.string().optional(),
+			pronouns: z.string().optional(),
+			bio: z.string().optional(),
+			visibility: z.enum(VisibilityEnum.enumValues).optional(),
+		}),
+		output: z.object({
+			success: z.boolean(),
+		}),
+	},
+
+	getAvatarPresignedUrl: {
+		input: z.object({
+			mimeType: z.enum(ALLOWED_MIME_TYPES.avatar),
+		}),
+		output: z.object({
+			presignedUrl: z.string(),
+			key: z.string(),
+		}),
+	},
+
+	getBannerPresignedUrl: {
+		input: z.object({
+			mimeType: z.enum(ALLOWED_MIME_TYPES.banner),
+		}),
+		output: z.object({
+			presignedUrl: z.string(),
+			key: z.string(),
+		}),
+	},
+
+	updateAvatar: {
+		input: z.object({
+			key: z.string(),
+			mimeType: z.enum(ALLOWED_MIME_TYPES.avatar),
+		}),
+		output: z.object({
+			success: z.boolean(),
+		}),
+	},
+
+	updateBanner: {
+		input: z.object({
+			key: z.string(),
+			mimeType: z.enum(ALLOWED_MIME_TYPES.banner),
+		}),
+		output: z.object({
+			success: z.boolean(),
 		}),
 	},
 };

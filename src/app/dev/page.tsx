@@ -1,8 +1,6 @@
 "use client";
 
-import { toast } from "sonner";
 import { type CarouselImage, ImageCarousel } from "@/components/ImageCarousel";
-import { Button } from "@/components/ui/button";
 import { ScrollContainer, VideoPlayer } from "@/components/VideoPlayer";
 
 const videosPair1 = ["video4", "video2", "video8"];
