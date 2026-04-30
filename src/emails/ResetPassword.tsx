@@ -55,7 +55,7 @@ export const GlimpseResetPasswordEmail = ({
 							<strong className="text-primary">Glimpse</strong>
 						</Heading>
 						<Text className="text-[14px] text-black leading-[24px]">
-							Hello {username ?? ""},
+							{`Hello${username ? ` ${username},` : ","}`}
 						</Text>
 						<Text className="text-[14px] text-black leading-[24px]">
 							We received a request to reset the password for the{" "}
