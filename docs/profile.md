@@ -19,6 +19,11 @@ What: Users have a profile created on signup. Viewable by others.
 - Other user's profile (no edit button)
 - Follow stats: NOT in this feature, stubbed as null/hidden
 
+### Pages
+
+- Profile sidebar in home
+- Profile view (/{username})
+
 ### Out of Scope (conscious decisions)
 
 - Follow counts on profile page → Follow feature
