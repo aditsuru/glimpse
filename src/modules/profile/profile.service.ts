@@ -12,11 +12,17 @@ export class ProfileService {
 		private userId: string
 	) {}
 
-	async get(): Promise<z.infer<typeof profileSchema.get.output>> {
+	async get({
+		username,
+	}: z.infer<typeof profileSchema.get.input>): Promise<
+		z.infer<typeof profileSchema.get.output>
+	> {
 		const [profile] = await this.db
 			.select()
 			.from(profilesTable)
-			.where(eq(profilesTable.userId, this.userId));
+			.where(eq(profilesTable.username, username))
+			.limit(1);
+
 		if (!profile)
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
@@ -27,6 +33,7 @@ export class ProfileService {
 			bio: profile.bio,
 			pronouns: profile.pronouns,
 			isGlimpseVerified: profile.isGlimpseVerified,
+			visibility: profile.visibility,
 			avatarUrl: profile.avatarKey
 				? constructPublicUrl({ key: profile.avatarKey }).publicUrl
 				: null,
@@ -37,6 +44,24 @@ export class ProfileService {
 			bannerMimeType: profile.bannerMimeType,
 			createdAt: profile.createdAt,
 			updatedAt: profile.updatedAt,
+		};
+	}
+
+	async isUsernameAvailable({
+		username,
+	}: z.infer<typeof profileSchema.isUsernameAvailable.input>): Promise<
+		z.infer<typeof profileSchema.isUsernameAvailable.output>
+	> {
+		const [result] = await this.db
+			.select({ username: profilesTable.username })
+			.from(profilesTable)
+			.where(eq(profilesTable.username, username))
+			.limit(1);
+
+		if (result) return { available: false };
+
+		return {
+			available: true,
 		};
 	}
 }
