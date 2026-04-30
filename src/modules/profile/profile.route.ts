@@ -16,8 +16,9 @@ const profileProcedure = authedProcedure.use(({ context, next }) => {
 
 export const profileRouter = base.router({
 	get: profileProcedure
+		.input(profileSchema.get.input)
 		.output(profileSchema.get.output)
-		.handler(async ({ context }) => {
-			return await context.profileService.get();
+		.handler(async ({ input, context }) => {
+			return await context.profileService.get({ ...input });
 		}),
 });
