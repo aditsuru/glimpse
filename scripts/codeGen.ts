@@ -19,7 +19,7 @@ fs.mkdirSync(componentsDir, { recursive: true });
 const files: Record<string, string> = {
 	[`${moduleName}.schema.ts`]: `import * as z from "zod"\n\nexport const ${moduleName}Schema = {}\n`,
 
-	[`${moduleName}.service.ts`]: `import type { db as DBType } from "@/drizzle/db"\n\nexport class ${pascal}Service {\n  constructor(\n    private db: typeof DBType,\n    private userId: string\n  ) {}\n}\n`,
+	[`${moduleName}.service.ts`]: `import type { db as DBType } from "@/db"\n\nexport class ${pascal}Service {\n  constructor(\n    private db: typeof DBType,\n    private userId: string\n  ) {}\n}\n`,
 
 	[`${moduleName}.route.ts`]: `import { base } from "@/server/os"\n\nexport const ${moduleName}Router = base.router({})\n`,
 
