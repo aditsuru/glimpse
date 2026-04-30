@@ -1,5 +1,9 @@
+"use client";
+
 import { type CarouselImage, ImageCarousel } from "@/components/ImageCarousel";
 import { ScrollContainer, VideoPlayer } from "@/components/VideoPlayer";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const videosPair1 = ["video4", "video2", "video8"];
 const videosPair2 = ["video7", "video5", "video6"];
