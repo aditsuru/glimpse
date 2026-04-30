@@ -14,7 +14,7 @@ export default async function AuthGuard({
 
 	if (session) {
 		const [profile] = await db
-			.select()
+			.select({ username: profilesTable.username })
 			.from(profilesTable)
 			.where(eq(profilesTable.userId, session.user.id));
 
