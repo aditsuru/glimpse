@@ -26,11 +26,11 @@ export const profileSchema = {
 		input: z.object({
 			username: z.string(),
 			displayName: z.string(),
-			avatarKey: z.string(),
-			avatarMimeType: z.enum(ALLOWED_MIME_TYPES.avatar),
+			avatarKey: z.string().optional(),
+			avatarMimeType: z.enum(ALLOWED_MIME_TYPES.avatar).optional(),
 		}),
 		output: z.object({
-			success: true,
+			success: z.boolean(),
 		}),
 	},
 
