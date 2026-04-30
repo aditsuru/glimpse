@@ -5,7 +5,7 @@ import { ORPCError } from "@orpc/client";
 import { PencilIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
@@ -29,14 +29,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { uploadToS3 } from "@/lib/client/upload-utils";
+import { useMediaUpload } from "@/hooks/useMediaUpload";
 import { cn } from "@/lib/client/utils";
-import {
-	ALLOWED_MIME_TYPES,
-	DEFAULT_PFP_URL,
-	isAllowedAvatarType,
-	MAX_FILE_SIZES,
-} from "@/lib/shared/constants";
+import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 import {
 	useGetAvatarPresignedUrl,
 	useIsUsernameAvailable,
@@ -64,26 +59,23 @@ const FormSchema = z.object({
 
 const Onboarding = () => {
 	const [isRedirecting, setIsRedirecting] = useState(false);
-	const [isUploading, setIsUploading] = useState(false);
 	const [usernameAvailable, setUsernameAvailable] = useState(false);
 	const [usernameError, setUsernameError] = useState<string | null>(null);
-	const [avatarTempKey, setAvatarTempKey] = useState<string | null>(null);
-	const [avatarMimeType, setAvatarMimeType] = useState<string | null>(null);
-	const [preview, setPreview] = useState<string>(DEFAULT_PFP_URL);
+
 	const router = useRouter();
-
-	const objectUrlRef = useRef<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
-
-	const getAvatarPresignedUrl = useGetAvatarPresignedUrl();
 	const isUsernameAvailable = useIsUsernameAvailable();
 	const onboard = useOnboard();
+	const getAvatarPresignedUrl = useGetAvatarPresignedUrl();
 
-	useEffect(() => {
-		return () => {
-			if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
-		};
-	}, []);
+	const { preview, tempKey, mimeType, isUploading, handleFileChange } =
+		useMediaUpload({
+			allowedMimeTypes: ALLOWED_MIME_TYPES.avatar,
+			getPresignedUrl: (mimeType) =>
+				getAvatarPresignedUrl.mutateAsync({
+					mimeType: mimeType as (typeof ALLOWED_MIME_TYPES.avatar)[number],
+				}),
+		});
 
 	const { formState, handleSubmit, control, setError, clearErrors } = useForm<
 		z.infer<typeof FormSchema>
@@ -111,62 +103,14 @@ const Onboarding = () => {
 		}
 	}, 500);
 
-	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) return;
-
-		// Validate type
-		if (!isAllowedAvatarType(file.type)) {
-			toast.error("Invalid file type");
-			return;
-		}
-
-		// Validate size
-		if (file.size > MAX_FILE_SIZES.image) {
-			toast.error("Image must be under 5MB");
-			return;
-		}
-
-		// Show preview immediately
-		const objectUrl = URL.createObjectURL(file);
-		if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
-		objectUrlRef.current = objectUrl;
-		setPreview(objectUrl);
-
-		// Start upload
-		setIsUploading(true);
-		try {
-			const { presignedUrl, key } = await getAvatarPresignedUrl.mutateAsync({
-				mimeType: file.type as
-					| "image/jpeg"
-					| "image/png"
-					| "image/webp"
-					| "image/gif",
-			});
-
-			await uploadToS3(presignedUrl, file);
-
-			setAvatarTempKey(key);
-			setAvatarMimeType(file.type);
-		} catch {
-			toast.error("Upload failed, please try again");
-			if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
-			objectUrlRef.current = null;
-			setPreview(DEFAULT_PFP_URL);
-		} finally {
-			setIsUploading(false);
-		}
-	};
-
 	const handleFormSubmit = async (formData: z.infer<typeof FormSchema>) => {
 		if (usernameError) return;
 		try {
 			await onboard.mutateAsync({
 				...formData,
-				avatarKey: avatarTempKey ?? undefined,
+				avatarKey: tempKey ?? undefined,
 				avatarMimeType:
-					(avatarMimeType as (typeof ALLOWED_MIME_TYPES.avatar)[number]) ??
-					undefined,
+					(mimeType as (typeof ALLOWED_MIME_TYPES.avatar)[number]) ?? undefined,
 			});
 			setIsRedirecting(true);
 			toast.success("Profile created successfully!");
