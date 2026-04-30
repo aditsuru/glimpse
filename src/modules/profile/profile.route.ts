@@ -29,6 +29,13 @@ export const profileRouter = base.router({
 			return await context.profileService.isUsernameAvailable({ ...input });
 		}),
 
+	onboard: profileProcedure
+		.input(profileSchema.onboard.input)
+		.output(profileSchema.onboard.output)
+		.handler(async ({ input, context }) => {
+			return await context.profileService.onboard({ ...input });
+		}),
+
 	update: profileProcedure
 		.input(profileSchema.update.input)
 		.output(profileSchema.update.output)

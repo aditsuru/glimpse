@@ -22,6 +22,18 @@ export const profileSchema = {
 		}),
 	},
 
+	onboard: {
+		input: z.object({
+			username: z.string(),
+			displayName: z.string(),
+			avatarKey: z.string(),
+			avatarMimeType: z.enum(ALLOWED_MIME_TYPES.avatar),
+		}),
+		output: z.object({
+			success: true,
+		}),
+	},
+
 	isUsernameAvailable: {
 		input: z.object({
 			username: z.string(),

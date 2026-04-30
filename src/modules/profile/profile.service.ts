@@ -88,6 +88,41 @@ export class ProfileService {
 		};
 	}
 
+	async onboard({
+		username,
+		displayName,
+		avatarKey,
+		avatarMimeType,
+	}: z.infer<typeof profileSchema.onboard.input>): Promise<
+		z.infer<typeof profileSchema.onboard.output>
+	> {
+		const permanentKey = avatarKey
+			? getPermanentKey({ tempKey: avatarKey }).permanentKey
+			: null;
+
+		const { available } = await this.isUsernameAvailable({ username });
+
+		if (!available) {
+			throw new ORPCError("CONFLICT", { message: "Username already taken" });
+		}
+
+		await this.db.transaction(async (tx) => {
+			await tx.insert(profilesTable).values({
+				userId: this.userId,
+				username,
+				displayName,
+				avatarKey: permanentKey,
+				avatarMimeType: permanentKey ? avatarMimeType : null,
+			});
+
+			if (avatarKey && permanentKey) {
+				await moveFile({ fromKey: avatarKey, toKey: permanentKey });
+			}
+		});
+
+		return { success: true };
+	}
+
 	async update({
 		username,
 		bio,
