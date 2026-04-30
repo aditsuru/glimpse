@@ -1,5 +1,5 @@
 export const ALLOWED_MIME_TYPES = {
-	avatar: ["image/jpeg", "image/png", "image/webp", "image/gif"],
+	avatar: ["image/jpeg", "image/png", "image/webp"],
 	banner: ["image/jpeg", "image/png", "image/webp", "image/gif"],
 	attachment: [
 		"image/jpeg",
