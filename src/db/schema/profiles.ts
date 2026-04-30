@@ -27,7 +27,9 @@ export const profilesTable = pgTable(
 		isGlimpseVerified: boolean("is_glimpse_verified").default(false).notNull(),
 		bio: text("bio"),
 		avatarKey: text("avatar_key"),
+		avatarMimeType: text("avatar_mime_type"),
 		bannerKey: text("banner_key"),
+		bannerMimeType: text("banner_mime_type"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),
