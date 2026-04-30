@@ -26,12 +26,16 @@ export async function getPresignedUploadUrl({
 		{ expiresIn: 3600 }
 	);
 
-	return { presignedUrl: url, key };
+	return { presignedUrl: url };
 }
 
 export function getPermanentKey({ tempKey }: { tempKey: string }) {
 	const permanentKey = tempKey.replace(/^temp\//, "");
 	return { permanentKey };
+}
+
+export function constructTempKey(suffix: string) {
+	return `temp/${suffix}`;
 }
 
 export async function moveFile({
