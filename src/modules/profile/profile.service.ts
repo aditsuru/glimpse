@@ -32,13 +32,24 @@ export class ProfileService {
 
 	async get({
 		username,
+		userId,
 	}: z.infer<typeof profileSchema.get.input>): Promise<
 		z.infer<typeof profileSchema.get.output>
 	> {
+		if (!username && !userId) {
+			throw new ORPCError("BAD_REQUEST", {
+				message: "Either username or userId must be provided",
+			});
+		}
+
+		const queryCondition = userId
+			? eq(profilesTable.userId, userId)
+			: eq(profilesTable.username, username as string);
+
 		const [profile] = await this.db
 			.select()
 			.from(profilesTable)
-			.where(eq(profilesTable.username, username))
+			.where(queryCondition)
 			.limit(1);
 
 		if (!profile)
@@ -55,7 +66,6 @@ export class ProfileService {
 			avatarUrl: profile.avatarKey
 				? constructPublicUrl({ key: profile.avatarKey }).publicUrl
 				: null,
-			avatarMimeType: profile.avatarMimeType,
 			bannerUrl: profile.bannerKey
 				? constructPublicUrl({ key: profile.bannerKey }).publicUrl
 				: null,
@@ -92,7 +102,6 @@ export class ProfileService {
 		username,
 		displayName,
 		avatarKey,
-		avatarMimeType,
 	}: z.infer<typeof profileSchema.onboard.input>): Promise<
 		z.infer<typeof profileSchema.onboard.output>
 	> {
@@ -112,7 +121,6 @@ export class ProfileService {
 				username,
 				displayName,
 				avatarKey: permanentKey,
-				avatarMimeType: permanentKey ? avatarMimeType : null,
 			});
 
 			if (avatarKey && permanentKey) {
@@ -212,7 +220,6 @@ export class ProfileService {
 
 	async updateAvatar({
 		key,
-		mimeType,
 	}: z.infer<typeof profileSchema.updateAvatar.input>): Promise<
 		z.infer<typeof profileSchema.updateAvatar.output>
 	> {
@@ -221,7 +228,7 @@ export class ProfileService {
 		await this.db.transaction(async (tx) => {
 			await tx
 				.update(profilesTable)
-				.set({ avatarKey: permanentKey, avatarMimeType: mimeType })
+				.set({ avatarKey: permanentKey })
 				.where(eq(profilesTable.userId, this.userId));
 
 			await moveFile({ fromKey: key, toKey: permanentKey });

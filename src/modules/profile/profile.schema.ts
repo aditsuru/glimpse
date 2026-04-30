@@ -4,7 +4,10 @@ import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 
 export const profileSchema = {
 	get: {
-		input: z.object({ username: z.string() }),
+		input: z.object({
+			username: z.string().optional(),
+			userId: z.string().optional(),
+		}),
 		output: z.object({
 			userId: z.string(),
 			username: z.string(),
@@ -14,7 +17,6 @@ export const profileSchema = {
 			bio: z.string().nullable(),
 			visibility: z.enum(VisibilityEnum.enumValues),
 			avatarUrl: z.string().nullable(),
-			avatarMimeType: z.string().nullable(),
 			bannerUrl: z.string().nullable(),
 			bannerMimeType: z.string().nullable(),
 			createdAt: z.date(),
@@ -27,7 +29,6 @@ export const profileSchema = {
 			username: z.string(),
 			displayName: z.string(),
 			avatarKey: z.string().optional(),
-			avatarMimeType: z.enum(ALLOWED_MIME_TYPES.avatar).optional(),
 		}),
 		output: z.object({
 			success: z.boolean(),
@@ -79,7 +80,6 @@ export const profileSchema = {
 	updateAvatar: {
 		input: z.object({
 			key: z.string(),
-			mimeType: z.enum(ALLOWED_MIME_TYPES.avatar),
 		}),
 		output: z.object({
 			success: z.boolean(),
