@@ -68,14 +68,13 @@ const Onboarding = () => {
 	const onboard = useOnboard();
 	const getAvatarPresignedUrl = useGetAvatarPresignedUrl();
 
-	const { preview, tempKey, mimeType, isUploading, handleFileChange } =
-		useMediaUpload({
-			allowedMimeTypes: ALLOWED_MIME_TYPES.avatar,
-			getPresignedUrl: (mimeType) =>
-				getAvatarPresignedUrl.mutateAsync({
-					mimeType: mimeType as (typeof ALLOWED_MIME_TYPES.avatar)[number],
-				}),
-		});
+	const { preview, tempKey, isUploading, handleFileChange } = useMediaUpload({
+		allowedMimeTypes: ALLOWED_MIME_TYPES.avatar,
+		getPresignedUrl: (mimeType) =>
+			getAvatarPresignedUrl.mutateAsync({
+				mimeType: mimeType as (typeof ALLOWED_MIME_TYPES.avatar)[number],
+			}),
+	});
 
 	const { formState, handleSubmit, control, setError, clearErrors } = useForm<
 		z.infer<typeof FormSchema>
@@ -109,8 +108,6 @@ const Onboarding = () => {
 			await onboard.mutateAsync({
 				...formData,
 				avatarKey: tempKey ?? undefined,
-				avatarMimeType:
-					(mimeType as (typeof ALLOWED_MIME_TYPES.avatar)[number]) ?? undefined,
 			});
 			setIsRedirecting(true);
 			toast.success("Profile created successfully!");
