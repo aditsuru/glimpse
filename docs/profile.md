@@ -4,12 +4,12 @@ What: Users have a profile created on signup. Viewable by others.
 
 ### DB
 
-- profiles table: id, userId, username, bio, pronouns, avatarUrl, visibility, bannerUrl, createdAt, updatedAt
+- profiles table: id, userId, username, displayName, isGlimpseVerified, bio, pronouns, avatarKey, bannerKey, visibility, createdAt, updatedAt
 
 ### Procedures (oRPC)
 
 - profiles.get({ userId }) → profile
-- profiles.update({ bio, avatarUrl, ... }) → profile [auth required]
+- profiles.update({ bio, avatar, ... }) → profile [auth required]
 - profiles.isUsernameAvailable({ username }) → boolean
 
 ### UI States
