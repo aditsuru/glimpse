@@ -8,10 +8,10 @@ import {
 	timestamp,
 	uuid,
 } from "drizzle-orm/pg-core";
-import { PROFILE_TYPES } from "@/lib/shared/constants";
 import { user } from "./auth-schema";
 
-export const profileTypeEnum = pgEnum("profile_type", PROFILE_TYPES);
+export const VisibilityEnum = pgEnum("visibility", ["public", "private"]);
+export type VisibilityEnumType = (typeof VisibilityEnum.enumValues)[number];
 
 export const profilesTable = pgTable(
 	"profiles",
@@ -22,16 +22,11 @@ export const profilesTable = pgTable(
 			.references(() => user.id, { onDelete: "cascade" }),
 		displayName: text("display_name").notNull(),
 		username: text("username").unique().notNull(),
-		type: profileTypeEnum("profile_type").default("public"),
+		visibility: VisibilityEnum("visibility").default("public").notNull(),
 		pronouns: text("pronouns"),
 		isGlimpseVerified: boolean("is_glimpse_verified").default(false).notNull(),
 		bio: text("bio"),
-		website: text("website"),
-		avatarUrl: text("avatar_url").default("/static/default-pfp.png").notNull(),
 		avatarKey: text("avatar_key"),
-		bannerUrl: text("banner_url")
-			.default("/static/default-banner.png")
-			.notNull(),
 		bannerKey: text("banner_key"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()

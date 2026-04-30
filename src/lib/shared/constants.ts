@@ -1,32 +1,23 @@
-export const ALLOWED_FILES_TYPES = [
-	"image/jpeg",
-	"image/png",
-	"image/gif",
-	"image/webp",
-	"video/mp4",
-	"video/webm",
-] as const;
+export const ALLOWED_MIME_TYPES = {
+	avatar: ["image/jpeg", "image/png", "image/webp", "image/gif"],
+	banner: ["image/jpeg", "image/png", "image/webp", "image/gif"],
+	attachment: [
+		"image/jpeg",
+		"image/png",
+		"image/webp",
+		"image/gif",
+		"video/mp4",
+		"video/webm",
+	],
+} as const;
 
-export const ATTACHMENT_TYPES = ["image", "gif", "video"] as const;
-export type AttachmentType = (typeof ATTACHMENT_TYPES)[number];
+export const VIDEO_MIME_TYPES: string[] = ["video/mp4", "video/webm"];
+export const GIF_MIME_TYPE = "image/gif";
 
-export const FOLLOW_REQUEST_STATUS = ["accepted", "pending"] as const;
-export type FollowRequestStatusType = (typeof FOLLOW_REQUEST_STATUS)[number];
-
-export const PROFILE_TYPES = ["private", "public"] as const;
-export type ProfileType = (typeof PROFILE_TYPES)[number];
-
-export const NOTIFICATION_TYPES = [
-	"like_post",
-	"like_comment",
-	"comment",
-	"reply",
-	"follow",
-	"follow_request",
-	"mention",
-	"system",
-] as const;
-export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
+export const isVideo = (mimeType: string) =>
+	VIDEO_MIME_TYPES.includes(mimeType);
+export const isImage = (mimeType: string) => !isVideo(mimeType);
+export const isGif = (mimeType: string) => mimeType === GIF_MIME_TYPE;
 
 export const RESERVED_USERNAMES = new Set([
 	"admin",
