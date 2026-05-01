@@ -10,13 +10,13 @@ import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { profilesTable } from "@/db/schema";
 import {
-	constructPublicUrl,
 	constructTempKey,
 	getPermanentKey,
 	getPresignedUploadUrl,
 	moveFile,
 } from "@/lib/server/s3-utils";
 import { RESERVED_USERNAMES } from "@/lib/shared/constants";
+import { constructPublicUrl } from "@/lib/shared/s3-utils";
 import type { profileSchema } from "./profile.schema";
 
 const matcher = new RegExpMatcher({

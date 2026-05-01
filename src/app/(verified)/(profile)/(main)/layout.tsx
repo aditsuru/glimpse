@@ -1,20 +1,30 @@
+import MobileNav from "@/components/layout/MobileNavbar";
+import Navbar from "@/components/layout/Navbar";
+import { getRequiredSession } from "@/lib/server/auth-utils";
+
 export default async function AuthGuard({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const { user } = await getRequiredSession();
 	return (
-		<div className="w-screen h-dvh overflow-hidden grid grid-cols-6">
-			{/* Profile Sidebar */}
-			<section className="col-span-2 border-accent border-r-2 h-full"></section>
+		<div className="w-screen h-dvh overflow-hidden flex flex-col md:grid md:grid-cols-3 xl:grid-cols-6">
+			{/* Sidebar - hidden on mobile */}
+			<aside className="hidden md:flex border-accent border-r-2 h-full md:col-span-1 xl:col-span-2">
+				<Navbar userId={user.id} />
+			</aside>
 
 			{/* Main Content */}
-			<section className="col-span-2 border-accent border-r-2 overflow-hidden h-full">
+			<main className="flex-1 border-accent md:border-r-2 overflow-hidden h-full md:col-span-2 xl:col-span-2">
 				{children}
-			</section>
+			</main>
 
 			{/* Secondary Sidebar */}
-			<section className="col-span-2"></section>
+			<section className="hidden xl:block xl:col-span-2" />
+
+			{/* Mobile Bottom Nav */}
+			<MobileNav />
 		</div>
 	);
 }

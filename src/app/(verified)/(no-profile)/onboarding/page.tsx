@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ORPCError } from "@orpc/client";
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, Trash } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -49,7 +49,7 @@ const FormSchema = z.object({
 	displayName: z
 		.string()
 		.min(1, "Display name is required")
-		.max(50, "Display name must be at most 50 characters")
+		.max(20, "Display name must be at most 20 characters")
 		.regex(
 			/^[a-zA-Z0-9_ ]+$/,
 			"Display name can only contain letters, numbers, underscores and spaces"
@@ -67,13 +67,14 @@ const Onboarding = () => {
 	const onboard = useOnboard();
 	const getAvatarPresignedUrl = useGetAvatarPresignedUrl();
 
-	const { preview, tempKey, isUploading, handleFileChange } = useMediaUpload({
-		allowedMimeTypes: ALLOWED_MIME_TYPES.avatar,
-		getPresignedUrl: (mimeType) =>
-			getAvatarPresignedUrl.mutateAsync({
-				mimeType: mimeType as (typeof ALLOWED_MIME_TYPES.avatar)[number],
-			}),
-	});
+	const { preview, tempKey, isUploading, handleFileChange, reset } =
+		useMediaUpload({
+			allowedMimeTypes: ALLOWED_MIME_TYPES.avatar,
+			getPresignedUrl: (mimeType) =>
+				getAvatarPresignedUrl.mutateAsync({
+					mimeType: mimeType as (typeof ALLOWED_MIME_TYPES.avatar)[number],
+				}),
+		});
 
 	const { formState, handleSubmit, control, setError, clearErrors } = useForm<
 		z.infer<typeof FormSchema>
@@ -149,27 +150,39 @@ const Onboarding = () => {
 							<FieldGroup onFocusCapture={() => clearErrors("root")}>
 								<Field>
 									<div className="w-full flex justify-center">
-										<button
-											type="button"
-											disabled={
-												formState.isSubmitting || isRedirecting || isUploading
-											}
-											className="relative"
-											onClick={() => inputRef.current?.click()}
-										>
-											<Avatar className="size-32 transition-all">
-												<AvatarImage src={preview} />
-											</Avatar>
-											{isUploading ? (
-												<div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
-													<Spinner className="size-8" />
-												</div>
-											) : (
-												<div className="absolute inset-0 rounded-full bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-													<PencilIcon className="size-5 text-white" />
-												</div>
+										<div className="relative">
+											<button
+												type="button"
+												disabled={
+													formState.isSubmitting || isRedirecting || isUploading
+												}
+												className="relative"
+												onClick={() => inputRef.current?.click()}
+											>
+												<Avatar className="size-32 transition-all">
+													<AvatarImage src={preview} />
+												</Avatar>
+												{isUploading ? (
+													<div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+														<Spinner className="size-8" />
+													</div>
+												) : (
+													<div className="absolute inset-0 rounded-full bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+														<PencilIcon className="size-5 text-white" />
+													</div>
+												)}
+											</button>
+
+											{tempKey && !isUploading && (
+												<button
+													type="button"
+													onClick={reset}
+													className="absolute -top-1 -right-1 bg-destructive rounded-full p-2 hover:brightness-90"
+												>
+													<Trash className="size-5 text-white" />
+												</button>
 											)}
-										</button>
+										</div>
 
 										<input
 											ref={inputRef}
