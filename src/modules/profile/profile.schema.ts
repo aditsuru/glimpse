@@ -26,8 +26,8 @@ export const profileSchema = {
 
 	onboard: {
 		input: z.object({
-			username: z.string(),
-			displayName: z.string(),
+			username: z.string().min(1),
+			displayName: z.string().min(1),
 			avatarKey: z.string().optional(),
 		}),
 		output: z.object({
@@ -46,8 +46,8 @@ export const profileSchema = {
 
 	update: {
 		input: z.object({
-			username: z.string().optional(),
-			displayName: z.string().optional(),
+			username: z.string().min(1).optional(),
+			displayName: z.string().min(1).optional(),
 			pronouns: z.string().optional(),
 			bio: z.string().optional(),
 			visibility: z.enum(VisibilityEnum.enumValues).optional(),

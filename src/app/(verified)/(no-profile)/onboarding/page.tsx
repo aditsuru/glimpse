@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/card";
 import {
 	Field,
-	FieldDescription,
 	FieldError,
 	FieldGroup,
 	FieldLabel,
@@ -90,20 +89,26 @@ const Onboarding = () => {
 
 	const checkUsername = useDebouncedCallback(async (value: string) => {
 		if (value.length < 3) return;
-		const { available } = await isUsernameAvailable.mutateAsync({
-			username: value,
-		});
-		if (!available) {
-			setUsernameError("Username already taken");
+		try {
+			const { available } = await isUsernameAvailable.mutateAsync({
+				username: value,
+			});
+			if (!available) {
+				setUsernameError("Username already taken");
+				setUsernameAvailable(false);
+			} else {
+				setUsernameError(null);
+				setUsernameAvailable(true);
+			}
+		} catch {
+			setUsernameError("Couldn't verify username, please try again");
 			setUsernameAvailable(false);
-		} else {
-			setUsernameError(null);
-			setUsernameAvailable(true);
 		}
 	}, 500);
 
 	const handleFormSubmit = async (formData: z.infer<typeof FormSchema>) => {
-		if (usernameError) return;
+		if (usernameError || isUsernameAvailable.isPending || !usernameAvailable)
+			return;
 		try {
 			await onboard.mutateAsync({
 				...formData,
@@ -127,7 +132,7 @@ const Onboarding = () => {
 			<Card className="w-md">
 				<CardHeader className="text-center">
 					<CardTitle className="text-xl">Let's get you started!</CardTitle>
-					<CardDescription>Create a profile to continue.</CardDescription>
+					<CardDescription>Complete your profile to continue.</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<form
@@ -174,10 +179,6 @@ const Onboarding = () => {
 											onChange={handleFileChange}
 										/>
 									</div>
-
-									<FieldDescription className="text-center">
-										Optionally upload a profile picture
-									</FieldDescription>
 								</Field>
 								{/* Display Name */}
 								<Controller
@@ -266,7 +267,11 @@ const Onboarding = () => {
 									<Button
 										type="submit"
 										disabled={
-											formState.isSubmitting || isRedirecting || isUploading
+											formState.isSubmitting ||
+											isRedirecting ||
+											isUploading ||
+											isUsernameAvailable.isPending ||
+											!usernameAvailable
 										}
 										className="w-full"
 									>
