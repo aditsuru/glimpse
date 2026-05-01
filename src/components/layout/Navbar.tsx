@@ -39,7 +39,7 @@ const navItems = [
 	{ label: "Follow", href: "/follow", icon: UserPlus },
 	{ label: "Notifications", href: "/notifications", icon: Bell },
 	{ label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
-	{ label: "Profile", href: "/profile", icon: User },
+	{ label: "Profile", href: "/aditsuru", icon: User },
 	{ label: "Settings", href: "/settings", icon: Settings },
 ];
 

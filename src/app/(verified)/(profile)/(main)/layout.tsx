@@ -24,7 +24,7 @@ export default async function AuthGuard({
 			<section className="hidden xl:block xl:col-span-2" />
 
 			{/* Mobile Bottom Nav */}
-			<MobileNav />
+			<MobileNav userId={user.id} />
 		</div>
 	);
 }

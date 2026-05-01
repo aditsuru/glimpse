@@ -24,11 +24,11 @@ function Dev() {
 	return (
 		<div className="w-full h-full flex flex-col items-center">
 			<div className="w-full h-20 border-b-2 text-center pt-4">
-				<h2 className="text-lg underline underline-offset-8 decoration-primary decoration-2 font-semibold">
+				<h2 className="text-lg underline underline-offset-8 decoration-primary decoration-2 font-semibold pt-2">
 					For You
 				</h2>
 			</div>
-			<ScrollContainer className="min-h-screen overflow-y-auto w-full no-scrollbar px-4 mt-1">
+			<ScrollContainer className="min-h-screen overflow-y-auto w-full no-scrollbar px-4">
 				{videosPair1.map((src) => (
 					<VideoPlayer
 						key={src}
