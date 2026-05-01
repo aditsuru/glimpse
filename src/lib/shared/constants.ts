@@ -51,3 +51,11 @@ export const LOCAL_STORAGE_KEYS = {
 	FORGOT_PASSWORD_COOLDOWN: "forgot_password_cooldown",
 	GLIMPSE_MEDIA_STORAGE: "glimpse_media_storage",
 };
+
+const SIDEBAR_GIF_BASE = "https://ik.imagekit.io/aditsuru/Glimpse";
+const SIDEBAR_GIF_COUNT = 7;
+
+export const SIDEBAR_GIFS = Array.from(
+	{ length: SIDEBAR_GIF_COUNT },
+	(_, i) => `${SIDEBAR_GIF_BASE}/${i + 1}.gif`
+);

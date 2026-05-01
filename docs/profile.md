@@ -24,6 +24,11 @@ What: Users have a profile created on signup. Viewable by others.
 - Profile sidebar in home
 - Profile view (/{username})
 
+### Constraints & Rules
+
+- Avatar and Banner urls might be undefined, fallback defined in `constants.ts` must always be used
+- Bio and pronouns can be empty strings - Forms, Validation and DB schema must accept it.
+
 ### Out of Scope (conscious decisions)
 
 - Follow counts on profile page → Follow feature

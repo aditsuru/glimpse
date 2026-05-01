@@ -7,10 +7,9 @@ const nextConfig: NextConfig = {
 		unoptimized: isDev,
 		remotePatterns: [
 			{
-				protocol: "http",
-				hostname: "localhost",
-				port: "9000",
-				pathname: "/glimpse-dev/**",
+				protocol: "https",
+				hostname: "ik.imagekit.io",
+				pathname: "/aditsuru/**",
 			},
 		],
 	},
