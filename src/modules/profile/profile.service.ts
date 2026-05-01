@@ -140,7 +140,13 @@ export class ProfileService {
 	}: z.infer<typeof profileSchema.update.input>): Promise<
 		z.infer<typeof profileSchema.update.output>
 	> {
-		if (!username && !bio && !displayName && !pronouns && !visibility) {
+		if (
+			username === undefined &&
+			bio === undefined &&
+			displayName === undefined &&
+			pronouns === undefined &&
+			visibility === undefined
+		) {
 			throw new ORPCError("BAD_REQUEST", { message: "Nothing to update" });
 		}
 
@@ -160,11 +166,11 @@ export class ProfileService {
 			const [updated] = await this.db
 				.update(profilesTable)
 				.set({
-					...(username && { username }),
-					...(bio && { bio }),
-					...(displayName && { displayName }),
-					...(pronouns && { pronouns }),
-					...(visibility && { visibility }),
+					...(username !== undefined && { username }),
+					...(bio !== undefined && { bio }),
+					...(displayName !== undefined && { displayName }),
+					...(pronouns !== undefined && { pronouns }),
+					...(visibility !== undefined && { visibility }),
 				})
 				.where(eq(profilesTable.userId, this.userId))
 				.returning();
