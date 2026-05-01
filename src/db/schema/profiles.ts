@@ -19,6 +19,7 @@ export const profilesTable = pgTable(
 		id: uuid("id").defaultRandom().primaryKey(),
 		userId: text("user_id")
 			.notNull()
+			.unique()
 			.references(() => user.id, { onDelete: "cascade" }),
 		displayName: text("display_name").notNull(),
 		username: text("username").unique().notNull(),
