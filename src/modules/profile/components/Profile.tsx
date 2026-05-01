@@ -1,3 +1,101 @@
-export default function Profile() {
-	return null;
+"use client";
+
+import Image from "next/image";
+import type * as z from "zod";
+import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DEFAULT_PFP_URL, isGif } from "@/lib/shared/constants";
+import type { profileSchema } from "../profile.schema";
+
+interface ProfileProps {
+	data?: z.infer<typeof profileSchema.get.output>;
+	viewerId: string;
 }
+const Profile = ({ data, viewerId }: ProfileProps) => {
+	return (
+		<div className="w-full">
+			<div className="relative">
+				<AspectRatio ratio={3 / 1} className="overflow-hidden">
+					{!!data?.bannerUrl && (
+						<Image
+							src={data?.bannerUrl}
+							alt="banner"
+							fill
+							unoptimized={isGif(data.bannerMimeType ?? "")}
+							className="object-cover object-center"
+							priority
+						/>
+					)}
+				</AspectRatio>
+				<div className="px-4">
+					<Avatar className="absolute -translate-y-1/2 size-30 ring-4 ring-background">
+						<AvatarImage src={data?.avatarUrl ?? DEFAULT_PFP_URL} />
+					</Avatar>
+				</div>
+				{viewerId === data?.userId && (
+					<Button
+						variant="ghost"
+						className="absolute right-4 text-base translate-y-1/2 p-4 rounded-full ring-1 ring-accent active:not-aria-[haspopup]:translate-y-5!"
+					>
+						Edit Profile
+					</Button>
+				)}
+			</div>
+			<div className="mt-[80px] px-4">
+				<h2 className="text-2xl font-semibold flex gap-1 items-center">
+					{data?.displayName}
+					{data?.isGlimpseVerified && <VerifiedBadge className="size-6" />}
+				</h2>
+				<div className="flex items-center gap-1 text-muted-foreground">
+					<h3>@{data?.username}</h3>
+					{data?.pronouns && <p>~ {data?.pronouns}</p>}
+				</div>
+				{data?.bio && (
+					<div className="mt-4">
+						<p className="line-clamp-5">{data.bio}</p>
+					</div>
+				)}
+				<div className="mt-4 flex gap-4 font-sm font-semibold">
+					<p className="hover:underline hover:underline-offset-4">
+						12{" "}
+						<span className="text-muted-foreground font-medium">Followers</span>
+					</p>
+					<p className="hover:underline hover:underline-offset-4">
+						12{" "}
+						<span className="text-muted-foreground font-medium">Following</span>
+					</p>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+const SuspenseProfile = () => {
+	return (
+		<div className="w-full">
+			<div className="relative">
+				<AspectRatio ratio={3 / 1}>
+					<Skeleton className="w-full h-full" />
+				</AspectRatio>
+				<div className="px-4">
+					<Skeleton className="absolute -translate-y-1/2 size-30 rounded-full ring-4 ring-background" />
+				</div>
+			</div>
+			<div className="mt-[80px] px-4 flex flex-col gap-3">
+				<Skeleton className="h-7 w-40 rounded" />
+				<Skeleton className="h-4 w-28 rounded" />
+				<Skeleton className="h-4 w-full rounded" />
+				<Skeleton className="h-4 w-3/4 rounded" />
+				<div className="flex gap-4 mt-1">
+					<Skeleton className="h-4 w-20 rounded" />
+					<Skeleton className="h-4 w-20 rounded" />
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export { Profile, SuspenseProfile };

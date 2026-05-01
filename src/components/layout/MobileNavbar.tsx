@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Bookmark, Home, Search } from "lucide-react";
+import { Bell, Home, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/client/utils";
@@ -10,8 +10,8 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 const mobileNavItems = [
 	{ href: "/", icon: Home },
 	{ href: "/notifications", icon: Bell },
+	{ href: "/create-post", icon: PlusCircle },
 	{ href: "/explore", icon: Search },
-	{ href: "/bookmarks", icon: Bookmark },
 ];
 
 type MobileNavbarProps = {
