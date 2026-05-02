@@ -1,4 +1,10 @@
 import * as z from "zod";
+import { profileSelectSchema } from "@/db/schema";
+
+const followListOutput = z.object({
+	items: z.array(profileSelectSchema),
+	nextCursor: z.date().nullable(),
+});
 
 export const followSchema = {
 	send: {
@@ -44,5 +50,51 @@ export const followSchema = {
 		output: z.object({
 			success: z.boolean(),
 		}),
+	},
+
+	getStatus: {
+		input: z.object({
+			targetUserId: z.string(),
+		}),
+		output: z.object({
+			status: z.enum([
+				"none",
+				"mutual",
+				"accepted",
+				"pending",
+				"follows_you",
+				"follows_you_pending",
+			]),
+		}),
+	},
+
+	getFollowers: {
+		input: z.object({
+			userId: z.string(),
+			cursor: z.date().optional(),
+		}),
+		output: followListOutput,
+	},
+
+	getFollowing: {
+		input: z.object({
+			userId: z.string(),
+			cursor: z.date().optional(),
+		}),
+		output: followListOutput,
+	},
+
+	getPendingReceived: {
+		input: z.object({
+			cursor: z.date().optional(),
+		}),
+		output: followListOutput,
+	},
+
+	getPendingSent: {
+		input: z.object({
+			cursor: z.date().optional(),
+		}),
+		output: followListOutput,
 	},
 };

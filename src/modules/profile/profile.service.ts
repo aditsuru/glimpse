@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: nextCursor can't be undefined */
 import { ORPCError } from "@orpc/server";
-import { and, desc, eq, ilike, lt, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, lt, or } from "drizzle-orm";
 import {
 	englishDataset,
 	englishRecommendedTransformers,
@@ -9,7 +9,7 @@ import {
 import { DatabaseError } from "pg";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
-import { profilesTable } from "@/db/schema";
+import { followsTable, profilesTable } from "@/db/schema";
 import {
 	constructTempKey,
 	getPermanentKey,
@@ -57,6 +57,27 @@ export class ProfileService {
 		if (!profile)
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
+		const [[{ followersCount }], [{ followingCount }]] = await Promise.all([
+			this.db
+				.select({ followersCount: count() })
+				.from(followsTable)
+				.where(
+					and(
+						eq(followsTable.followingId, profile.userId),
+						eq(followsTable.status, "accepted")
+					)
+				),
+			this.db
+				.select({ followingCount: count() })
+				.from(followsTable)
+				.where(
+					and(
+						eq(followsTable.followerId, profile.userId),
+						eq(followsTable.status, "accepted")
+					)
+				),
+		]);
+
 		return {
 			id: profile.id,
 			userId: profile.userId,
@@ -81,6 +102,8 @@ export class ProfileService {
 			bannerMimeType: profile.bannerMimeType,
 			createdAt: profile.createdAt,
 			updatedAt: profile.updatedAt,
+			followersCount,
+			followingCount,
 		};
 	}
 
@@ -279,7 +302,35 @@ export class ProfileService {
 		z.infer<typeof profileSchema.search.output>
 	> {
 		let items = await this.db
-			.select()
+			.select({
+				id: profilesTable.id,
+				userId: profilesTable.userId,
+				username: profilesTable.username,
+				displayName: profilesTable.displayName,
+				avatarKey: profilesTable.avatarKey,
+				bannerKey: profilesTable.bannerKey,
+				bannerMimeType: profilesTable.bannerMimeType,
+				isGlimpseVerified: profilesTable.isGlimpseVerified,
+				pronouns: profilesTable.pronouns,
+				bio: profilesTable.bio,
+				visibility: profilesTable.visibility,
+				createdAt: profilesTable.createdAt,
+				updatedAt: profilesTable.updatedAt,
+				followersCount: this.db.$count(
+					followsTable,
+					and(
+						eq(followsTable.followingId, profilesTable.userId),
+						eq(followsTable.status, "accepted")
+					)
+				),
+				followingCount: this.db.$count(
+					followsTable,
+					and(
+						eq(followsTable.followerId, profilesTable.userId),
+						eq(followsTable.status, "accepted")
+					)
+				),
+			})
 			.from(profilesTable)
 			.where(
 				and(
@@ -300,19 +351,15 @@ export class ProfileService {
 			items = items.slice(0, -1);
 		}
 
-		const mappedItems = items.map((profile) => ({
+		const mappedItems = items.map(({ avatarKey, bannerKey, ...profile }) => ({
 			...profile,
-			avatarUrl: profile.avatarKey
-				? constructPublicUrl({
-						key: profile.avatarKey,
-						updatedAt: profile.updatedAt,
-					}).publicUrl
+			avatarUrl: avatarKey
+				? constructPublicUrl({ key: avatarKey, updatedAt: profile.updatedAt })
+						.publicUrl
 				: null,
-			bannerUrl: profile.bannerKey
-				? constructPublicUrl({
-						key: profile.bannerKey,
-						updatedAt: profile.updatedAt,
-					}).publicUrl
+			bannerUrl: bannerKey
+				? constructPublicUrl({ key: bannerKey, updatedAt: profile.updatedAt })
+						.publicUrl
 				: null,
 		}));
 
