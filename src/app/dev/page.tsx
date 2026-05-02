@@ -14,12 +14,7 @@ function Dev() {
 	return (
 		<div className="w-screen h-dvh flex justify-center items-center">
 			<div className="w-lg">
-				<ProfileCard
-					data={data}
-					viewerId={sessionData?.user.id as string}
-					handleFollow={() => {}}
-					className="border rounded-full"
-				/>
+				<ProfileCard data={data} className="border rounded-full" />
 			</div>
 		</div>
 	);
