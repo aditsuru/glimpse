@@ -42,6 +42,12 @@ export const useMediaUpload = ({
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!tempKey) {
+			setPreview(defaultPreview);
+		}
+	}, [defaultPreview, tempKey]);
+
 	const reset = () => {
 		if (objectUrlRef.current) {
 			URL.revokeObjectURL(objectUrlRef.current);

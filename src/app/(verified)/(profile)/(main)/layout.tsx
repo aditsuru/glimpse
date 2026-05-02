@@ -16,7 +16,7 @@ export default async function AuthGuard({
 			</aside>
 
 			{/* Main Content */}
-			<main className="flex-1 border-accent md:border-r-2 overflow-hidden h-full md:col-span-2 xl:col-span-2">
+			<main className="flex-1 border-accent md:border-r-2 overflow-x-hidden overflow-y-auto h-full md:col-span-2 xl:col-span-2">
 				{children}
 			</main>
 

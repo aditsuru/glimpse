@@ -1,6 +1,6 @@
 import { Meh } from "lucide-react";
 
-const UserNotFound = () => {
+const ErrorMessage = () => {
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center gap-3 text-muted-foreground">
 			<Meh className="size-12" />
@@ -14,4 +14,4 @@ const UserNotFound = () => {
 	);
 };
 
-export default UserNotFound;
+export default ErrorMessage;

@@ -64,10 +64,16 @@ export class ProfileService {
 			isGlimpseVerified: profile.isGlimpseVerified,
 			visibility: profile.visibility,
 			avatarUrl: profile.avatarKey
-				? constructPublicUrl({ key: profile.avatarKey }).publicUrl
+				? constructPublicUrl({
+						key: profile.avatarKey,
+						updatedAt: profile.updatedAt,
+					}).publicUrl
 				: null,
 			bannerUrl: profile.bannerKey
-				? constructPublicUrl({ key: profile.bannerKey }).publicUrl
+				? constructPublicUrl({
+						key: profile.bannerKey,
+						updatedAt: profile.updatedAt,
+					}).publicUrl
 				: null,
 			bannerMimeType: profile.bannerMimeType,
 			createdAt: profile.createdAt,
