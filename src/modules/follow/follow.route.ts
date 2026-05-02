@@ -45,4 +45,39 @@ export const followRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.followService.removeFollower({ ...input });
 		}),
+
+	getStatus: followProcedure
+		.input(followSchema.getStatus.input)
+		.output(followSchema.getStatus.output)
+		.handler(async ({ input, context }) => {
+			return await context.followService.getStatus({ ...input });
+		}),
+
+	getFollowers: followProcedure
+		.input(followSchema.getFollowers.input)
+		.output(followSchema.getFollowers.output)
+		.handler(async ({ input, context }) => {
+			return await context.followService.getFollowers({ ...input });
+		}),
+
+	getFollowing: followProcedure
+		.input(followSchema.getFollowing.input)
+		.output(followSchema.getFollowing.output)
+		.handler(async ({ input, context }) => {
+			return await context.followService.getFollowing({ ...input });
+		}),
+
+	getPendingReceived: followProcedure
+		.input(followSchema.getPendingReceived.input)
+		.output(followSchema.getPendingReceived.output)
+		.handler(async ({ input, context }) => {
+			return await context.followService.getPendingReceived({ ...input });
+		}),
+
+	getPendingSent: followProcedure
+		.input(followSchema.getPendingSent.input)
+		.output(followSchema.getPendingSent.output)
+		.handler(async ({ input, context }) => {
+			return await context.followService.getPendingSent({ ...input });
+		}),
 });

@@ -44,7 +44,7 @@ const HoverProfileCard = ({
 				<div className="mt-4 flex gap-4 font-semibold">
 					<Link href={`/${data.username}/followers`}>
 						<p className="hover:underline hover:underline-offset-4">
-							12{" "}
+							{data.followersCount}{" "}
 							<span className="text-muted-foreground font-medium">
 								Followers
 							</span>
@@ -52,7 +52,7 @@ const HoverProfileCard = ({
 					</Link>
 					<Link href={`/${data.username}/following`}>
 						<p className="hover:underline hover:underline-offset-4">
-							12{" "}
+							{data.followingCount}{" "}
 							<span className="text-muted-foreground font-medium">
 								Following
 							</span>

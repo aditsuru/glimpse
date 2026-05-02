@@ -7,6 +7,7 @@ import {
 	text,
 	timestamp,
 } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
 import { user } from "./auth-schema";
 
 export const StatusEnum = pgEnum("status", ["pending", "accepted"]);
@@ -39,3 +40,4 @@ export const followsTable = pgTable(
 
 export type Follow = InferSelectModel<typeof followsTable>;
 export type NewFollow = InferInsertModel<typeof followsTable>;
+export const followSelectSchema = createSelectSchema(followsTable);

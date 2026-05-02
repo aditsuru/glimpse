@@ -8,6 +8,8 @@ import {
 	timestamp,
 	uuid,
 } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
+import * as z from "zod";
 import { user } from "./auth-schema";
 
 export const VisibilityEnum = pgEnum("visibility", ["public", "private"]);
@@ -46,3 +48,13 @@ export const profilesTable = pgTable(
 
 export type Profile = InferSelectModel<typeof profilesTable>;
 export type NewProfile = InferInsertModel<typeof profilesTable>;
+
+export const profileSelectSchema = createSelectSchema(profilesTable)
+	.omit({
+		avatarKey: true,
+		bannerKey: true,
+	})
+	.extend({
+		avatarUrl: z.string().nullable(),
+		bannerUrl: z.string().nullable(),
+	});

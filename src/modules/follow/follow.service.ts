@@ -1,8 +1,12 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: sliced data can't be null */
+
 import { ORPCError } from "@orpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, lt } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
+import { config } from "@/lib/shared/config";
+import { constructPublicUrl } from "@/lib/shared/s3-utils";
 import type { followSchema } from "./follow.schema";
 
 export class FollowService {
@@ -191,5 +195,299 @@ export class FollowService {
 		await this.db.delete(followsTable).where(matchCondition);
 
 		return { success: true };
+	}
+
+	async getStatus({
+		targetUserId,
+	}: z.infer<typeof followSchema.getStatus.input>): Promise<
+		z.infer<typeof followSchema.getStatus.output>
+	> {
+		const theyFollowMeCondition = and(
+			eq(followsTable.followerId, targetUserId),
+			eq(followsTable.followingId, this.userId)
+		);
+
+		const theyFollowedByMeCondition = and(
+			eq(followsTable.followerId, this.userId),
+			eq(followsTable.followingId, targetUserId)
+		);
+
+		const [[theyFollowMe], [theyFollowedByMe]] = await Promise.all([
+			this.db
+				.select({
+					status: followsTable.status,
+				})
+				.from(followsTable)
+				.where(theyFollowMeCondition),
+			this.db
+				.select({ status: followsTable.status })
+				.from(followsTable)
+				.where(theyFollowedByMeCondition),
+		]);
+
+		const iFollow = theyFollowedByMe?.status;
+		const theyFollow = theyFollowMe?.status;
+
+		// I follow them (accepted) + they follow me (accepted) → mutual
+		if (iFollow === "accepted" && theyFollow === "accepted")
+			return { status: "mutual" };
+
+		// I follow them (accepted), they don't → accepted
+		if (iFollow === "accepted" && !theyFollow) return { status: "accepted" };
+
+		// I requested (pending), regardless of them → pending
+		if (iFollow === "pending") return { status: "pending" };
+
+		// I don't follow, they follow me (accepted) → follows_you
+		if (!iFollow && theyFollow === "accepted") return { status: "follows_you" };
+
+		// I don't follow, they requested (pending) → follows_you_pending
+		if (!iFollow && theyFollow === "pending")
+			return { status: "follows_you_pending" };
+
+		// nothing on either side
+		return { status: "none" };
+	}
+
+	async getFollowers({
+		userId,
+		cursor,
+	}: z.infer<typeof followSchema.getFollowers.input>): Promise<
+		z.infer<typeof followSchema.getFollowers.output>
+	> {
+		const items = await this.db
+			.select({
+				id: profilesTable.id,
+				userId: profilesTable.userId,
+				username: profilesTable.username,
+				displayName: profilesTable.displayName,
+				avatarKey: profilesTable.avatarKey,
+				bannerKey: profilesTable.bannerKey,
+				bannerMimeType: profilesTable.bannerMimeType,
+				isGlimpseVerified: profilesTable.isGlimpseVerified,
+				pronouns: profilesTable.pronouns,
+				bio: profilesTable.bio,
+				visibility: profilesTable.visibility,
+				updatedAt: profilesTable.updatedAt,
+				createdAt: followsTable.createdAt,
+			})
+			.from(followsTable)
+			.innerJoin(
+				profilesTable,
+				eq(followsTable.followerId, profilesTable.userId)
+			)
+			.where(
+				and(
+					eq(followsTable.followingId, userId),
+					eq(followsTable.status, "accepted"),
+					cursor ? lt(followsTable.createdAt, cursor) : undefined
+				)
+			)
+			.orderBy(desc(followsTable.createdAt))
+			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
+
+		const hasMore = items.length > config.PROFILE_PAGINATION_LIMIT;
+		const data = hasMore ? items.slice(0, -1) : items;
+		const nextCursor = hasMore ? data.at(-1)!.createdAt : null;
+
+		return {
+			items: data.map((item) => ({
+				...item,
+				avatarUrl: item.avatarKey
+					? constructPublicUrl({
+							key: item.avatarKey,
+							updatedAt: item.updatedAt,
+						}).publicUrl
+					: null,
+				bannerUrl: item.bannerKey
+					? constructPublicUrl({
+							key: item.bannerKey,
+							updatedAt: item.updatedAt,
+						}).publicUrl
+					: null,
+			})),
+			nextCursor,
+		};
+	}
+
+	async getFollowing({
+		userId,
+		cursor,
+	}: z.infer<typeof followSchema.getFollowing.input>): Promise<
+		z.infer<typeof followSchema.getFollowing.output>
+	> {
+		const items = await this.db
+			.select({
+				id: profilesTable.id,
+				userId: profilesTable.userId,
+				username: profilesTable.username,
+				displayName: profilesTable.displayName,
+				avatarKey: profilesTable.avatarKey,
+				bannerKey: profilesTable.bannerKey,
+				bannerMimeType: profilesTable.bannerMimeType,
+				isGlimpseVerified: profilesTable.isGlimpseVerified,
+				pronouns: profilesTable.pronouns,
+				bio: profilesTable.bio,
+				visibility: profilesTable.visibility,
+				updatedAt: profilesTable.updatedAt,
+				createdAt: followsTable.createdAt,
+			})
+			.from(followsTable)
+			.innerJoin(
+				profilesTable,
+				eq(followsTable.followingId, profilesTable.userId)
+			)
+			.where(
+				and(
+					eq(followsTable.followerId, userId),
+					eq(followsTable.status, "accepted"),
+					cursor ? lt(followsTable.createdAt, cursor) : undefined
+				)
+			)
+			.orderBy(desc(followsTable.createdAt))
+			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
+
+		const hasMore = items.length > config.PROFILE_PAGINATION_LIMIT;
+		const data = hasMore ? items.slice(0, -1) : items;
+		const nextCursor = hasMore ? data.at(-1)!.createdAt : null;
+
+		return {
+			items: data.map((item) => ({
+				...item,
+				avatarUrl: item.avatarKey
+					? constructPublicUrl({
+							key: item.avatarKey,
+							updatedAt: item.updatedAt,
+						}).publicUrl
+					: null,
+				bannerUrl: item.bannerKey
+					? constructPublicUrl({
+							key: item.bannerKey,
+							updatedAt: item.updatedAt,
+						}).publicUrl
+					: null,
+			})),
+			nextCursor,
+		};
+	}
+
+	async getPendingReceived({
+		cursor,
+	}: z.infer<typeof followSchema.getPendingReceived.input>): Promise<
+		z.infer<typeof followSchema.getPendingReceived.output>
+	> {
+		const items = await this.db
+			.select({
+				id: profilesTable.id,
+				userId: profilesTable.userId,
+				username: profilesTable.username,
+				displayName: profilesTable.displayName,
+				avatarKey: profilesTable.avatarKey,
+				bannerKey: profilesTable.bannerKey,
+				bannerMimeType: profilesTable.bannerMimeType,
+				isGlimpseVerified: profilesTable.isGlimpseVerified,
+				pronouns: profilesTable.pronouns,
+				bio: profilesTable.bio,
+				visibility: profilesTable.visibility,
+				updatedAt: profilesTable.updatedAt,
+				createdAt: followsTable.createdAt,
+			})
+			.from(followsTable)
+			.innerJoin(
+				profilesTable,
+				eq(followsTable.followerId, profilesTable.userId)
+			)
+			.where(
+				and(
+					eq(followsTable.followingId, this.userId),
+					eq(followsTable.status, "pending"),
+					cursor ? lt(followsTable.createdAt, cursor) : undefined
+				)
+			)
+			.orderBy(desc(followsTable.createdAt))
+			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
+
+		const hasMore = items.length > config.PROFILE_PAGINATION_LIMIT;
+		const data = hasMore ? items.slice(0, -1) : items;
+		const nextCursor = hasMore ? data.at(-1)!.createdAt : null;
+
+		return {
+			items: data.map((item) => ({
+				...item,
+				avatarUrl: item.avatarKey
+					? constructPublicUrl({
+							key: item.avatarKey,
+							updatedAt: item.updatedAt,
+						}).publicUrl
+					: null,
+				bannerUrl: item.bannerKey
+					? constructPublicUrl({
+							key: item.bannerKey,
+							updatedAt: item.updatedAt,
+						}).publicUrl
+					: null,
+			})),
+			nextCursor,
+		};
+	}
+
+	async getPendingSent({
+		cursor,
+	}: z.infer<typeof followSchema.getPendingSent.input>): Promise<
+		z.infer<typeof followSchema.getPendingSent.output>
+	> {
+		const items = await this.db
+			.select({
+				id: profilesTable.id,
+				userId: profilesTable.userId,
+				username: profilesTable.username,
+				displayName: profilesTable.displayName,
+				avatarKey: profilesTable.avatarKey,
+				bannerKey: profilesTable.bannerKey,
+				bannerMimeType: profilesTable.bannerMimeType,
+				isGlimpseVerified: profilesTable.isGlimpseVerified,
+				pronouns: profilesTable.pronouns,
+				bio: profilesTable.bio,
+				visibility: profilesTable.visibility,
+				updatedAt: profilesTable.updatedAt,
+				createdAt: followsTable.createdAt,
+			})
+			.from(followsTable)
+			.innerJoin(
+				profilesTable,
+				eq(followsTable.followingId, profilesTable.userId)
+			)
+			.where(
+				and(
+					eq(followsTable.followerId, this.userId),
+					eq(followsTable.status, "pending"),
+					cursor ? lt(followsTable.createdAt, cursor) : undefined
+				)
+			)
+			.orderBy(desc(followsTable.createdAt))
+			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
+
+		const hasMore = items.length > config.PROFILE_PAGINATION_LIMIT;
+		const data = hasMore ? items.slice(0, -1) : items;
+		const nextCursor = hasMore ? data.at(-1)!.createdAt : null;
+
+		return {
+			items: data.map((item) => ({
+				...item,
+				avatarUrl: item.avatarKey
+					? constructPublicUrl({
+							key: item.avatarKey,
+							updatedAt: item.updatedAt,
+						}).publicUrl
+					: null,
+				bannerUrl: item.bannerKey
+					? constructPublicUrl({
+							key: item.bannerKey,
+							updatedAt: item.updatedAt,
+						}).publicUrl
+					: null,
+			})),
+			nextCursor,
+		};
 	}
 }

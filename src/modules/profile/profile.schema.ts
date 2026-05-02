@@ -1,21 +1,10 @@
 import * as z from "zod";
-import { VisibilityEnum } from "@/db/schema";
+import { profileSelectSchema, VisibilityEnum } from "@/db/schema";
 import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 
-const Profile = z.object({
-	id: z.string(),
-	userId: z.string(),
-	username: z.string(),
-	displayName: z.string(),
-	pronouns: z.string().nullable(),
-	isGlimpseVerified: z.boolean(),
-	bio: z.string().nullable(),
-	visibility: z.enum(VisibilityEnum.enumValues),
-	avatarUrl: z.string().nullable(),
-	bannerUrl: z.string().nullable(),
-	bannerMimeType: z.string().nullable(),
-	createdAt: z.date(),
-	updatedAt: z.date(),
+const getProfileOutput = profileSelectSchema.extend({
+	followersCount: z.number(),
+	followingCount: z.number(),
 });
 
 export const profileSchema = {
@@ -24,7 +13,7 @@ export const profileSchema = {
 			username: z.string().optional(),
 			userId: z.string().optional(),
 		}),
-		output: Profile,
+		output: getProfileOutput,
 	},
 
 	onboard: {
@@ -105,7 +94,7 @@ export const profileSchema = {
 			cursor: z.date().optional(),
 		}),
 		output: z.object({
-			items: z.array(Profile),
+			items: z.array(getProfileOutput),
 			nextCursor: z.date().nullable(),
 		}),
 	},
