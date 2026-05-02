@@ -8,9 +8,9 @@ What: Users have a profile created on signup. Viewable by others.
 
 ### Procedures (oRPC)
 
-- profiles.get({ userId }) → profile
-- profiles.update({ bio, avatar, ... }) → profile [auth required]
-- profiles.isUsernameAvailable({ username }) → boolean
+- profile.get({ userId }) → profile
+- profile.update({ bio, avatar, ... }) → profile [auth required]
+- profile.isUsernameAvailable({ username }) → boolean
 
 ### UI States
 

@@ -38,10 +38,10 @@ const Profile = ({ data, viewerId }: ProfileProps) => {
 				</div>
 				{viewerId === data.userId && (
 					<Button
-						variant="ghost"
+						variant="outline-ring"
 						nativeButton={false}
-						className="absolute right-4 text-base translate-y-1/2 p-4 rounded-full ring-1 ring-accent active:not-aria-[haspopup]:translate-y-5!"
 						render={<Link href="/settings/profile" />}
+						className="absolute right-4 translate-y-1/2 active:not-aria-[haspopup]:translate-y-5!"
 					>
 						Edit Profile
 					</Button>
