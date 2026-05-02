@@ -53,7 +53,7 @@ export const LOCAL_STORAGE_KEYS = {
 };
 
 const SIDEBAR_GIF_BASE = "https://ik.imagekit.io/aditsuru/Glimpse";
-const SIDEBAR_GIF_COUNT = 7;
+const SIDEBAR_GIF_COUNT = 8;
 
 export const SIDEBAR_GIFS = Array.from(
 	{ length: SIDEBAR_GIF_COUNT },

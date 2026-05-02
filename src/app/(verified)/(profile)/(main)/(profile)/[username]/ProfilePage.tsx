@@ -2,8 +2,8 @@
 
 import { ORPCError } from "@orpc/client";
 import { Ghost } from "lucide-react";
-import UserNotFound from "@/components/layout/UserNotFound";
-import { Profile, SuspenseProfile } from "@/modules/profile/components/Profile";
+import UserNotFound from "@/components/layout/ErrorMessage";
+import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
 import { useProfile } from "@/modules/profile/profile.queries";
 
 const ProfilePage = ({
@@ -15,7 +15,7 @@ const ProfilePage = ({
 }) => {
 	const { data, isLoading, error } = useProfile({ username });
 
-	if (isLoading) return <SuspenseProfile />;
+	if (isLoading) return <ProfileSkeleton />;
 
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {
@@ -31,6 +31,8 @@ const ProfilePage = ({
 		}
 		return <UserNotFound />;
 	}
+
+	if (!data) return;
 
 	return (
 		<div className="w-full h-full">
