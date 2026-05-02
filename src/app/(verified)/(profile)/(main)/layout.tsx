@@ -8,7 +8,7 @@ import Navbar from "@/components/layout/Navbar";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
 
-export default async function AuthGuard({
+export default async function Layout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
