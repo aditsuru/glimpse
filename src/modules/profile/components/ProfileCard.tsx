@@ -1,0 +1,65 @@
+import type * as z from "zod";
+import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+	HoverCard,
+	HoverCardContent,
+	HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { cn } from "@/lib/client/utils";
+import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
+import type { profileSchema } from "../profile.schema";
+import HoverProfileCard from "./HoverProfileCard";
+
+interface ProfileCardProps {
+	className?: string;
+	viewerId: string;
+	data: z.infer<typeof profileSchema.get.output>;
+	handleFollow: () => void;
+}
+
+const ProfileCard = ({
+	data,
+	className,
+	viewerId,
+	handleFollow,
+}: ProfileCardProps) => {
+	return (
+		<div className={cn("w-full", className)}>
+			<div className="w-full flex justify-between items-center p-4">
+				<div className="flex gap-4 items-start">
+					<Avatar className="size-12">
+						<AvatarImage src={data.avatarUrl || DEFAULT_PFP_URL} />
+					</Avatar>
+					<div>
+						<div className="text-lg font-semibold flex gap-1 items-center">
+							<HoverCard>
+								<HoverCardTrigger
+									delay={10}
+									render={
+										<p className="hover:underline hover:underline-offset-4">
+											{data.displayName}
+										</p>
+									}
+								/>
+								<HoverCardContent className="w-xs rounded-xl bg-background">
+									<HoverProfileCard data={data} handleFollow={handleFollow} />
+								</HoverCardContent>
+							</HoverCard>
+							{data.isGlimpseVerified && <VerifiedBadge className="size-4.5" />}
+						</div>
+						<p className="text-muted-foreground -mt-1">@{data.username}</p>
+					</div>
+				</div>
+				{viewerId !== data.userId && (
+					<Button variant="follow" onClick={handleFollow}>
+						Follow
+					</Button>
+				)}
+			</div>
+		</div>
+	);
+};
+
+export default ProfileCard;

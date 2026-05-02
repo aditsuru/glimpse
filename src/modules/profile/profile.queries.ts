@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
 
 export function useOnboard() {
@@ -34,6 +34,17 @@ export function useProfile(input: { username?: string; userId?: string }) {
 		orpc.profile.get.queryOptions({
 			input,
 			enabled: !!(input.username || input.userId),
+		})
+	);
+}
+
+export function useSearchProfiles(query: string) {
+	return useInfiniteQuery(
+		orpc.profile.search.infiniteOptions({
+			input: (pageParam) => ({ query, cursor: pageParam as Date | undefined }),
+			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+			initialPageParam: undefined as Date | undefined,
+			enabled: query.length > 0,
 		})
 	);
 }
