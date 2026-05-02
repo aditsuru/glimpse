@@ -234,9 +234,8 @@ const ProfileSettings = () => {
 		}
 	};
 
-	if (isProfileLoading) return <ProfileSkeleton />;
+	if (isProfileLoading || !profileData) return <ProfileSkeleton />;
 	if (profileError) return <ErrorMessage />;
-	if (!profileData) return null;
 
 	const isAnythingUploading = isAvatarUploading || isBannerUploading;
 

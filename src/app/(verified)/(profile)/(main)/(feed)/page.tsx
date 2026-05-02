@@ -24,8 +24,9 @@ function Dev() {
 	return (
 		<div className="w-full h-full flex flex-col items-center">
 			<div className="w-full h-20 border-b-2 text-center pt-4">
-				<h2 className="text-lg underline underline-offset-8 decoration-primary decoration-2 font-semibold pt-2">
+				<h2 className="text-lg font-semibold py-2 relative">
 					For You
+					<span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-1 bg-primary rounded-full" />
 				</h2>
 			</div>
 			<ScrollContainer className="min-h-screen overflow-y-auto w-full no-scrollbar px-4">
