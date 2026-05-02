@@ -87,7 +87,7 @@ export const config = createEnv({
 		NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT: msMs.default(60000),
 
 		// ── React Query ───────────────────────────────────────────────
-		NEXT_PUBLIC_QUERY_STALE_TIME: msMs.default(300000),
+		NEXT_PUBLIC_QUERY_STALE_TIME: msMs.default(0),
 		NEXT_PUBLIC_QUERY_GC_TIME: msMs.default(300000),
 		NEXT_PUBLIC_QUERY_MAX_RETRIES: z.coerce.number().nonnegative().default(1),
 	},

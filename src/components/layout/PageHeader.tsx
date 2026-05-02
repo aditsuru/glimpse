@@ -1,0 +1,27 @@
+"use client";
+
+import { ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+
+type PageHeaderProps = {
+	title: string;
+};
+
+const PageHeader = ({ title }: PageHeaderProps) => {
+	const router = useRouter();
+	return (
+		<div className="flex items-center gap-4 px-4 py-3 border-b border-accent sticky top-0 bg-background/80 backdrop-blur-sm z-10">
+			<Button
+				variant="ghost"
+				onClick={() => router.back()}
+				className="rounded-full p-2 hover:bg-accent transition-colors"
+			>
+				<ChevronLeft className="size-5" />
+			</Button>
+			<h1 className="text-xl font-bold">{title}</h1>
+		</div>
+	);
+};
+
+export default PageHeader;
