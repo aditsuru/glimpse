@@ -39,7 +39,7 @@ const navItems = [
 	{ label: "Follow", href: "/requests", icon: UserPlus },
 	{ label: "Notifications", href: "/notifications", icon: Bell },
 	{ label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
-	{ label: "Profile", href: "/aditsuru", icon: User },
+	{ label: "Profile", href: "/profile", icon: User },
 	{ label: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -109,6 +109,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 				{/* Nav Items */}
 				{navItems.map(({ label, href, icon: Icon }) => {
 					const isActive = pathname === href;
+					href = label === "Profile" ? `/${data?.username}` : href;
 					return (
 						<Link
 							key={href}
