@@ -54,7 +54,7 @@ const Explore = () => {
 						key={profile.id}
 						className="hover:bg-accent/20  px-4"
 					>
-						<ProfileCard data={profile} handleFollow={() => {}} viewerId="a" />
+						<ProfileCard data={profile} />
 					</Link>
 				))}
 

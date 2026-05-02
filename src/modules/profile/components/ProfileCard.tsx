@@ -1,7 +1,6 @@
 import type * as z from "zod";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
 	HoverCard,
 	HoverCardContent,
@@ -14,17 +13,11 @@ import HoverProfileCard from "./HoverProfileCard";
 
 interface ProfileCardProps {
 	className?: string;
-	viewerId: string;
 	data: z.infer<typeof profileSchema.get.output>;
-	handleFollow: () => void;
+	action?: React.ReactNode;
 }
 
-const ProfileCard = ({
-	data,
-	className,
-	viewerId,
-	handleFollow,
-}: ProfileCardProps) => {
+const ProfileCard = ({ data, className, action }: ProfileCardProps) => {
 	return (
 		<div className={cn("w-full", className)}>
 			<div className="w-full flex justify-between items-center p-4">
@@ -44,7 +37,7 @@ const ProfileCard = ({
 									}
 								/>
 								<HoverCardContent className="w-xs rounded-xl bg-background">
-									<HoverProfileCard data={data} handleFollow={handleFollow} />
+									<HoverProfileCard data={data} action={action} />
 								</HoverCardContent>
 							</HoverCard>
 							{data.isGlimpseVerified && <VerifiedBadge className="size-4.5" />}
@@ -52,11 +45,7 @@ const ProfileCard = ({
 						<p className="text-muted-foreground -mt-1">@{data.username}</p>
 					</div>
 				</div>
-				{viewerId !== data.userId && (
-					<Button variant="follow" onClick={handleFollow}>
-						Follow
-					</Button>
-				)}
+				{action}
 			</div>
 		</div>
 	);

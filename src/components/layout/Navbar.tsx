@@ -36,7 +36,7 @@ import { Skeleton } from "../ui/skeleton";
 const navItems = [
 	{ label: "Home", href: "/", icon: Home },
 	{ label: "Explore", href: "/explore", icon: Search },
-	{ label: "Follow", href: "/follow", icon: UserPlus },
+	{ label: "Follow", href: "/requests", icon: UserPlus },
 	{ label: "Notifications", href: "/notifications", icon: Bell },
 	{ label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
 	{ label: "Profile", href: "/aditsuru", icon: User },

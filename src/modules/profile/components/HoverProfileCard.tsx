@@ -4,7 +4,6 @@ import Link from "next/link";
 import type * as z from "zod";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/client/utils";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import type { profileSchema } from "../profile.schema";
@@ -12,13 +11,13 @@ import type { profileSchema } from "../profile.schema";
 interface HoverProfileCardProps {
 	className?: string;
 	data: z.infer<typeof profileSchema.get.output>;
-	handleFollow: () => void;
+	action?: React.ReactNode;
 }
 
 const HoverProfileCard = ({
 	className,
 	data,
-	handleFollow,
+	action,
 }: HoverProfileCardProps) => {
 	return (
 		<div className={cn("w-full p-4 flex flex-col gap-4", className)}>
@@ -27,9 +26,7 @@ const HoverProfileCard = ({
 					<Avatar className="size-15">
 						<AvatarImage src={data.avatarUrl || DEFAULT_PFP_URL} />
 					</Avatar>
-					<Button variant="follow" onClick={handleFollow}>
-						Follow
-					</Button>
+					{action}
 				</div>
 				<Link href={`/${data.username}`}>
 					<p className="text-xl font-semibold mt-2 flex gap-1 items-center hover:underline hover:underline-offset-4">
