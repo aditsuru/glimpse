@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type * as z from "zod";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
@@ -16,7 +18,7 @@ import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import type { profileSchema } from "../profile.schema";
 
 interface HoverProfileCardProps {
-	className: string;
+	className?: string;
 	data: z.infer<typeof profileSchema.get.output>;
 	handleFollow: () => void;
 }
@@ -32,11 +34,7 @@ const HoverProfileCard = ({
 					<Avatar className="size-15">
 						<AvatarImage src={data.avatarUrl || DEFAULT_PFP_URL} />
 					</Avatar>
-					<Button
-						variant="ghost"
-						className="text-base p-4 rounded-full ring-1 ring-accent"
-						onClick={handleFollow}
-					>
+					<Button variant="outline-ring" onClick={handleFollow}>
 						Follow
 					</Button>
 				</div>
@@ -46,7 +44,7 @@ const HoverProfileCard = ({
 						{data.isGlimpseVerified && <VerifiedBadge />}
 					</CardTitle>
 				</Link>
-				<CardDescription className="text-muted-foreground ">
+				<CardDescription className="text-muted-foreground flex gap-1">
 					@{data.username}
 					{data.pronouns && <p>~ {data.pronouns}</p>}
 				</CardDescription>
