@@ -3,6 +3,7 @@
 import { ORPCError } from "@orpc/client";
 import { Ghost } from "lucide-react";
 import UserNotFound from "@/components/layout/ErrorMessage";
+import PageHeader from "@/components/layout/PageHeader";
 import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
 import { useProfile } from "@/modules/profile/profile.queries";
 
@@ -36,6 +37,7 @@ const ProfilePage = ({
 
 	return (
 		<div className="w-full h-full">
+			<PageHeader title={username} />
 			<Profile data={data} viewerId={viewerId} />
 		</div>
 	);
