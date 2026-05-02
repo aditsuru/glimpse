@@ -70,4 +70,11 @@ export const profileRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.profileService.updateBanner({ ...input });
 		}),
+
+	search: profileProcedure
+		.input(profileSchema.search.input)
+		.output(profileSchema.search.output)
+		.handler(async ({ input, context }) => {
+			return await context.profileService.search({ ...input });
+		}),
 });

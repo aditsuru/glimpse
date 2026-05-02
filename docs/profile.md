@@ -36,3 +36,12 @@ What: Users have a profile created on signup. Viewable by others.
 ### Utility needed
 
 - AWS S3 helper functions
+
+### Search
+
+- profiles.search({ query, cursor? }) → { profiles: Profile[], nextCursor: string | null }
+- Query matches against username and displayName
+- Cursor-based pagination
+- Returns partial matches (ILIKE/prefix search)
+- Max 10 results per page
+- Auth required

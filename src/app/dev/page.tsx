@@ -1,7 +1,7 @@
 "use client";
 
 import { authClient } from "@/lib/client/auth-client";
-import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
+import ProfileCard from "@/modules/profile/components/ProfileCard";
 import { useProfile } from "@/modules/profile/profile.queries";
 
 function Dev() {
@@ -13,7 +13,14 @@ function Dev() {
 	if (!data) return;
 	return (
 		<div className="w-screen h-dvh flex justify-center items-center">
-			<HoverProfileCard data={data} handleFollow={() => {}} />
+			<div className="w-lg">
+				<ProfileCard
+					data={data}
+					viewerId={sessionData?.user.id as string}
+					handleFollow={() => {}}
+					className="border rounded-full"
+				/>
+			</div>
 		</div>
 	);
 }
