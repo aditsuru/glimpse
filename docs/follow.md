@@ -1,34 +1,52 @@
 ## Feature: Follows
 
-What: Users can follow each other directly or via requests.
+What: Users can follow each other. Private profiles require approval.
 
 ### DB
 
 - follows table: followerId, followingId, status, createdAt, updatedAt
+- status enum: pending | accepted
+- Unique constraint on (followerId, followingId)
+- Index on followerId, index on followingId
 
 ### Procedures (oRPC)
 
-- profile.get({ userId }) → profile
-- profile.update({ bio, avatar, ... }) → profile [auth required]
-- profile.isUsernameAvailable({ username }) → boolean
-
-### UI States
-
-- Loading skeleton + Server Side hydration
-- Own profile (shows edit button)
-- Other user's profile (no edit button)
-- Follow stats: NOT in this feature, stubbed as null/hidden
-
-### Pages
-
-- /{username}/follow → display followers and followings sections for the user
-- /follow → See pending requests (sent and received)
+- follow.send({ targetUserId }) → { success: true }
+- follow.remove({ targetUserId }) → { success: true } — unfollow or cancel request
+- follow.removeFollower({ followerId }) → { success: true }
+- follow.accept({ followerId }) → { success: true }
+- follow.reject({ followerId }) → { success: true }
+- follow.getStatus({ targetUserId }) → { status: "none" | "pending" | "accepted" | "follows_you" | "mutual" }
+- follow.getFollowers({ userId, cursor? }) → { items: Profile[], nextCursor: Date | null }
+- follow.getFollowing({ userId, cursor? }) → { items: Profile[], nextCursor: Date | null }
+- follow.getPendingReceived({ cursor? }) → { items: Profile[], nextCursor: Date | null }
+- follow.getPendingSent({ cursor? }) → { items: Profile[], nextCursor: Date | null }
 
 ### Constraints & Rules
 
-- User must always request to follow a private profile
-- All the three pages must follow cursor based pagination
+- Private profiles always require a follow request regardless of who is asking
+- A user cannot follow themselves — enforced at service level and DB check constraint
+- status: pending = waiting for approval, accepted = following
+- Unfollowing removes the row entirely, not a status change
+- Removing a follower removes their row entirely
 
-### Out of Scope (conscious decisions)
+### UI States
 
-- Notifications → Notification feature
+- Follow button states: Follow | Requested | Following | Follow Back
+- Follow Back shown when target already follows the viewer but viewer doesn't follow back
+- Following profile: clicking shows "Unfollow" on hover
+- No follow button on own profile
+- Pending requests page shows sent and received in separate tabs
+- Followers page has remove option (three dots) per follower
+
+### Pages
+
+- /{username}/followers — paginated followers list
+- /{username}/following — paginated following list
+- /requests — pending sent and received follow requests
+
+### Out of Scope
+
+- Blocking users
+- Notifications (separate feature)
+- Follow counts on profile (stubbed as 0, unblocked by this feature)
