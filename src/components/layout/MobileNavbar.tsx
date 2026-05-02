@@ -34,9 +34,11 @@ const MobileNav = ({ userId }: MobileNavbarProps) => {
 					/>
 				</Link>
 			))}
-			<Avatar className="size-7 shrink-0">
-				<AvatarImage src={data?.avatarUrl ?? "/static/default-pfp.png"} />
-			</Avatar>
+			<Link href={`/${data?.username}`}>
+				<Avatar className="size-7 shrink-0">
+					<AvatarImage src={data?.avatarUrl ?? "/static/default-pfp.png"} />
+				</Avatar>
+			</Link>
 		</nav>
 	);
 };
