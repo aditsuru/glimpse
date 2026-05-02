@@ -241,7 +241,7 @@ const ProfileSettings = () => {
 	const isAnythingUploading = isAvatarUploading || isBannerUploading;
 
 	return (
-		<div className="w-full overflow-y-auto scrollbar-none mb-8">
+		<div className="w-full overflow-y-auto no-scrollbar mb-8">
 			<PageHeader title="Edit Profile" />
 			<div className="relative">
 				{/* Banner */}

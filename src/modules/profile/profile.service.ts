@@ -1,5 +1,6 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: nextCursor can't be undefined */
 import { ORPCError } from "@orpc/server";
-import { eq } from "drizzle-orm";
+import { and, desc, eq, ilike, lt, or } from "drizzle-orm";
 import {
 	englishDataset,
 	englishRecommendedTransformers,
@@ -15,6 +16,7 @@ import {
 	getPresignedUploadUrl,
 	moveFile,
 } from "@/lib/server/s3-utils";
+import { config } from "@/lib/shared/config";
 import { RESERVED_USERNAMES } from "@/lib/shared/constants";
 import { constructPublicUrl } from "@/lib/shared/s3-utils";
 import type { profileSchema } from "./profile.schema";
@@ -56,6 +58,7 @@ export class ProfileService {
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
 		return {
+			id: profile.id,
 			userId: profile.userId,
 			username: profile.username,
 			displayName: profile.displayName,
@@ -267,5 +270,55 @@ export class ProfileService {
 		});
 
 		return { success: true };
+	}
+
+	async search({
+		query,
+		cursor,
+	}: z.infer<typeof profileSchema.search.input>): Promise<
+		z.infer<typeof profileSchema.search.output>
+	> {
+		let items = await this.db
+			.select()
+			.from(profilesTable)
+			.where(
+				and(
+					or(
+						ilike(profilesTable.username, `%${query}%`),
+						ilike(profilesTable.displayName, `%${query}%`)
+					),
+					cursor ? lt(profilesTable.createdAt, cursor) : undefined
+				)
+			)
+			.orderBy(desc(profilesTable.createdAt))
+			.limit(config.PROFILE_PAGINATION_LIMIT + 1);
+
+		let nextCursor = null;
+
+		if (items.length > config.PROFILE_PAGINATION_LIMIT) {
+			nextCursor = items.at(-1)!.createdAt;
+			items = items.slice(0, -1);
+		}
+
+		const mappedItems = items.map((profile) => ({
+			...profile,
+			avatarUrl: profile.avatarKey
+				? constructPublicUrl({
+						key: profile.avatarKey,
+						updatedAt: profile.updatedAt,
+					}).publicUrl
+				: null,
+			bannerUrl: profile.bannerKey
+				? constructPublicUrl({
+						key: profile.bannerKey,
+						updatedAt: profile.updatedAt,
+					}).publicUrl
+				: null,
+		}));
+
+		return {
+			items: mappedItems,
+			nextCursor,
+		};
 	}
 }

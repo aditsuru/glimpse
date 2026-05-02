@@ -15,6 +15,7 @@ interface ProfileProps {
 	data: z.infer<typeof profileSchema.get.output>;
 	viewerId: string;
 }
+
 const Profile = ({ data, viewerId }: ProfileProps) => {
 	return (
 		<div className="w-full">

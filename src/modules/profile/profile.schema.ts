@@ -2,26 +2,29 @@ import * as z from "zod";
 import { VisibilityEnum } from "@/db/schema";
 import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 
+const Profile = z.object({
+	id: z.string(),
+	userId: z.string(),
+	username: z.string(),
+	displayName: z.string(),
+	pronouns: z.string().nullable(),
+	isGlimpseVerified: z.boolean(),
+	bio: z.string().nullable(),
+	visibility: z.enum(VisibilityEnum.enumValues),
+	avatarUrl: z.string().nullable(),
+	bannerUrl: z.string().nullable(),
+	bannerMimeType: z.string().nullable(),
+	createdAt: z.date(),
+	updatedAt: z.date(),
+});
+
 export const profileSchema = {
 	get: {
 		input: z.object({
 			username: z.string().optional(),
 			userId: z.string().optional(),
 		}),
-		output: z.object({
-			userId: z.string(),
-			username: z.string(),
-			displayName: z.string(),
-			pronouns: z.string().nullable(),
-			isGlimpseVerified: z.boolean(),
-			bio: z.string().nullable(),
-			visibility: z.enum(VisibilityEnum.enumValues),
-			avatarUrl: z.string().nullable(),
-			bannerUrl: z.string().nullable(),
-			bannerMimeType: z.string().nullable(),
-			createdAt: z.date(),
-			updatedAt: z.date(),
-		}),
+		output: Profile,
 	},
 
 	onboard: {
@@ -93,6 +96,17 @@ export const profileSchema = {
 		}),
 		output: z.object({
 			success: z.boolean(),
+		}),
+	},
+
+	search: {
+		input: z.object({
+			query: z.string(),
+			cursor: z.date().optional(),
+		}),
+		output: z.object({
+			items: z.array(Profile),
+			nextCursor: z.date().nullable(),
 		}),
 	},
 };
