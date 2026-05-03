@@ -10,6 +10,7 @@ const followProcedure = authedProcedure.use(({ context, next }) => {
 		},
 	});
 });
+
 export const followRouter = base.router({
 	send: followProcedure
 		.input(followSchema.send.input)

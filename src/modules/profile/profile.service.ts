@@ -108,7 +108,6 @@ export class ProfileService {
 			viewerFollows?.status,
 			profileFollowsViewer?.status
 		);
-
 		return {
 			id: profile.id,
 			userId: profile.userId,
@@ -415,12 +414,16 @@ export class ProfileService {
 			}) => ({
 				...profile,
 				avatarUrl: avatarKey
-					? constructPublicUrl({ key: avatarKey, updatedAt: profile.updatedAt })
-							.publicUrl
+					? constructPublicUrl({
+							key: avatarKey,
+							updatedAt: profile.updatedAt,
+						}).publicUrl
 					: null,
 				bannerUrl: bannerKey
-					? constructPublicUrl({ key: bannerKey, updatedAt: profile.updatedAt })
-							.publicUrl
+					? constructPublicUrl({
+							key: bannerKey,
+							updatedAt: profile.updatedAt,
+						}).publicUrl
 					: null,
 				viewerStatus: computeViewerStatus(
 					viewerFollowsStatus,

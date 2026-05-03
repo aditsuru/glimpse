@@ -48,7 +48,14 @@ const Profile = ({ data, viewerId }: ProfileProps) => {
 						Edit Profile
 					</Button>
 				)}
-				{viewerId !== data.userId && <FollowButton />}
+				{viewerId !== data.userId && (
+					<FollowButton
+						initialStatus={data.viewerStatus}
+						targetUserId={data.userId}
+						targetVisibility={data.visibility}
+						className="absolute right-4 translate-y-1/2 active:not-aria-[haspopup]:translate-y-5!"
+					/>
+				)}
 			</div>
 			<div className="mt-[80px] px-4">
 				<h2 className="text-2xl font-semibold flex gap-1 items-center">

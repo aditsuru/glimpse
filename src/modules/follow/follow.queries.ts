@@ -1,24 +1,80 @@
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+	useInfiniteQuery,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
 
+/**
+ * Side effects:
+ * - Optimistic: FollowButton maintains a local state. No cache operations.
+ * - Refetch on settle: profile.get, profile.search
+ */
+
 export function useSendFollow() {
-	return useMutation(orpc.follow.send.mutationOptions());
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.follow.send.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
+				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+			]);
+		},
+	});
 }
 
 export function useRemoveFollow() {
-	return useMutation(orpc.follow.remove.mutationOptions());
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.follow.remove.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
+				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+			]);
+		},
+	});
 }
 
 export function useRemoveFollower() {
-	return useMutation(orpc.follow.removeFollower.mutationOptions());
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.follow.removeFollower.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
+				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+			]);
+		},
+	});
 }
 
 export function useAcceptRequest() {
-	return useMutation(orpc.follow.accept.mutationOptions());
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.follow.accept.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
+				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+			]);
+		},
+	});
 }
 
 export function useRejectRequest() {
-	return useMutation(orpc.follow.reject.mutationOptions());
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.follow.reject.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
+				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+			]);
+		},
+	});
 }
 
 export function useFollowStatus(
