@@ -1,8 +1,9 @@
 "use client";
 
 import { ORPCError } from "@orpc/client";
-import { Ghost } from "lucide-react";
 import Link from "next/link";
+import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import ErrorMessage from "@/components/layout/ErrorMessage";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,7 +12,6 @@ import { cn } from "@/lib/client/utils";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import FollowButton from "@/modules/follow/components/FollowButton";
 import { useProfile } from "../profile.queries";
-import { ProfileError } from "./Profile";
 
 interface HoverProfileCardProps {
 	className?: string;
@@ -23,9 +23,14 @@ const HoverProfileCard = ({ className, username }: HoverProfileCardProps) => {
 	const { data: sessionData } = authClient.useSession();
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {
-			return <ProfileError />;
+			return (
+				<EmptyStateMessage
+					title="This account doesn't exist"
+					description="Try searching for another."
+				/>
+			);
 		}
-		return <HoverProfileError />;
+		return <ErrorMessage />;
 	}
 
 	if (isLoading || !data) return <HoverProfileCardSkeleton />;
@@ -41,6 +46,7 @@ const HoverProfileCard = ({ className, username }: HoverProfileCardProps) => {
 						<FollowButton
 							initialStatus={data.viewerStatus}
 							targetUserId={data.userId}
+							targetUsername={data.username}
 							targetVisibility={data.visibility}
 						/>
 					)}
@@ -100,18 +106,6 @@ const HoverProfileCardSkeleton = ({ className }: { className?: string }) => {
 					<Skeleton className="h-4 w-20 rounded" />
 				</div>
 			</div>
-		</div>
-	);
-};
-
-const HoverProfileError = () => {
-	return (
-		<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
-			<Ghost className="size-12" />
-			<p className="text-lg font-semibold text-foreground">
-				This account doesn't exist
-			</p>
-			<p className="text-sm">Try searching for another.</p>
 		</div>
 	);
 };

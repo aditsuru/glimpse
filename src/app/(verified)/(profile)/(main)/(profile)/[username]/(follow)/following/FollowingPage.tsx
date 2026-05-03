@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
 import FollowButton from "@/modules/follow/components/FollowButton";
@@ -19,8 +20,8 @@ const FollowingPage = ({ username }: { username: string }) => {
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
 
 	return (
-		<div className="w-full h-full overflow-y-auto no-scrollbar">
-			<div className="flex flex-col">
+		<div className="w-full h-full">
+			<div className="flex flex-col h-full">
 				{profiles.map((profile) => (
 					<div
 						key={profile.id}
@@ -33,6 +34,7 @@ const FollowingPage = ({ username }: { username: string }) => {
 							<FollowButton
 								initialStatus={profile.viewerStatus}
 								targetUserId={profile.userId}
+								targetUsername={profile.username}
 								targetVisibility={profile.visibility}
 								className="mr-4"
 							/>
@@ -41,9 +43,7 @@ const FollowingPage = ({ username }: { username: string }) => {
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
 				{profiles.length === 0 && !isFetching && (
-					<p className="text-center text-muted-foreground text-base py-8">
-						No followers yet
-					</p>
+					<EmptyStateMessage title="This user doesn't follow any accounts." />
 				)}
 			</div>
 		</div>

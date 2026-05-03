@@ -2,6 +2,7 @@
 
 import { EllipsisVertical } from "lucide-react";
 import Link from "next/link";
+import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -31,8 +32,8 @@ const FollowersPage = ({ username }: { username: string }) => {
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
 
 	return (
-		<div className="w-full h-full overflow-y-auto no-scrollbar">
-			<div className="flex flex-col">
+		<div className="w-full h-full">
+			<div className="flex flex-col h-full">
 				{profiles.map((profile) => (
 					<div
 						key={profile.id}
@@ -45,6 +46,7 @@ const FollowersPage = ({ username }: { username: string }) => {
 							<FollowButton
 								initialStatus={profile.viewerStatus}
 								targetUserId={profile.userId}
+								targetUsername={profile.username}
 								targetVisibility={profile.visibility}
 								className="mr-4"
 							/>
@@ -56,9 +58,10 @@ const FollowersPage = ({ username }: { username: string }) => {
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
 				{profiles.length === 0 && !isFetching && (
-					<p className="text-center text-muted-foreground text-base py-8">
-						No followers yet
-					</p>
+					<EmptyStateMessage
+						title="No followers found."
+						description={`Be the first to follow ${username}`}
+					/>
 				)}
 			</div>
 		</div>

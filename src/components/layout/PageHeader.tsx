@@ -15,7 +15,7 @@ const PageHeader = ({ title, className }: PageHeaderProps) => {
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-4 px-4 py-3 border-b border-accent sticky top-0 bg-background/80 backdrop-blur-sm z-10",
+				"flex items-center gap-4 px-4 border-b border-accent sticky top-0 bg-background/80 backdrop-blur-sm z-10 h-18",
 				className
 			)}
 		>

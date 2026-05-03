@@ -36,7 +36,7 @@ const MobileProfileHeader = ({
 	return (
 		<div
 			className={cn(
-				"flex items-center px-4 py-3 border-b border-accent sticky top-0 bg-background/80 backdrop-blur-sm z-10",
+				"flex items-center px-4 py-3 border-b border-accent sticky top-0 bg-background/80 backdrop-blur-sm z-10 h-18",
 				className
 			)}
 		>
