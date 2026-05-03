@@ -3,12 +3,12 @@
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
 import FollowButton from "@/modules/follow/components/FollowButton";
 import ProfileCard from "@/modules/profile/components/ProfileCard";
@@ -22,6 +22,8 @@ const Explore = () => {
 	const { data, fetchNextPage, hasNextPage, isFetching } =
 		useSearchProfiles(searchQuery);
 
+	const ref = useInfiniteScroll(fetchNextPage, isFetching);
+
 	const handleSubmit = (e: React.SubmitEvent) => {
 		e.preventDefault();
 		setSearchQuery(inputValue);
@@ -30,58 +32,47 @@ const Explore = () => {
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
 
 	return (
-		<div className="w-full">
-			<form onSubmit={handleSubmit}>
-				<div className="w-full flex justify-center p-4">
-					<InputGroup className="w-sm bg-background! rounded-full! p-4! py-5!">
-						<InputGroupInput
-							value={inputValue}
-							onChange={(e) => setInputValue(e.target.value)}
-							placeholder="Search profiles..."
-							autoComplete="off"
-							className="text-base!"
-						/>
-						<InputGroupAddon className="mr-1!">
-							<button type="submit">
-								<Search className="size-4" />
-							</button>
-						</InputGroupAddon>
-					</InputGroup>
-				</div>
+		<div className="w-full h-full overflow-y-auto no-scrollbar">
+			<form
+				onSubmit={handleSubmit}
+				className="sticky top-0 w-full flex justify-center px-4 py-3 border-b border-accent bg-background/80 backdrop-blur-sm z-10"
+			>
+				<InputGroup className="w-sm bg-background! rounded-full! p-4! py-5!">
+					<InputGroupInput
+						value={inputValue}
+						onChange={(e) => setInputValue(e.target.value)}
+						placeholder="Search profiles..."
+						autoComplete="off"
+						className="text-base!"
+					/>
+					<InputGroupAddon className="mr-1!">
+						<button type="submit">
+							<Search className="size-4" />
+						</button>
+					</InputGroupAddon>
+				</InputGroup>
 			</form>
 
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col">
 				{profiles.map((profile) => (
-					<Link
-						href={`/${profile.username}`}
-						key={profile.id}
-						className="hover:bg-accent/20  px-4"
-					>
-						<ProfileCard
-							data={profile}
-							action={
-								profile.userId !== sessionData?.user.id && (
-									<FollowButton
-										initialStatus={profile.viewerStatus}
-										targetUserId={profile.userId}
-										targetVisibility={profile.visibility}
-									/>
-								)
-							}
-						/>
-					</Link>
+					<div key={profile.id} className="hover:bg-accent/20 px-4">
+						<Link href={`/${profile.username}`}>
+							<ProfileCard
+								data={profile}
+								action={
+									profile.userId !== sessionData?.user.id && (
+										<FollowButton
+											initialStatus={profile.viewerStatus}
+											targetUserId={profile.userId}
+											targetVisibility={profile.visibility}
+										/>
+									)
+								}
+							/>
+						</Link>
+					</div>
 				))}
-
-				{hasNextPage && (
-					<Button
-						onClick={() => fetchNextPage()}
-						disabled={isFetching}
-						className="w-full py-3 text-muted-foreground hover:text-foreground transition-colors text-sm"
-					>
-						{isFetching ? "Loading..." : "Load more"}
-					</Button>
-				)}
-
+				{hasNextPage && <div ref={ref} className="h-1" />}
 				{searchQuery && profiles.length === 0 && !isFetching && (
 					<p className="text-center text-muted-foreground text-base py-8">
 						No profiles found for "{searchQuery}"
