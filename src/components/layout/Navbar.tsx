@@ -63,7 +63,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 	}, [error]);
 
 	const [currentIndex, setCurrentIndex] = useState(0);
-	const [SignOutOpen, setSignOutOpen] = useState(false);
+	const [signOutOpen, setSignOutOpen] = useState(false);
 
 	useEffect(() => {
 		setCurrentIndex(Math.floor(Math.random() * SIDEBAR_GIFS.length));
@@ -189,11 +189,11 @@ const Navbar = ({ userId }: NavbarProps) => {
 						</Button>
 					</PopoverContent>
 				</Popover>
-				<Dialog open={SignOutOpen} onOpenChange={setSignOutOpen}>
+				<Dialog open={signOutOpen} onOpenChange={setSignOutOpen}>
 					<DialogContent>
 						<DialogHeader>
 							<DialogTitle className="text-lg">Sign out?</DialogTitle>
-							<DialogDescription>
+							<DialogDescription className="text-base">
 								You can always sign back in at any time.
 							</DialogDescription>
 						</DialogHeader>

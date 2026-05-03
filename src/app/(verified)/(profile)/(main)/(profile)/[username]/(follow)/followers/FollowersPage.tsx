@@ -1,10 +1,22 @@
 "use client";
 
+import { EllipsisVertical } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
 import FollowButton from "@/modules/follow/components/FollowButton";
-import { useFollowers } from "@/modules/follow/follow.queries";
+import {
+	useFollowers,
+	useRemoveFollower,
+} from "@/modules/follow/follow.queries";
 import ProfileCard from "@/modules/profile/components/ProfileCard";
 import { useProfile } from "@/modules/profile/profile.queries";
 
@@ -37,6 +49,9 @@ const FollowersPage = ({ username }: { username: string }) => {
 								className="mr-4"
 							/>
 						)}
+						{profile.userId !== sessionData?.user.id && (
+							<DropdownMenuSubmenu followerId={profile.userId} />
+						)}
 					</div>
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
@@ -49,5 +64,37 @@ const FollowersPage = ({ username }: { username: string }) => {
 		</div>
 	);
 };
+
+export function DropdownMenuSubmenu({ followerId }: { followerId: string }) {
+	const removeFollower = useRemoveFollower();
+
+	const handleRemoveFollower = () => {
+		removeFollower.mutate({
+			followerId,
+		});
+	};
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger
+				render={
+					<Button variant="ghost" className="rounded-full">
+						<EllipsisVertical />
+					</Button>
+				}
+			/>
+			<DropdownMenuContent className="w-auto">
+				<DropdownMenuGroup>
+					<DropdownMenuItem
+						onClick={handleRemoveFollower}
+						className="text-destructive hover:text-destructive!"
+					>
+						Remove Follower
+					</DropdownMenuItem>
+				</DropdownMenuGroup>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
 
 export default FollowersPage;
