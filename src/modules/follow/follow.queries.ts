@@ -9,7 +9,7 @@ import { orpc } from "@/lib/client/orpc-client";
 /**
  * Side effects:
  * - Optimistic: FollowButton maintains a local state. No cache operations.
- * - Refetch on settle: profile.get, profile.search
+ * - Refetch on settle: profile.get, profile.search, follow.getFollowers. follow.getFollowing
  */
 
 export function useSendFollow() {
@@ -20,6 +20,12 @@ export function useSendFollow() {
 			await Promise.all([
 				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
 				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowers.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowing.key(),
+				}),
 			]);
 		},
 	});
@@ -33,6 +39,12 @@ export function useRemoveFollow() {
 			await Promise.all([
 				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
 				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowers.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowing.key(),
+				}),
 			]);
 		},
 	});
@@ -46,6 +58,12 @@ export function useRemoveFollower() {
 			await Promise.all([
 				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
 				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowers.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowing.key(),
+				}),
 			]);
 		},
 	});
@@ -59,6 +77,12 @@ export function useAcceptRequest() {
 			await Promise.all([
 				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
 				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowers.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowing.key(),
+				}),
 			]);
 		},
 	});
@@ -72,6 +96,12 @@ export function useRejectRequest() {
 			await Promise.all([
 				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
 				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowers.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getFollowing.key(),
+				}),
 			]);
 		},
 	});

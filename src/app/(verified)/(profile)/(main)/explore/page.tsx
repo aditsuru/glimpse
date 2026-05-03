@@ -55,21 +55,21 @@ const Explore = () => {
 
 			<div className="flex flex-col">
 				{profiles.map((profile) => (
-					<div key={profile.id} className="hover:bg-accent/20 px-4">
-						<Link href={`/${profile.username}`}>
-							<ProfileCard
-								data={profile}
-								action={
-									profile.userId !== sessionData?.user.id && (
-										<FollowButton
-											initialStatus={profile.viewerStatus}
-											targetUserId={profile.userId}
-											targetVisibility={profile.visibility}
-										/>
-									)
-								}
-							/>
+					<div
+						key={profile.id}
+						className="hover:bg-accent/20 px-4 flex items-center"
+					>
+						<Link href={`/${profile.username}`} className="flex-1">
+							<ProfileCard data={profile} />
 						</Link>
+						{profile.userId !== sessionData?.user.id && (
+							<FollowButton
+								initialStatus={profile.viewerStatus}
+								targetUserId={profile.userId}
+								targetVisibility={profile.visibility}
+								className="mr-4"
+							/>
+						)}
 					</div>
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}

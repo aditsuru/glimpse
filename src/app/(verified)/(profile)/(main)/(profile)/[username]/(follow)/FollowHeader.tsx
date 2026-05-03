@@ -29,7 +29,7 @@ const FollowHeader = ({ username }: FollowHeaderProps) => {
 				>
 					<ChevronLeft className="size-5" />
 				</Button>
-				<h1 className="text-xl font-bold">@{username}</h1>
+				<h1 className="text-xl font-bold">{username}</h1>
 			</div>
 			<div className="flex w-full">
 				{tabs.map(({ label, href }) => {

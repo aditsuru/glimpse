@@ -13,7 +13,10 @@ import HoverProfileCard from "./HoverProfileCard";
 
 interface ProfileCardProps {
 	className?: string;
-	data: z.infer<typeof profileSchema.get.output>;
+	data: Omit<
+		z.infer<typeof profileSchema.get.output>,
+		"followersCount" | "followingCount"
+	>;
 	action?: React.ReactNode;
 }
 
@@ -37,7 +40,7 @@ const ProfileCard = ({ data, className, action }: ProfileCardProps) => {
 									}
 								/>
 								<HoverCardContent className="w-xs rounded-xl bg-background">
-									<HoverProfileCard data={data} action={action} />
+									<HoverProfileCard username={data.username} />
 								</HoverCardContent>
 							</HoverCard>
 							{data.isGlimpseVerified && <VerifiedBadge className="size-4.5" />}

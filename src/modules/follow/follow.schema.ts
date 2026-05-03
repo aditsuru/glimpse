@@ -3,6 +3,15 @@ import { profileSelectSchema } from "@/db/schema";
 import { viewerFollowStatusEnum } from "@/lib/server/helpers";
 
 const followListOutput = z.object({
+	items: z.array(
+		profileSelectSchema.extend({
+			viewerStatus: z.enum(viewerFollowStatusEnum),
+		})
+	),
+	nextCursor: z.date().nullable(),
+});
+
+const pendingListOutput = z.object({
 	items: z.array(profileSelectSchema),
 	nextCursor: z.date().nullable(),
 });
@@ -82,13 +91,13 @@ export const followSchema = {
 		input: z.object({
 			cursor: z.date().optional(),
 		}),
-		output: followListOutput,
+		output: pendingListOutput,
 	},
 
 	getPendingSent: {
 		input: z.object({
 			cursor: z.date().optional(),
 		}),
-		output: followListOutput,
+		output: pendingListOutput,
 	},
 };
