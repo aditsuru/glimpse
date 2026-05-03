@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { profileSelectSchema } from "@/db/schema";
+import { viewerFollowStatusEnum } from "@/lib/server/helpers";
 
 const followListOutput = z.object({
 	items: z.array(profileSelectSchema),
@@ -57,14 +58,7 @@ export const followSchema = {
 			targetUserId: z.string(),
 		}),
 		output: z.object({
-			status: z.enum([
-				"none",
-				"mutual",
-				"accepted",
-				"pending",
-				"follows_you",
-				"follows_you_pending",
-			]),
+			status: z.enum(viewerFollowStatusEnum),
 		}),
 	},
 

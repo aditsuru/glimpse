@@ -1,4 +1,9 @@
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+	useInfiniteQuery,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
 
 export function useOnboard() {
@@ -25,8 +30,31 @@ export function useUpdateBanner() {
 	return useMutation(orpc.profile.updateBanner.mutationOptions());
 }
 
-export function useUpdateProfile() {
-	return useMutation(orpc.profile.update.mutationOptions());
+/**
+ * Side effects:
+ * - Refetch: profile.get by userId and username
+ */
+export function useUpdateProfile({
+	userId,
+	username,
+}: {
+	userId: string;
+	username: string;
+}) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.profile.update.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.refetchQueries(
+					orpc.profile.get.queryOptions({ input: { userId } })
+				),
+				queryClient.refetchQueries(
+					orpc.profile.get.queryOptions({ input: { username } })
+				),
+			]);
+		},
+	});
 }
 
 export function useProfile(input: { username?: string; userId?: string }) {

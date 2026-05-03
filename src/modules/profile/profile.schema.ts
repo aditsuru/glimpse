@@ -1,10 +1,12 @@
 import * as z from "zod";
 import { profileSelectSchema, VisibilityEnum } from "@/db/schema";
+import { viewerFollowStatusEnum } from "@/lib/server/helpers";
 import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 
 const getProfileOutput = profileSelectSchema.extend({
 	followersCount: z.number(),
 	followingCount: z.number(),
+	viewerStatus: z.enum(viewerFollowStatusEnum),
 });
 
 export const profileSchema = {

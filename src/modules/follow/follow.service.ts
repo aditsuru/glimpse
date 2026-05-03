@@ -5,6 +5,7 @@ import { and, desc, eq, lt } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
+import { computeViewerStatus } from "@/lib/server/helpers";
 import { config } from "@/lib/shared/config";
 import { constructPublicUrl } from "@/lib/shared/s3-utils";
 import type { followSchema } from "./follow.schema";
@@ -228,25 +229,7 @@ export class FollowService {
 		const iFollow = theyFollowedByMe?.status;
 		const theyFollow = theyFollowMe?.status;
 
-		// I follow them (accepted) + they follow me (accepted) → mutual
-		if (iFollow === "accepted" && theyFollow === "accepted")
-			return { status: "mutual" };
-
-		// I follow them (accepted), they don't → accepted
-		if (iFollow === "accepted" && !theyFollow) return { status: "accepted" };
-
-		// I requested (pending), regardless of them → pending
-		if (iFollow === "pending") return { status: "pending" };
-
-		// I don't follow, they follow me (accepted) → follows_you
-		if (!iFollow && theyFollow === "accepted") return { status: "follows_you" };
-
-		// I don't follow, they requested (pending) → follows_you_pending
-		if (!iFollow && theyFollow === "pending")
-			return { status: "follows_you_pending" };
-
-		// nothing on either side
-		return { status: "none" };
+		return { status: computeViewerStatus(iFollow, theyFollow) };
 	}
 
 	async getFollowers({

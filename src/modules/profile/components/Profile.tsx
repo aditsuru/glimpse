@@ -9,6 +9,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_PFP_URL, isGif } from "@/lib/shared/constants";
+import FollowButton from "@/modules/follow/components/FollowButton";
 import type { profileSchema } from "../profile.schema";
 
 interface ProfileProps {
@@ -47,6 +48,7 @@ const Profile = ({ data, viewerId }: ProfileProps) => {
 						Edit Profile
 					</Button>
 				)}
+				{viewerId !== data.userId && <FollowButton />}
 			</div>
 			<div className="mt-[80px] px-4">
 				<h2 className="text-2xl font-semibold flex gap-1 items-center">
