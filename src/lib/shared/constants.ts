@@ -50,13 +50,15 @@ export const LOCAL_STORAGE_KEYS = {
 	VERIFY_EMAIL_COOLDOWN: "verify_email_cooldown",
 	FORGOT_PASSWORD_COOLDOWN: "forgot_password_cooldown",
 	GLIMPSE_MEDIA_STORAGE: "glimpse_media_storage",
+	SIDEBAR_GIF_PANEL_TOGGLE: "sidebar_gif_panel_toggle",
 };
 
 export const SIDEBAR_GIFS = [
-	"https://ik.imagekit.io/aditsuru/Glimpse/asset2.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/asset3.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/asset5.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/asset4.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/asset6.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/asset8.gif",
+	"https://ik.imagekit.io/aditsuru/Glimpse/banner1.gif",
+	"https://ik.imagekit.io/aditsuru/Glimpse/banner2.gif",
+	"https://ik.imagekit.io/aditsuru/Glimpse/banner3.gif",
+	"https://ik.imagekit.io/aditsuru/Glimpse/banner4.gif",
+	"https://ik.imagekit.io/aditsuru/Glimpse/banner5.gif",
+	"https://ik.imagekit.io/aditsuru/Glimpse/banner6.gif",
+	"https://ik.imagekit.io/aditsuru/Glimpse/banner7.gif",
 ] as const;

@@ -51,9 +51,10 @@ const FollowersPage = ({ username }: { username: string }) => {
 								className="mr-4"
 							/>
 						)}
-						{profile.userId !== sessionData?.user.id && (
-							<DropdownMenuSubmenu followerId={profile.userId} />
-						)}
+						{profile.userId === sessionData?.user.id &&
+							profile.userId !== sessionData?.user.id && (
+								<DropdownMenuSubmenu followerId={profile.userId} />
+							)}
 					</div>
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
