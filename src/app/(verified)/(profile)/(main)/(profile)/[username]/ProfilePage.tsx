@@ -17,7 +17,7 @@ const ProfilePage = ({
 }) => {
 	const { data, isLoading, error } = useProfile({ username });
 
-	if (isLoading) return <ProfileSkeleton />;
+	if (isLoading || !data) return <ProfileSkeleton />;
 
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {
@@ -33,8 +33,6 @@ const ProfilePage = ({
 		}
 		return <UserNotFound />;
 	}
-
-	if (!data) return;
 
 	return (
 		<div className="w-full h-full">

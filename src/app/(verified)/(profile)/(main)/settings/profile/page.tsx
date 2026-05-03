@@ -2,7 +2,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, Trash } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
@@ -28,7 +27,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useMediaUpload } from "@/hooks/useMediaUpload";
 import { authClient } from "@/lib/client/auth-client";
-import { orpc } from "@/lib/client/orpc-client";
 import { cn } from "@/lib/client/utils";
 import {
 	ALLOWED_MIME_TYPES,
@@ -105,11 +103,12 @@ const ProfileSettings = () => {
 	const isUsernameAvailable = useIsUsernameAvailable();
 	const getAvatarPresignedUrl = useGetAvatarPresignedUrl();
 	const getBannerPresignedUrl = useGetBannerPresignedUrl();
-	const updateProfile = useUpdateProfile();
+	const updateProfile = useUpdateProfile({
+		userId: sessionData?.user.id ?? "",
+		username: profileData?.username ?? "",
+	});
 	const updateAvatar = useUpdateAvatar();
 	const updateBanner = useUpdateBanner();
-
-	const queryClient = useQueryClient();
 
 	const {
 		preview: avatarPreview,
@@ -205,27 +204,6 @@ const ProfileSettings = () => {
 				});
 
 			toast.success("Profile updated successfully!");
-
-			await Promise.all([
-				queryClient.refetchQueries(
-					orpc.profile.get.queryOptions({
-						input: { userId: sessionData?.user.id },
-					})
-				),
-				queryClient.refetchQueries(
-					orpc.profile.get.queryOptions({
-						input: { username: profileData?.username },
-					})
-				),
-			]);
-
-			if (formData.username !== profileData?.username) {
-				await queryClient.refetchQueries(
-					orpc.profile.get.queryOptions({
-						input: { username: formData.username },
-					})
-				);
-			}
 
 			avatarReset();
 			bannerReset();

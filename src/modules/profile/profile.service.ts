@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: nextCursor can't be undefined */
 import { ORPCError } from "@orpc/server";
-import { and, count, desc, eq, ilike, lt, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, lt, or, sql } from "drizzle-orm";
 import {
 	englishDataset,
 	englishRecommendedTransformers,
@@ -10,6 +10,7 @@ import { DatabaseError } from "pg";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
+import { computeViewerStatus } from "@/lib/server/helpers";
 import {
 	constructTempKey,
 	getPermanentKey,
@@ -57,7 +58,12 @@ export class ProfileService {
 		if (!profile)
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
-		const [[{ followersCount }], [{ followingCount }]] = await Promise.all([
+		const [
+			[{ followersCount }],
+			[{ followingCount }],
+			[viewerFollows],
+			[profileFollowsViewer],
+		] = await Promise.all([
 			this.db
 				.select({ followersCount: count() })
 				.from(followsTable)
@@ -76,7 +82,32 @@ export class ProfileService {
 						eq(followsTable.status, "accepted")
 					)
 				),
+			this.db
+				.select({ status: followsTable.status })
+				.from(followsTable)
+				.where(
+					and(
+						eq(followsTable.followerId, this.userId),
+						eq(followsTable.followingId, profile.userId)
+					)
+				)
+				.limit(1),
+			this.db
+				.select({ status: followsTable.status })
+				.from(followsTable)
+				.where(
+					and(
+						eq(followsTable.followerId, profile.userId),
+						eq(followsTable.followingId, this.userId)
+					)
+				)
+				.limit(1),
 		]);
+
+		const viewerStatus = computeViewerStatus(
+			viewerFollows?.status,
+			profileFollowsViewer?.status
+		);
 
 		return {
 			id: profile.id,
@@ -104,6 +135,7 @@ export class ProfileService {
 			updatedAt: profile.updatedAt,
 			followersCount,
 			followingCount,
+			viewerStatus,
 		};
 	}
 
@@ -330,6 +362,28 @@ export class ProfileService {
 						eq(followsTable.status, "accepted")
 					)
 				),
+				viewerFollowsStatus: this.db
+					.select({ status: followsTable.status })
+					.from(followsTable)
+					.where(
+						and(
+							eq(followsTable.followerId, sql`${this.userId}`),
+							eq(followsTable.followingId, profilesTable.userId)
+						)
+					)
+					.limit(1)
+					.as("viewer_follows_status"),
+				profileFollowsViewerStatus: this.db
+					.select({ status: followsTable.status })
+					.from(followsTable)
+					.where(
+						and(
+							eq(followsTable.followerId, profilesTable.userId),
+							eq(followsTable.followingId, sql`${this.userId}`)
+						)
+					)
+					.limit(1)
+					.as("profile_follows_status"),
 			})
 			.from(profilesTable)
 			.where(
@@ -351,17 +405,29 @@ export class ProfileService {
 			items = items.slice(0, -1);
 		}
 
-		const mappedItems = items.map(({ avatarKey, bannerKey, ...profile }) => ({
-			...profile,
-			avatarUrl: avatarKey
-				? constructPublicUrl({ key: avatarKey, updatedAt: profile.updatedAt })
-						.publicUrl
-				: null,
-			bannerUrl: bannerKey
-				? constructPublicUrl({ key: bannerKey, updatedAt: profile.updatedAt })
-						.publicUrl
-				: null,
-		}));
+		const mappedItems = items.map(
+			({
+				avatarKey,
+				bannerKey,
+				viewerFollowsStatus,
+				profileFollowsViewerStatus,
+				...profile
+			}) => ({
+				...profile,
+				avatarUrl: avatarKey
+					? constructPublicUrl({ key: avatarKey, updatedAt: profile.updatedAt })
+							.publicUrl
+					: null,
+				bannerUrl: bannerKey
+					? constructPublicUrl({ key: bannerKey, updatedAt: profile.updatedAt })
+							.publicUrl
+					: null,
+				viewerStatus: computeViewerStatus(
+					viewerFollowsStatus,
+					profileFollowsViewerStatus
+				),
+			})
+		);
 
 		return {
 			items: mappedItems,

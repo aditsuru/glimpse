@@ -10,8 +10,8 @@ import {
 import { createSelectSchema } from "drizzle-zod";
 import { user } from "./auth-schema";
 
-export const StatusEnum = pgEnum("status", ["pending", "accepted"]);
-export type StatusEnumType = (typeof StatusEnum.enumValues)[number];
+export const FollowStatusEnum = pgEnum("status", ["pending", "accepted"]);
+export type FollowStatusEnumType = (typeof FollowStatusEnum.enumValues)[number];
 
 export const followsTable = pgTable(
 	"follows",
@@ -22,7 +22,7 @@ export const followsTable = pgTable(
 		followingId: text("following_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		status: StatusEnum("status").notNull(),
+		status: FollowStatusEnum("status").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),
