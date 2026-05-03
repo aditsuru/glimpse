@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@/lib/client/auth-client";
-import ProfileCard from "@/modules/profile/components/ProfileCard";
 import { useProfile } from "@/modules/profile/profile.queries";
 
 function Dev() {
@@ -13,9 +12,7 @@ function Dev() {
 	if (!data) return;
 	return (
 		<div className="w-screen h-dvh flex justify-center items-center">
-			<div className="w-lg">
-				<ProfileCard data={data} className="border rounded-full" />
-			</div>
+			<div className="w-lg"></div>
 		</div>
 	);
 }

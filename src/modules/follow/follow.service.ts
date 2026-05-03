@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: sliced data can't be null */
 
 import { ORPCError } from "@orpc/server";
-import { and, desc, eq, lt } from "drizzle-orm";
+import { and, desc, eq, lt, sql } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
@@ -253,6 +253,28 @@ export class FollowService {
 				visibility: profilesTable.visibility,
 				updatedAt: profilesTable.updatedAt,
 				createdAt: followsTable.createdAt,
+				viewerFollowsStatus: this.db
+					.select({ status: followsTable.status })
+					.from(followsTable)
+					.where(
+						and(
+							eq(followsTable.followerId, sql`${this.userId}`),
+							eq(followsTable.followingId, profilesTable.userId)
+						)
+					)
+					.limit(1)
+					.as("viewer_follows_status"),
+				profileFollowsViewerStatus: this.db
+					.select({ status: followsTable.status })
+					.from(followsTable)
+					.where(
+						and(
+							eq(followsTable.followerId, profilesTable.userId),
+							eq(followsTable.followingId, sql`${this.userId}`)
+						)
+					)
+					.limit(1)
+					.as("profile_follows_status"),
 			})
 			.from(followsTable)
 			.innerJoin(
@@ -274,21 +296,29 @@ export class FollowService {
 		const nextCursor = hasMore ? data.at(-1)!.createdAt : null;
 
 		return {
-			items: data.map((item) => ({
-				...item,
-				avatarUrl: item.avatarKey
-					? constructPublicUrl({
-							key: item.avatarKey,
-							updatedAt: item.updatedAt,
-						}).publicUrl
-					: null,
-				bannerUrl: item.bannerKey
-					? constructPublicUrl({
-							key: item.bannerKey,
-							updatedAt: item.updatedAt,
-						}).publicUrl
-					: null,
-			})),
+			items: data.map(
+				({
+					avatarKey,
+					bannerKey,
+					viewerFollowsStatus,
+					profileFollowsViewerStatus,
+					...item
+				}) => ({
+					...item,
+					avatarUrl: avatarKey
+						? constructPublicUrl({ key: avatarKey, updatedAt: item.updatedAt })
+								.publicUrl
+						: null,
+					bannerUrl: bannerKey
+						? constructPublicUrl({ key: bannerKey, updatedAt: item.updatedAt })
+								.publicUrl
+						: null,
+					viewerStatus: computeViewerStatus(
+						viewerFollowsStatus,
+						profileFollowsViewerStatus
+					),
+				})
+			),
 			nextCursor,
 		};
 	}
@@ -314,6 +344,28 @@ export class FollowService {
 				visibility: profilesTable.visibility,
 				updatedAt: profilesTable.updatedAt,
 				createdAt: followsTable.createdAt,
+				viewerFollowsStatus: this.db
+					.select({ status: followsTable.status })
+					.from(followsTable)
+					.where(
+						and(
+							eq(followsTable.followerId, sql`${this.userId}`),
+							eq(followsTable.followingId, profilesTable.userId)
+						)
+					)
+					.limit(1)
+					.as("viewer_follows_status"),
+				profileFollowsViewerStatus: this.db
+					.select({ status: followsTable.status })
+					.from(followsTable)
+					.where(
+						and(
+							eq(followsTable.followerId, profilesTable.userId),
+							eq(followsTable.followingId, sql`${this.userId}`)
+						)
+					)
+					.limit(1)
+					.as("profile_follows_status"),
 			})
 			.from(followsTable)
 			.innerJoin(
@@ -335,21 +387,29 @@ export class FollowService {
 		const nextCursor = hasMore ? data.at(-1)!.createdAt : null;
 
 		return {
-			items: data.map((item) => ({
-				...item,
-				avatarUrl: item.avatarKey
-					? constructPublicUrl({
-							key: item.avatarKey,
-							updatedAt: item.updatedAt,
-						}).publicUrl
-					: null,
-				bannerUrl: item.bannerKey
-					? constructPublicUrl({
-							key: item.bannerKey,
-							updatedAt: item.updatedAt,
-						}).publicUrl
-					: null,
-			})),
+			items: data.map(
+				({
+					avatarKey,
+					bannerKey,
+					viewerFollowsStatus,
+					profileFollowsViewerStatus,
+					...item
+				}) => ({
+					...item,
+					avatarUrl: avatarKey
+						? constructPublicUrl({ key: avatarKey, updatedAt: item.updatedAt })
+								.publicUrl
+						: null,
+					bannerUrl: bannerKey
+						? constructPublicUrl({ key: bannerKey, updatedAt: item.updatedAt })
+								.publicUrl
+						: null,
+					viewerStatus: computeViewerStatus(
+						viewerFollowsStatus,
+						profileFollowsViewerStatus
+					),
+				})
+			),
 			nextCursor,
 		};
 	}

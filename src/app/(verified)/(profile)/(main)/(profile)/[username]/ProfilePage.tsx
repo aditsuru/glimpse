@@ -1,11 +1,14 @@
 "use client";
 
 import { ORPCError } from "@orpc/client";
-import { Ghost } from "lucide-react";
 import UserNotFound from "@/components/layout/ErrorMessage";
 import PageHeader from "@/components/layout/PageHeader";
 import MobileProfileHeader from "@/modules/profile/components/MobileProfileHeader";
-import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
+import {
+	Profile,
+	ProfileError,
+	ProfileSkeleton,
+} from "@/modules/profile/components/Profile";
 import { useProfile } from "@/modules/profile/profile.queries";
 
 const ProfilePage = ({
@@ -17,22 +20,14 @@ const ProfilePage = ({
 }) => {
 	const { data, isLoading, error } = useProfile({ username });
 
-	if (isLoading || !data) return <ProfileSkeleton />;
-
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {
-			return (
-				<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
-					<Ghost className="size-12" />
-					<p className="text-lg font-semibold text-foreground">
-						This account doesn't exist
-					</p>
-					<p className="text-sm">Try searching for another.</p>
-				</div>
-			);
+			return <ProfileError />;
 		}
 		return <UserNotFound />;
 	}
+
+	if (isLoading || !data) return <ProfileSkeleton />;
 
 	return (
 		<div className="w-full h-full">

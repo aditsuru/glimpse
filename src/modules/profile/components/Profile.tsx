@@ -1,5 +1,6 @@
 "use client";
 
+import { Ghost } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type * as z from "zod";
@@ -119,4 +120,16 @@ const ProfileSkeleton = () => {
 	);
 };
 
-export { Profile, ProfileSkeleton };
+const ProfileError = () => {
+	return (
+		<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
+			<Ghost className="size-12" />
+			<p className="text-lg font-semibold text-foreground">
+				This account doesn't exist
+			</p>
+			<p className="text-sm">Try searching for another.</p>
+		</div>
+	);
+};
+
+export { Profile, ProfileError, ProfileSkeleton };

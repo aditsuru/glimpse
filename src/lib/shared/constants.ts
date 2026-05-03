@@ -53,12 +53,10 @@ export const LOCAL_STORAGE_KEYS = {
 };
 
 export const SIDEBAR_GIFS = [
-	"https://ik.imagekit.io/aditsuru/Glimpse/asset1.gif",
 	"https://ik.imagekit.io/aditsuru/Glimpse/asset2.gif",
 	"https://ik.imagekit.io/aditsuru/Glimpse/asset3.gif",
 	"https://ik.imagekit.io/aditsuru/Glimpse/asset5.gif",
 	"https://ik.imagekit.io/aditsuru/Glimpse/asset4.gif",
 	"https://ik.imagekit.io/aditsuru/Glimpse/asset6.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/asset7.gif",
 	"https://ik.imagekit.io/aditsuru/Glimpse/asset8.gif",
 ] as const;
