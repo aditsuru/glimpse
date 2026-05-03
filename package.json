@@ -66,6 +66,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.13",
+		"@faker-js/faker": "^10.4.0",
 		"@react-email/preview-server": "^5.2.10",
 		"@tailwindcss/postcss": "^4",
 		"@types/ms": "^2.1.0",
