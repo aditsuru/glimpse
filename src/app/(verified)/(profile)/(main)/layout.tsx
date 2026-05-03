@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import MobileNav from "@/components/layout/MobileNavbar";
 import Navbar from "@/components/layout/Navbar";
+import Snowfall from "@/components/misc/Snowfall";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
 
@@ -38,6 +39,7 @@ export default async function Layout({
 
 				{/* Mobile Bottom Nav */}
 				<MobileNav userId={user.id} />
+				<Snowfall />
 			</div>
 		</HydrationBoundary>
 	);

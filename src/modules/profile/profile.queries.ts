@@ -76,3 +76,21 @@ export function useSearchProfiles(query: string) {
 		})
 	);
 }
+
+/**
+ * Side effects:
+ * - Refetch on settle: profile.get (visibility, viewerStatus changes)
+ * - Refetch on settle: profile.search (viewerStatus changes for private accounts)
+ */
+export function useUpdateVisibility() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.profile.updateVisibility.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
+				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
+			]);
+		},
+	});
+}

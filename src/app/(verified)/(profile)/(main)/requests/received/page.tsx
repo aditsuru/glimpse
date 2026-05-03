@@ -4,12 +4,20 @@ import Link from "next/link";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { usePendingReceived } from "@/modules/follow/follow.queries";
+import {
+	useAcceptRequest,
+	usePendingReceived,
+	useRejectRequest,
+} from "@/modules/follow/follow.queries";
 import ProfileCard from "@/modules/profile/components/ProfileCard";
 import RequestsHeader from "../RequestsHeader";
 
 const ReceivedPage = () => {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingReceived();
+	const rejectRequest = useRejectRequest();
+	const acceptRequest = useAcceptRequest();
+
+	const disabledCondition = rejectRequest.isPending || acceptRequest.isPending;
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
@@ -26,8 +34,27 @@ const ReceivedPage = () => {
 						<Link href={`/${profile.username}`} className="flex-1">
 							<ProfileCard data={profile} />
 						</Link>
-						<Button variant="destructive">Reject</Button>
-						<Button variant="outline-ring">Accept</Button>
+						<div className="flex gap-4 mr-4">
+							<Button
+								variant="outline-ring"
+								className="text-destructive"
+								disabled={disabledCondition}
+								onClick={() =>
+									rejectRequest.mutate({ followerId: profile.userId })
+								}
+							>
+								Reject
+							</Button>
+							<Button
+								variant="outline-ring"
+								disabled={disabledCondition}
+								onClick={() =>
+									acceptRequest.mutate({ followerId: profile.userId })
+								}
+							>
+								Accept
+							</Button>
+						</div>
 					</div>
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
