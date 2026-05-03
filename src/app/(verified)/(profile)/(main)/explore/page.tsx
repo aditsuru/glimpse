@@ -9,6 +9,8 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
+import { authClient } from "@/lib/client/auth-client";
+import FollowButton from "@/modules/follow/components/FollowButton";
 import ProfileCard from "@/modules/profile/components/ProfileCard";
 import { useSearchProfiles } from "@/modules/profile/profile.queries";
 
@@ -16,6 +18,7 @@ const Explore = () => {
 	const [inputValue, setInputValue] = useState("");
 	const [searchQuery, setSearchQuery] = useState("");
 
+	const { data: sessionData } = authClient.useSession();
 	const { data, fetchNextPage, hasNextPage, isFetching } =
 		useSearchProfiles(searchQuery);
 
@@ -54,7 +57,18 @@ const Explore = () => {
 						key={profile.id}
 						className="hover:bg-accent/20  px-4"
 					>
-						<ProfileCard data={profile} />
+						<ProfileCard
+							data={profile}
+							action={
+								profile.userId !== sessionData?.user.id && (
+									<FollowButton
+										initialStatus={profile.viewerStatus}
+										targetUserId={profile.userId}
+										targetVisibility={profile.visibility}
+									/>
+								)
+							}
+						/>
 					</Link>
 				))}
 
