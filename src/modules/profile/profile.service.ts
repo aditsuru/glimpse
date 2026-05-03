@@ -437,4 +437,21 @@ export class ProfileService {
 			nextCursor,
 		};
 	}
+
+	async updateVisibility({
+		visibility,
+	}: z.infer<typeof profileSchema.updateVisibility.input>): Promise<
+		z.infer<typeof profileSchema.updateVisibility.output>
+	> {
+		const [updated] = await this.db
+			.update(profilesTable)
+			.set({ visibility })
+			.where(eq(profilesTable.userId, this.userId))
+			.returning();
+
+		if (!updated)
+			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
+
+		return { success: true };
+	}
 }

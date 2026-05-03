@@ -50,7 +50,7 @@ export const LOCAL_STORAGE_KEYS = {
 	VERIFY_EMAIL_COOLDOWN: "verify_email_cooldown",
 	FORGOT_PASSWORD_COOLDOWN: "forgot_password_cooldown",
 	GLIMPSE_MEDIA_STORAGE: "glimpse_media_storage",
-	SIDEBAR_GIF_PANEL_TOGGLE: "sidebar_gif_panel_toggle",
+	SETTINGS_STORAGE: "settings_storage",
 };
 
 export const SIDEBAR_GIFS = [

@@ -26,6 +26,12 @@ export function useSendFollow() {
 				queryClient.refetchQueries({
 					queryKey: orpc.follow.getFollowing.key(),
 				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getPendingReceived.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getPendingSent.key(),
+				}),
 			]);
 		},
 	});
@@ -44,6 +50,12 @@ export function useRemoveFollow() {
 				}),
 				queryClient.refetchQueries({
 					queryKey: orpc.follow.getFollowing.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getPendingReceived.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getPendingSent.key(),
 				}),
 			]);
 		},
@@ -64,6 +76,12 @@ export function useRemoveFollower() {
 				queryClient.refetchQueries({
 					queryKey: orpc.follow.getFollowing.key(),
 				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getPendingReceived.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getPendingSent.key(),
+				}),
 			]);
 		},
 	});
@@ -83,6 +101,9 @@ export function useAcceptRequest() {
 				queryClient.refetchQueries({
 					queryKey: orpc.follow.getFollowing.key(),
 				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getPendingReceived.key(),
+				}),
 			]);
 		},
 	});
@@ -101,6 +122,9 @@ export function useRejectRequest() {
 				}),
 				queryClient.refetchQueries({
 					queryKey: orpc.follow.getFollowing.key(),
+				}),
+				queryClient.refetchQueries({
+					queryKey: orpc.follow.getPendingReceived.key(),
 				}),
 			]);
 		},

@@ -100,4 +100,13 @@ export const profileSchema = {
 			nextCursor: z.date().nullable(),
 		}),
 	},
+
+	updateVisibility: {
+		input: z.object({
+			visibility: z.enum(VisibilityEnum.enumValues),
+		}),
+		output: z.object({
+			success: z.boolean(),
+		}),
+	},
 };

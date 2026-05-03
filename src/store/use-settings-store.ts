@@ -3,22 +3,25 @@ import { persist } from "zustand/middleware";
 import { LOCAL_STORAGE_KEYS } from "@/lib/shared/constants";
 
 interface SettingsState {
-	issidebarGifGalleryEnabled: boolean;
-	setsidebarGifGalleryEnabled: (toggle: boolean) => void;
+	isSidebarGifGalleryEnabled: boolean;
+	isSnowfallEnabled: boolean;
+	setSidebarGifGalleryEnabled: (toggle: boolean) => void;
+	setSnowfallEnabled: (toggle: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
 	persist(
 		(set) => ({
 			// Initial State
-			issidebarGifGalleryEnabled: true,
-
+			isSidebarGifGalleryEnabled: false,
+			isSnowfallEnabled: false,
 			// Actions
-			setsidebarGifGalleryEnabled: (toggle) =>
-				set({ issidebarGifGalleryEnabled: toggle }),
+			setSidebarGifGalleryEnabled: (toggle) =>
+				set({ isSidebarGifGalleryEnabled: toggle }),
+			setSnowfallEnabled: (toggle) => set({ isSnowfallEnabled: toggle }),
 		}),
 		{
-			name: LOCAL_STORAGE_KEYS.SIDEBAR_GIF_PANEL_TOGGLE,
+			name: LOCAL_STORAGE_KEYS.SETTINGS_STORAGE,
 		}
 	)
 );
