@@ -1,6 +1,5 @@
 "use client";
 
-import { Ghost } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type * as z from "zod";
@@ -53,6 +52,7 @@ const Profile = ({ data, viewerId }: ProfileProps) => {
 					<FollowButton
 						initialStatus={data.viewerStatus}
 						targetUserId={data.userId}
+						targetUsername={data.username}
 						targetVisibility={data.visibility}
 						className="absolute right-4 translate-y-1/2 active:not-aria-[haspopup]:translate-y-5!"
 					/>
@@ -120,16 +120,4 @@ const ProfileSkeleton = () => {
 	);
 };
 
-const ProfileError = () => {
-	return (
-		<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
-			<Ghost className="size-12" />
-			<p className="text-lg font-semibold text-foreground">
-				This account doesn't exist
-			</p>
-			<p className="text-sm">Try searching for another.</p>
-		</div>
-	);
-};
-
-export { Profile, ProfileError, ProfileSkeleton };
+export { Profile, ProfileSkeleton };

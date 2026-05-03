@@ -6,17 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/client/utils";
 
-type FollowHeaderProps = {
-	username: string;
-};
-
-const FollowHeader = ({ username }: FollowHeaderProps) => {
+const RequestsHeader = () => {
 	const pathname = usePathname();
 	const router = useRouter();
 
 	const tabs = [
-		{ label: "Followers", href: `/${username}/followers` },
-		{ label: "Following", href: `/${username}/following` },
+		{ label: "Received", href: "/requests/received" },
+		{ label: "Sent", href: "/requests/sent" },
 	];
 
 	return (
@@ -29,7 +25,7 @@ const FollowHeader = ({ username }: FollowHeaderProps) => {
 				>
 					<ChevronLeft className="size-5" />
 				</Button>
-				<h1 className="text-xl font-bold">{username}</h1>
+				<h1 className="text-xl font-bold">Follow Requests</h1>
 			</div>
 			<div className="flex w-full">
 				{tabs.map(({ label, href }) => {
@@ -55,4 +51,4 @@ const FollowHeader = ({ username }: FollowHeaderProps) => {
 	);
 };
 
-export default FollowHeader;
+export default RequestsHeader;

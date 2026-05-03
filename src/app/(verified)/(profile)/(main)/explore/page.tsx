@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import {
 	InputGroup,
 	InputGroupAddon,
@@ -32,10 +33,10 @@ const Explore = () => {
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
 
 	return (
-		<div className="w-full h-full overflow-y-auto no-scrollbar">
+		<div className="w-full h-full overflow-y-auto no-scrollbar flex flex-col">
 			<form
 				onSubmit={handleSubmit}
-				className="sticky top-0 w-full flex justify-center px-4 py-3 border-b border-accent bg-background/80 backdrop-blur-sm z-10"
+				className="sticky top-0 w-full flex justify-center px-4 py-3 border-b border-accent bg-background/80 backdrop-blur-sm z-10 h-18 items-center"
 			>
 				<InputGroup className="w-sm bg-background! rounded-full! p-4! py-5!">
 					<InputGroupInput
@@ -53,7 +54,7 @@ const Explore = () => {
 				</InputGroup>
 			</form>
 
-			<div className="flex flex-col">
+			<div className="flex flex-col flex-1">
 				{profiles.map((profile) => (
 					<div
 						key={profile.id}
@@ -66,6 +67,7 @@ const Explore = () => {
 							<FollowButton
 								initialStatus={profile.viewerStatus}
 								targetUserId={profile.userId}
+								targetUsername={profile.username}
 								targetVisibility={profile.visibility}
 								className="mr-4"
 							/>
@@ -74,9 +76,11 @@ const Explore = () => {
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
 				{searchQuery && profiles.length === 0 && !isFetching && (
-					<p className="text-center text-muted-foreground text-base py-8">
-						No profiles found for "{searchQuery}"
-					</p>
+					<div className="flex-1">
+						<EmptyStateMessage
+							title={`No profiles found for "${searchQuery}"`}
+						/>
+					</div>
 				)}
 			</div>
 		</div>

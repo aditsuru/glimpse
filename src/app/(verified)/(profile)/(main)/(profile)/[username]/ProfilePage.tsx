@@ -1,14 +1,11 @@
 "use client";
 
 import { ORPCError } from "@orpc/client";
-import UserNotFound from "@/components/layout/ErrorMessage";
+import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import ErrorMessage from "@/components/layout/ErrorMessage";
 import PageHeader from "@/components/layout/PageHeader";
 import MobileProfileHeader from "@/modules/profile/components/MobileProfileHeader";
-import {
-	Profile,
-	ProfileError,
-	ProfileSkeleton,
-} from "@/modules/profile/components/Profile";
+import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
 import { useProfile } from "@/modules/profile/profile.queries";
 
 const ProfilePage = ({
@@ -22,9 +19,14 @@ const ProfilePage = ({
 
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {
-			return <ProfileError />;
+			return (
+				<EmptyStateMessage
+					title="This account doesn't exist"
+					description="Try searching for another."
+				/>
+			);
 		}
-		return <UserNotFound />;
+		return <ErrorMessage />;
 	}
 
 	if (isLoading || !data) return <ProfileSkeleton />;
