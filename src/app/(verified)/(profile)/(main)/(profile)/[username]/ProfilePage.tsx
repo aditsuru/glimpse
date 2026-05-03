@@ -22,7 +22,7 @@ const ProfilePage = ({
 			return (
 				<EmptyStateMessage
 					title="This account doesn't exist"
-					description="Try searching for another."
+					description="Try searching for another"
 				/>
 			);
 		}

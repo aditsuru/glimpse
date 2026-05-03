@@ -43,7 +43,7 @@ const FollowingPage = ({ username }: { username: string }) => {
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
 				{profiles.length === 0 && !isFetching && (
-					<EmptyStateMessage title="This user doesn't follow any accounts." />
+					<EmptyStateMessage title="This user doesn't follow any accounts" />
 				)}
 			</div>
 		</div>
