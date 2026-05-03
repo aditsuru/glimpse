@@ -59,7 +59,7 @@ const FollowersPage = ({ username }: { username: string }) => {
 				{hasNextPage && <div ref={ref} className="h-1" />}
 				{profiles.length === 0 && !isFetching && (
 					<EmptyStateMessage
-						title="No followers found."
+						title="No followers found"
 						description={`Be the first to follow ${username}`}
 					/>
 				)}

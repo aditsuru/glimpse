@@ -15,7 +15,7 @@ interface ProfileCardProps {
 	className?: string;
 	data: Omit<
 		z.infer<typeof profileSchema.get.output>,
-		"followersCount" | "followingCount"
+		"followersCount" | "followingCount" | "viewerStatus"
 	>;
 	action?: React.ReactNode;
 }

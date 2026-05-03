@@ -2,10 +2,11 @@
 
 import RequestsHeader from "../RequestsHeader";
 
-const SentPage = async () => {
+const SentPage = () => {
 	return (
-		<main className="w-full overflow-y-auto no-scrollbar">
+		<main className="w-full h-full overflow-y-auto no-scrollbar flex flex-col">
 			<RequestsHeader />
+			<div className="flex-1"></div>
 		</main>
 	);
 };

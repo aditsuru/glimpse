@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/client/utils";
 
 const navItems = [
-	{ label: "Follow", href: "/requests", icon: UserPlus },
+	{ label: "Follow", href: "/requests/received", icon: UserPlus },
 	{ label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
 	{ label: "Settings", href: "/settings", icon: Settings },
 ];
