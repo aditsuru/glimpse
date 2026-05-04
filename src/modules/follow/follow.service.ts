@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: sliced data can't be null */
 
 import { ORPCError } from "@orpc/server";
-import { and, desc, eq, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, lt, sql } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
@@ -471,6 +471,24 @@ export class FollowService {
 					: null,
 			})),
 			nextCursor,
+		};
+	}
+
+	async getPendingReceivedCount(): Promise<
+		z.infer<typeof followSchema.getPendingReceivedCount.output>
+	> {
+		const [result] = await this.db
+			.select({ value: count() })
+			.from(followsTable)
+			.where(
+				and(
+					eq(followsTable.followingId, this.userId),
+					eq(followsTable.status, "pending")
+				)
+			);
+
+		return {
+			count: result?.value ?? 0,
 		};
 	}
 

@@ -94,6 +94,12 @@ export const followSchema = {
 		output: pendingListOutput,
 	},
 
+	getPendingReceivedCount: {
+		output: z.object({
+			count: z.number(),
+		}),
+	},
+
 	getPendingSent: {
 		input: z.object({
 			cursor: z.date().optional(),

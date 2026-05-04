@@ -275,6 +275,9 @@ export function useAcceptRequest({ viewerUserId }: { viewerUserId: string }) {
 					queryKey: orpc.follow.getPendingReceived.key(),
 				}),
 				queryClient.invalidateQueries({
+					queryKey: orpc.follow.getPendingReceivedCount.key(),
+				}),
+				queryClient.invalidateQueries({
 					queryKey: orpc.follow.getFollowers.key(),
 				}),
 			];
@@ -312,6 +315,9 @@ export function useRejectRequest() {
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.follow.getPendingReceived.key(),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: orpc.follow.getPendingReceivedCount.key(),
 				}),
 				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
 			]);
@@ -361,6 +367,10 @@ export function usePendingReceived() {
 			initialPageParam: undefined as Date | undefined,
 		})
 	);
+}
+
+export function usePendingReceivedCount() {
+	return useQuery(orpc.follow.getPendingReceivedCount.queryOptions());
 }
 
 export function usePendingSent() {
