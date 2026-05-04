@@ -21,7 +21,7 @@ const files: Record<string, string> = {
 
 	[`${moduleName}.service.ts`]: `import type { db as DBType } from "@/db"\n\nexport class ${pascal}Service {\n  constructor(\n    private db: typeof DBType,\n    private userId: string\n  ) {}\n}\n`,
 
-	[`${moduleName}.route.ts`]: `import { base } from "@/server/os"\nimport { ${pascal}Service } from "./${moduleName}.service";\n\nconst ${moduleName}Procedure = authedProcedure.use(({ context, next }) => {\n	const ${moduleName}Service = new ${moduleName}Service(\n		context.db,\n		context.session.user.id\n	);\n	return next({		\ncontext: {			\n${moduleName}Service,		\n},	\n});\n});\nexport const ${moduleName}Router = base.router({})\n`,
+	[`${moduleName}.route.ts`]: `import { authedProcedure, base } from "@/server/os"\nimport { ${pascal}Service } from "./${moduleName}.service";\n\nconst ${moduleName}Procedure = authedProcedure.use(({ context, next }) => {\n	const ${moduleName}Service = new ${pascal}Service(\n		context.db,\n		context.session.user.id\n	);\n	return next({		\ncontext: {			\n${moduleName}Service,		\n},	\n});\n});\nexport const ${moduleName}Router = base.router({})\n`,
 
 	[`${moduleName}.queries.ts`]: ``,
 
