@@ -1,28 +1,21 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: any is required */
 "use client";
 
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/client/utils";
 import type { ViewerFollowStatus } from "@/lib/server/helpers";
 import {
+	useFollowStatus,
 	useRemoveFollow,
 	useSendFollow,
 } from "@/modules/follow/follow.queries";
+import { useDialogStore } from "@/store/use-unfollow-confirm-store";
 
 interface FollowButtonProps {
 	className?: string;
 	targetUserId: string;
 	targetUsername: string;
-	initialStatus: ViewerFollowStatus;
+	initialStatus?: ViewerFollowStatus;
 	targetVisibility: "public" | "private";
 }
 
@@ -33,56 +26,40 @@ const FollowButton = ({
 	initialStatus,
 	targetVisibility,
 }: FollowButtonProps) => {
-	const [status, setStatus] = useState<ViewerFollowStatus>(initialStatus);
-	const [dialogOpen, setDialogOpen] = useState(false);
+	const openDialog = useDialogStore((state) => state.openUnfollowDialog);
 
-	useEffect(() => {
-		setStatus(initialStatus);
-	}, [initialStatus]);
+	// Only fetch if we are NOT in a list (i.e. initialStatus is undefined)
+	const { data, isLoading } = useFollowStatus(
+		{ targetUserId },
+		initialStatus === undefined
+	);
 
-	const sendFollow = useSendFollow();
+	// The source of truth: Cache > List Prop > Fallback
+	const status = data?.status ?? initialStatus ?? "none";
+
+	// Hook takes targetVisibility so IT can do the optimistic math
+	const sendFollow = useSendFollow(targetVisibility);
 	const removeFollow = useRemoveFollow();
 
-	const handleClick = async () => {
+	const handleClick = () => {
 		if (status === "none" || status === "follows_you") {
-			const nextStatus =
-				status === "follows_you"
-					? "mutual"
-					: targetVisibility === "private"
-						? "pending"
-						: "accepted";
-			setStatus(nextStatus);
-			await sendFollow.mutateAsync({ targetUserId });
+			sendFollow.mutate({ targetUserId });
 		} else if (status === "pending" || status === "follows_you_pending") {
-			setStatus(status === "follows_you_pending" ? "follows_you" : "none");
-			await removeFollow.mutateAsync({ targetUserId });
+			removeFollow.mutate({ targetUserId });
 		} else if (status === "accepted" || status === "mutual") {
 			if (targetVisibility === "private") {
-				setDialogOpen(true);
+				// Pass the mutate function to the dialog to fire on confirm
+				openDialog(targetUsername, () => removeFollow.mutate({ targetUserId }));
 			} else {
-				const previousStatus = status;
-				setStatus(status === "mutual" ? "follows_you" : "none");
-				try {
-					await removeFollow.mutateAsync({ targetUserId });
-				} catch {
-					setStatus(previousStatus);
-				}
+				removeFollow.mutate({ targetUserId });
 			}
 		}
 	};
 
-	const handleDialog = async () => {
-		const previousStatus = status;
-		setDialogOpen(false);
-		setStatus(status === "mutual" ? "follows_you" : "none");
-		try {
-			await removeFollow.mutateAsync({ targetUserId });
-		} catch {
-			setStatus(previousStatus);
-		}
-	};
-
-	const isPending = sendFollow.isPending || removeFollow.isPending;
+	const isPending =
+		sendFollow.isPending ||
+		removeFollow.isPending ||
+		(isLoading && initialStatus === undefined);
 
 	const { label, variant } = (() => {
 		if (status === "none") return { label: "Follow", variant: "follow" };
@@ -108,25 +85,6 @@ const FollowButton = ({
 			>
 				{label}
 			</Button>
-			<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle className="text-lg">Are you sure?</DialogTitle>
-						<DialogDescription className="text-base">
-							Unfollow @{targetUsername}? You will have to request to follow
-							them again.
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<Button variant="outline" onClick={() => setDialogOpen(false)}>
-							Cancel
-						</Button>
-						<Button variant="destructive" onClick={handleDialog}>
-							Unfollow
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
 		</div>
 	);
 };

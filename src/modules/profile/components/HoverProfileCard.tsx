@@ -44,7 +44,6 @@ const HoverProfileCard = ({ className, username }: HoverProfileCardProps) => {
 					</Avatar>
 					{data.userId !== sessionData?.user.id && (
 						<FollowButton
-							initialStatus={data.viewerStatus}
 							targetUserId={data.userId}
 							targetUsername={data.username}
 							targetVisibility={data.visibility}

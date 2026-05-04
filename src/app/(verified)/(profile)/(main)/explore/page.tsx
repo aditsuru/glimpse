@@ -1,7 +1,6 @@
 "use client";
 
 import { Search } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import {
@@ -60,9 +59,8 @@ const Explore = () => {
 						key={profile.id}
 						className="hover:bg-accent/20 px-4 flex items-center"
 					>
-						<Link href={`/${profile.username}`} className="flex-1">
-							<ProfileCard data={profile} />
-						</Link>
+						<ProfileCard data={profile} />
+
 						{profile.userId !== sessionData?.user.id && (
 							<FollowButton
 								initialStatus={profile.viewerStatus}

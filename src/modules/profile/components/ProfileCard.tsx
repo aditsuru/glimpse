@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type * as z from "zod";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -34,9 +35,11 @@ const ProfileCard = ({ data, className, action }: ProfileCardProps) => {
 								<HoverCardTrigger
 									delay={10}
 									render={
-										<p className="hover:underline hover:underline-offset-4">
-											{data.displayName}
-										</p>
+										<Link href={`/${data.username}`}>
+											<p className="hover:underline hover:underline-offset-4">
+												{data.displayName}
+											</p>
+										</Link>
 									}
 								/>
 								<HoverCardContent className="w-xs rounded-xl bg-background">

@@ -1,7 +1,6 @@
 "use client";
 
 import { EllipsisVertical } from "lucide-react";
-import Link from "next/link";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,9 +38,8 @@ const FollowersPage = ({ username }: { username: string }) => {
 						key={profile.id}
 						className="hover:bg-accent/20 px-4 flex items-center"
 					>
-						<Link href={`/${profile.username}`} className="flex-1">
-							<ProfileCard data={profile} />
-						</Link>
+						<ProfileCard data={profile} />
+
 						{profile.userId !== sessionData?.user.id && (
 							<FollowButton
 								initialStatus={profile.viewerStatus}
@@ -51,7 +49,7 @@ const FollowersPage = ({ username }: { username: string }) => {
 								className="mr-4"
 							/>
 						)}
-						{profile.userId === sessionData?.user.id &&
+						{profileData?.userId === sessionData?.user.id &&
 							profile.userId !== sessionData?.user.id && (
 								<DropdownMenuSubmenu followerId={profile.userId} />
 							)}
