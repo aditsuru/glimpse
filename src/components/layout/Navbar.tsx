@@ -16,6 +16,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useOnboardingTooltip } from "@/hooks/useOnboardingComplete";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import { SIDEBAR_GIFS } from "@/lib/shared/constants";
@@ -33,6 +34,7 @@ import {
 } from "../ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Skeleton } from "../ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 const navItems = [
 	{ label: "Home", href: "/", icon: Home },
@@ -60,6 +62,9 @@ const Navbar = ({ userId }: NavbarProps) => {
 		userId,
 	});
 
+	const { open, onHoverStart, onHoverEnd, isOnboardingDone } =
+		useOnboardingTooltip();
+
 	useEffect(() => {
 		if (error)
 			toast.error(
@@ -74,11 +79,12 @@ const Navbar = ({ userId }: NavbarProps) => {
 		setCurrentIndex(Math.floor(Math.random() * SIDEBAR_GIFS.length));
 
 		const interval = setInterval(() => {
+			if (!issidebarGifGalleryEnabled) return;
 			setCurrentIndex((i) => (i + 1) % SIDEBAR_GIFS.length);
 		}, 15000);
 
 		return () => clearInterval(interval);
-	}, []);
+	}, [issidebarGifGalleryEnabled]);
 
 	const gifUrl = SIDEBAR_GIFS[currentIndex];
 
@@ -116,10 +122,50 @@ const Navbar = ({ userId }: NavbarProps) => {
 				{/* Nav Items */}
 				{navItems.map(({ label, href, icon: Icon }) => {
 					const isActive = pathname === href;
-					href = label === "Profile" ? `/${data?.username}` : href;
+					href = label === "Profile" ? `/${data?.username || ""}` : href;
+
+					const resolvedHref =
+						label === "Profile" ? `/${data?.username || ""}` : href;
+
+					if (resolvedHref === "/settings") {
+						return (
+							<Tooltip
+								key={label}
+								open={isOnboardingDone ? open : false}
+								onOpenChange={(nextOpen) => {
+									if (!nextOpen) onHoverStart();
+								}}
+							>
+								<TooltipTrigger
+									render={
+										<Link
+											href={href}
+											onMouseEnter={onHoverStart}
+											onMouseLeave={onHoverEnd}
+											onFocus={onHoverStart}
+											className={cn(
+												"flex items-center gap-4 px-3 py-3 rounded-full text-xl transition-colors hover:bg-accent w-full",
+												{ "font-bold": isActive }
+											)}
+										>
+											<Icon className="size-7 shrink-0" />
+											<span>{label}</span>
+										</Link>
+									}
+								/>
+								<TooltipContent
+									className="text-base px-4 font-semibold"
+									side="left"
+								>
+									Customize your experience
+								</TooltipContent>
+							</Tooltip>
+						);
+					}
+
 					return (
 						<Link
-							key={href}
+							key={label}
 							href={href}
 							className={cn(
 								"flex items-center gap-4 px-3 py-3 rounded-full text-xl transition-colors hover:bg-accent w-full",

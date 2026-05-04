@@ -77,7 +77,7 @@ const Settings = () => {
 				</div>
 				<Separator />
 				<div className="flex flex-col gap-4">
-					<h2 className="text-xl font-semibold">Others</h2>
+					<h2 className="text-xl font-semibold">Personalization</h2>
 
 					<div className="flex flex-col gap-8">
 						<Field orientation="horizontal" className="w-full">
