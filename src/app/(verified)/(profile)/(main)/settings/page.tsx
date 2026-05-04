@@ -20,7 +20,9 @@ import { useSettingsStore } from "@/store/use-settings-store";
 const Settings = () => {
 	const { data: sessionData } = authClient.useSession();
 	const { data: profileData } = useProfile({ userId: sessionData?.user.id });
-	const updateVisibility = useUpdateVisibility();
+	const updateVisibility = useUpdateVisibility({
+		viewerUserId: sessionData?.user.id ?? "",
+	});
 
 	const handleVisibilityChange = async (checked: boolean) => {
 		await updateVisibility.mutateAsync({

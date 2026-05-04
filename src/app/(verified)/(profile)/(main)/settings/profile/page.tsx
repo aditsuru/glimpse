@@ -108,7 +108,7 @@ const ProfileSettings = () => {
 	const getBannerPresignedUrl = useGetBannerPresignedUrl();
 	const updateProfile = useUpdateProfile({
 		userId: sessionData?.user.id ?? "",
-		username: profileData?.username ?? "",
+		currentUsername: profileData?.username ?? "",
 	});
 	const updateAvatar = useUpdateAvatar();
 	const updateBanner = useUpdateBanner();
