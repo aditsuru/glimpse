@@ -22,9 +22,9 @@ export function computeViewerStatus(
 	theyFollow: FollowStatusEnumType | undefined
 ): ViewerFollowStatus {
 	if (iFollow === "accepted" && theyFollow === "accepted") return "mutual";
-	if (iFollow === "accepted" && !theyFollow) return "accepted";
+	if (iFollow === "accepted") return "accepted";
 	if (iFollow === "pending") return "pending";
-	if (!iFollow && theyFollow === "accepted") return "follows_you";
-	if (!iFollow && theyFollow === "pending") return "follows_you_pending";
+	if (theyFollow === "accepted") return "follows_you";
+	if (theyFollow === "pending") return "follows_you_pending";
 	return "none";
 }

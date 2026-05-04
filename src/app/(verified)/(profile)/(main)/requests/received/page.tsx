@@ -3,6 +3,7 @@
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { authClient } from "@/lib/client/auth-client";
 import {
 	useAcceptRequest,
 	usePendingReceived,
@@ -13,9 +14,11 @@ import RequestsHeader from "../RequestsHeader";
 
 const ReceivedPage = () => {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingReceived();
+	const { data: sessionData } = authClient.useSession();
 	const rejectRequest = useRejectRequest();
-	const acceptRequest = useAcceptRequest();
-
+	const acceptRequest = useAcceptRequest({
+		viewerUserId: sessionData?.user.id ?? "",
+	});
 	const disabledCondition = rejectRequest.isPending || acceptRequest.isPending;
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);

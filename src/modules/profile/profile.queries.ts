@@ -30,33 +30,6 @@ export function useUpdateBanner() {
 	return useMutation(orpc.profile.updateBanner.mutationOptions());
 }
 
-/**
- * Side effects:
- * - Refetch: profile.get by userId and username
- */
-export function useUpdateProfile({
-	userId,
-	username,
-}: {
-	userId: string;
-	username: string;
-}) {
-	const queryClient = useQueryClient();
-	return useMutation({
-		...orpc.profile.update.mutationOptions(),
-		onSettled: async () => {
-			await Promise.all([
-				queryClient.refetchQueries(
-					orpc.profile.get.queryOptions({ input: { userId } })
-				),
-				queryClient.refetchQueries(
-					orpc.profile.get.queryOptions({ input: { username } })
-				),
-			]);
-		},
-	});
-}
-
 export function useProfile(input: { username?: string; userId?: string }) {
 	return useQuery(
 		orpc.profile.get.queryOptions({
@@ -79,18 +52,73 @@ export function useSearchProfiles(query: string) {
 
 /**
  * Side effects:
- * - Refetch on settle: profile.get (visibility, viewerStatus changes)
- * - Refetch on settle: profile.search (viewerStatus changes for private accounts)
+ * - Invalidate on settle: profile.get[userId], profile.get[username:currentUsername]
  */
-export function useUpdateVisibility() {
+export function useUpdateProfile({
+	userId,
+	currentUsername,
+}: {
+	userId: string;
+	currentUsername: string;
+}) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.profile.update.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({ input: { userId } })
+						.queryKey,
+				}),
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({
+						input: { username: currentUsername },
+					}).queryKey,
+				}),
+			]);
+		},
+	});
+}
+
+/**
+ * Side effects:
+ * - Invalidate on settle: profile.get[userId], profile.get[username:viewer],
+ *   profile.search (viewerStatus changes for accounts interacting with viewer)
+ */
+export function useUpdateVisibility({
+	viewerUserId,
+}: {
+	viewerUserId: string;
+}) {
 	const queryClient = useQueryClient();
 	return useMutation({
 		...orpc.profile.updateVisibility.mutationOptions(),
 		onSettled: async () => {
-			await Promise.all([
-				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
-				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
-			]);
+			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
+				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
+					.queryKey
+			)?.username;
+
+			const refetches: Promise<unknown>[] = [
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({
+						input: { userId: viewerUserId },
+					}).queryKey,
+				}),
+				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
+			];
+
+			if (viewerUsername) {
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.profile.get.queryOptions({
+							input: { username: viewerUsername },
+						}).queryKey,
+					})
+				);
+			}
+
+			await Promise.all(refetches);
 		},
 	});
 }

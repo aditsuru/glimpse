@@ -9,12 +9,22 @@ import type { ViewerFollowStatus } from "@/lib/server/helpers";
 
 /**
  * Side effects:
- * - Optimistic Updates: follow.getStatus
- * - Refetch on settle: profile.get, profile.search, follow.getFollowers, follow.getFollowing, follow.getStatus
+ * - Optimistic: follow.getStatus[targetUserId]
+ * - Invalidate on settle (public target): profile.get[username:viewer], profile.get[username:target],
+ *   follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search
+ * - Invalidate on settle (private target): follow.getPendingSent, follow.getStatus[targetUserId], profile.search
  */
-
-export function useSendFollow(targetVisibility?: "public" | "private") {
+export function useSendFollow({
+	viewerUserId,
+	targetUsername,
+	targetVisibility = "public",
+}: {
+	viewerUserId: string;
+	targetUsername: string;
+	targetVisibility?: "public" | "private";
+}) {
 	const queryClient = useQueryClient();
+
 	return useMutation({
 		...orpc.follow.send.mutationOptions(),
 		onMutate: async ({ targetUserId }) => {
@@ -28,47 +38,92 @@ export function useSendFollow(targetVisibility?: "public" | "private") {
 				queryClient.getQueryData<{ status: ViewerFollowStatus }>(statusKey)
 					?.status ?? "none";
 
-			// Hook computes optimistic status
 			let nextStatus: ViewerFollowStatus = "pending";
-			if (previousStatus === "follows_you") nextStatus = "mutual";
-			else if (targetVisibility === "public") nextStatus = "accepted";
+			if (previousStatus === "follows_you" && targetVisibility === "public") {
+				nextStatus = "mutual";
+			} else if (targetVisibility === "public") {
+				nextStatus = "accepted";
+			}
 
 			queryClient.setQueryData(statusKey, { status: nextStatus });
-
 			return { previousStatus, statusKey };
 		},
-		onError: (_err, _variables, context) => {
-			// Rollback on error
+		onError: (_err, _vars, context) => {
 			if (context?.statusKey) {
 				queryClient.setQueryData(context.statusKey, {
 					status: context.previousStatus,
 				});
 			}
 		},
-		onSettled: async () => {
-			await Promise.all([
-				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
-				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowers.key(),
+		onSettled: async (_data, _err, { targetUserId }) => {
+			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
+				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
+					.queryKey
+			)?.username;
+
+			const wasAccepted = targetVisibility === "public";
+
+			const refetches: Promise<unknown>[] = [
+				queryClient.invalidateQueries({
+					queryKey: orpc.follow.getStatus.queryOptions({
+						input: { targetUserId },
+					}).queryKey,
 				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowing.key(),
-				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getPendingReceived.key(),
-				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getPendingSent.key(),
-				}),
-				queryClient.refetchQueries({ queryKey: orpc.follow.getStatus.key() }),
-			]);
+				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
+			];
+
+			if (wasAccepted) {
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.profile.get.queryOptions({
+							input: { username: targetUsername },
+						}).queryKey,
+					}),
+					queryClient.invalidateQueries({
+						queryKey: orpc.follow.getFollowing.key(),
+					}),
+					queryClient.invalidateQueries({
+						queryKey: orpc.follow.getFollowers.key(),
+					})
+				);
+				if (viewerUsername) {
+					refetches.push(
+						queryClient.invalidateQueries({
+							queryKey: orpc.profile.get.queryOptions({
+								input: { username: viewerUsername },
+							}).queryKey,
+						})
+					);
+				}
+			} else {
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.follow.getPendingSent.key(),
+					})
+				);
+			}
+
+			await Promise.all(refetches);
 		},
 	});
 }
 
-export function useRemoveFollow() {
+/**
+ * Side effects:
+ * - Optimistic: follow.getStatus[targetUserId]
+ * - Invalidate on settle (was accepted/mutual): profile.get[username:viewer], profile.get[username:target],
+ *   follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search
+ * - Invalidate on settle (was pending): follow.getPendingSent, follow.getStatus[targetUserId], profile.search
+ */
+export function useRemoveFollow({
+	viewerUserId,
+	targetUsername,
+}: {
+	viewerUserId: string;
+	targetUsername: string;
+}) {
 	const queryClient = useQueryClient();
+
 	return useMutation({
 		...orpc.follow.remove.mutationOptions(),
 		onMutate: async ({ targetUserId }) => {
@@ -84,115 +139,181 @@ export function useRemoveFollow() {
 
 			let nextStatus: ViewerFollowStatus = "none";
 			if (previousStatus === "mutual") nextStatus = "follows_you";
-			else if (previousStatus === "follows_you_pending")
-				nextStatus = "follows_you";
 
 			queryClient.setQueryData(statusKey, { status: nextStatus });
-
 			return { previousStatus, statusKey };
 		},
-		onError: (_err, _variables, context) => {
+		onError: (_err, _vars, context) => {
 			if (context?.statusKey) {
 				queryClient.setQueryData(context.statusKey, {
 					status: context.previousStatus,
 				});
 			}
 		},
-		onSettled: async () => {
-			await Promise.all([
-				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
-				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowers.key(),
+		onSettled: async (_data, _err, { targetUserId }, context) => {
+			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
+				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
+					.queryKey
+			)?.username;
+
+			const previousStatus = context?.previousStatus ?? "none";
+			const wasAccepted =
+				previousStatus === "accepted" || previousStatus === "mutual";
+
+			const refetches: Promise<unknown>[] = [
+				queryClient.invalidateQueries({
+					queryKey: orpc.follow.getStatus.queryOptions({
+						input: { targetUserId },
+					}).queryKey,
 				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowing.key(),
-				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getPendingReceived.key(),
-				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getPendingSent.key(),
-				}),
-				queryClient.refetchQueries({ queryKey: orpc.follow.getStatus.key() }),
-			]);
+				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
+			];
+
+			if (wasAccepted) {
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.profile.get.queryOptions({
+							input: { username: targetUsername },
+						}).queryKey,
+					}),
+					queryClient.invalidateQueries({
+						queryKey: orpc.follow.getFollowing.key(),
+					}),
+					queryClient.invalidateQueries({
+						queryKey: orpc.follow.getFollowers.key(),
+					})
+				);
+				if (viewerUsername) {
+					refetches.push(
+						queryClient.invalidateQueries({
+							queryKey: orpc.profile.get.queryOptions({
+								input: { username: viewerUsername },
+							}).queryKey,
+						})
+					);
+				}
+			} else {
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.follow.getPendingSent.key(),
+					})
+				);
+			}
+
+			await Promise.all(refetches);
 		},
 	});
 }
 
-export function useRemoveFollower() {
+/**
+ * Side effects:
+ * - Invalidate on settle: profile.get[username:viewer], follow.getFollowers,
+ *   follow.getStatus[followerId], profile.search
+ */
+export function useRemoveFollower({ viewerUserId }: { viewerUserId: string }) {
 	const queryClient = useQueryClient();
+
 	return useMutation({
 		...orpc.follow.removeFollower.mutationOptions(),
-		onSettled: async () => {
-			await Promise.all([
-				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
-				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
-				queryClient.refetchQueries({
+		onSettled: async (_data, _err, { followerId }) => {
+			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
+				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
+					.queryKey
+			)?.username;
+
+			const refetches: Promise<unknown>[] = [
+				queryClient.invalidateQueries({
+					queryKey: orpc.follow.getStatus.queryOptions({
+						input: { targetUserId: followerId },
+					}).queryKey,
+				}),
+				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.invalidateQueries({
 					queryKey: orpc.follow.getFollowers.key(),
 				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowing.key(),
-				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getPendingReceived.key(),
-				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getPendingSent.key(),
-				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getStatus.key(),
-				}),
-			]);
+			];
+
+			if (viewerUsername) {
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.profile.get.queryOptions({
+							input: { username: viewerUsername },
+						}).queryKey,
+					})
+				);
+			}
+
+			await Promise.all(refetches);
 		},
 	});
 }
 
-export function useAcceptRequest() {
+/**
+ * Side effects:
+ * - Invalidate on settle: profile.get[username:viewer], follow.getPendingReceived,
+ *   follow.getFollowers, follow.getStatus[followerId], profile.search
+ */
+export function useAcceptRequest({ viewerUserId }: { viewerUserId: string }) {
 	const queryClient = useQueryClient();
+
 	return useMutation({
 		...orpc.follow.accept.mutationOptions(),
-		onSettled: async () => {
-			await Promise.all([
-				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
-				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowers.key(),
+		onSettled: async (_data, _err, { followerId }) => {
+			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
+				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
+					.queryKey
+			)?.username;
+
+			const refetches: Promise<unknown>[] = [
+				queryClient.invalidateQueries({
+					queryKey: orpc.follow.getStatus.queryOptions({
+						input: { targetUserId: followerId },
+					}).queryKey,
 				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowing.key(),
-				}),
-				queryClient.refetchQueries({
+				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.invalidateQueries({
 					queryKey: orpc.follow.getPendingReceived.key(),
 				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getStatus.key(),
+				queryClient.invalidateQueries({
+					queryKey: orpc.follow.getFollowers.key(),
 				}),
-			]);
+			];
+
+			if (viewerUsername) {
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.profile.get.queryOptions({
+							input: { username: viewerUsername },
+						}).queryKey,
+					})
+				);
+			}
+
+			await Promise.all(refetches);
 		},
 	});
 }
 
+/**
+ * Side effects:
+ * - Invalidate on settle: follow.getPendingReceived, follow.getStatus[followerId], profile.search
+ */
 export function useRejectRequest() {
 	const queryClient = useQueryClient();
+
 	return useMutation({
 		...orpc.follow.reject.mutationOptions(),
-		onSettled: async () => {
+		onSettled: async (_data, _err, { followerId }) => {
 			await Promise.all([
-				queryClient.refetchQueries({ queryKey: orpc.profile.get.key() }),
-				queryClient.refetchQueries({ queryKey: orpc.profile.search.key() }),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowers.key(),
+				queryClient.invalidateQueries({
+					queryKey: orpc.follow.getStatus.queryOptions({
+						input: { targetUserId: followerId },
+					}).queryKey,
 				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getFollowing.key(),
-				}),
-				queryClient.refetchQueries({
+				queryClient.invalidateQueries({
 					queryKey: orpc.follow.getPendingReceived.key(),
 				}),
-				queryClient.refetchQueries({
-					queryKey: orpc.follow.getStatus.key(),
-				}),
+				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
 			]);
 		},
 	});

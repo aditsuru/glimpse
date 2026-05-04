@@ -51,7 +51,10 @@ const FollowersPage = ({ username }: { username: string }) => {
 						)}
 						{profileData?.userId === sessionData?.user.id &&
 							profile.userId !== sessionData?.user.id && (
-								<DropdownMenuSubmenu followerId={profile.userId} />
+								<DropdownMenuSubmenu
+									followerId={profile.userId}
+									viewerUserId={sessionData?.user.id ?? ""}
+								/>
 							)}
 					</div>
 				))}
@@ -67,8 +70,14 @@ const FollowersPage = ({ username }: { username: string }) => {
 	);
 };
 
-export function DropdownMenuSubmenu({ followerId }: { followerId: string }) {
-	const removeFollower = useRemoveFollower();
+export function DropdownMenuSubmenu({
+	followerId,
+	viewerUserId,
+}: {
+	followerId: string;
+	viewerUserId: string;
+}) {
+	const removeFollower = useRemoveFollower({ viewerUserId });
 
 	const handleRemoveFollower = () => {
 		removeFollower.mutate({
