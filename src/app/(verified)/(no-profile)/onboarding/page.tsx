@@ -117,7 +117,7 @@ const Onboarding = () => {
 			});
 			setIsRedirecting(true);
 			toast.success("Profile created successfully!");
-			router.push("/");
+			router.push("/?onboarding=complete");
 		} catch (e) {
 			let message = "Something went wrong, please try again";
 
