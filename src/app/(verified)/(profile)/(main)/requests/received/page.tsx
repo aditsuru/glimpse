@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -31,9 +30,8 @@ const ReceivedPage = () => {
 						key={profile.id}
 						className="hover:bg-accent/20 px-4 flex items-center"
 					>
-						<Link href={`/${profile.username}`} className="flex-1">
-							<ProfileCard data={profile} />
-						</Link>
+						<ProfileCard data={profile} />
+
 						<div className="flex gap-4 mr-4">
 							<Button
 								variant="outline-ring"

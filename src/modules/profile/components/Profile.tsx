@@ -50,7 +50,6 @@ const Profile = ({ data, viewerId }: ProfileProps) => {
 				)}
 				{viewerId !== data.userId && (
 					<FollowButton
-						initialStatus={data.viewerStatus}
 						targetUserId={data.userId}
 						targetUsername={data.username}
 						targetVisibility={data.visibility}

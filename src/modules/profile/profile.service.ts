@@ -58,12 +58,7 @@ export class ProfileService {
 		if (!profile)
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
-		const [
-			[{ followersCount }],
-			[{ followingCount }],
-			[viewerFollows],
-			[profileFollowsViewer],
-		] = await Promise.all([
+		const [[{ followersCount }], [{ followingCount }]] = await Promise.all([
 			this.db
 				.select({ followersCount: count() })
 				.from(followsTable)
@@ -82,32 +77,8 @@ export class ProfileService {
 						eq(followsTable.status, "accepted")
 					)
 				),
-			this.db
-				.select({ status: followsTable.status })
-				.from(followsTable)
-				.where(
-					and(
-						eq(followsTable.followerId, this.userId),
-						eq(followsTable.followingId, profile.userId)
-					)
-				)
-				.limit(1),
-			this.db
-				.select({ status: followsTable.status })
-				.from(followsTable)
-				.where(
-					and(
-						eq(followsTable.followerId, profile.userId),
-						eq(followsTable.followingId, this.userId)
-					)
-				)
-				.limit(1),
 		]);
 
-		const viewerStatus = computeViewerStatus(
-			viewerFollows?.status,
-			profileFollowsViewer?.status
-		);
 		return {
 			id: profile.id,
 			userId: profile.userId,
@@ -134,7 +105,6 @@ export class ProfileService {
 			updatedAt: profile.updatedAt,
 			followersCount,
 			followingCount,
-			viewerStatus,
 		};
 	}
 

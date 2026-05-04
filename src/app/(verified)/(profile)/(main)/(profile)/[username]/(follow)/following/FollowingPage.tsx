@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
@@ -27,9 +26,8 @@ const FollowingPage = ({ username }: { username: string }) => {
 						key={profile.id}
 						className="hover:bg-accent/20 px-4 flex items-center"
 					>
-						<Link href={`/${profile.username}`} className="flex-1">
-							<ProfileCard data={profile} />
-						</Link>
+						<ProfileCard data={profile} />
+
 						{profile.userId !== sessionData?.user.id && (
 							<FollowButton
 								initialStatus={profile.viewerStatus}

@@ -6,6 +6,9 @@ import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 const getProfileOutput = profileSelectSchema.extend({
 	followersCount: z.number(),
 	followingCount: z.number(),
+});
+
+const getProfileListOutput = getProfileOutput.extend({
 	viewerStatus: z.enum(viewerFollowStatusEnum),
 });
 
@@ -96,7 +99,7 @@ export const profileSchema = {
 			cursor: z.date().optional(),
 		}),
 		output: z.object({
-			items: z.array(getProfileOutput),
+			items: z.array(getProfileListOutput),
 			nextCursor: z.date().nullable(),
 		}),
 	},
