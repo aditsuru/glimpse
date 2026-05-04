@@ -20,6 +20,7 @@ import { useOnboardingTooltip } from "@/hooks/useOnboardingComplete";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import { SIDEBAR_GIFS } from "@/lib/shared/constants";
+import { usePendingReceivedCount } from "@/modules/follow/follow.queries";
 import { useProfile } from "@/modules/profile/profile.queries";
 import { useSettingsStore } from "@/store/use-settings-store";
 import { Avatar, AvatarImage } from "../ui/avatar";
@@ -61,6 +62,8 @@ const Navbar = ({ userId }: NavbarProps) => {
 	const { data, error, isLoading } = useProfile({
 		userId,
 	});
+
+	const { data: followCountData } = usePendingReceivedCount();
 
 	const { open, onHoverStart, onHoverEnd, isOnboardingDone } =
 		useOnboardingTooltip();
@@ -160,6 +163,29 @@ const Navbar = ({ userId }: NavbarProps) => {
 									Customize your experience
 								</TooltipContent>
 							</Tooltip>
+						);
+					}
+
+					if (resolvedHref === "/requests/received") {
+						return (
+							<Link
+								key={label}
+								href={href}
+								className={cn(
+									"flex items-center gap-4 px-[14px] py-3 rounded-full text-xl transition-colors hover:bg-accent w-full",
+									{ "font-bold": isActive }
+								)}
+							>
+								<div className="relative inline-flex">
+									<Icon className="size-7 shrink-0" />
+									{followCountData && followCountData.count !== 0 && (
+										<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
+											{followCountData.count}
+										</span>
+									)}
+								</div>
+								<span>{label}</span>
+							</Link>
 						);
 					}
 

@@ -75,6 +75,12 @@ export const followRouter = base.router({
 			return await context.followService.getPendingReceived({ ...input });
 		}),
 
+	getPendingReceivedCount: followProcedure
+		.output(followSchema.getPendingReceivedCount.output)
+		.handler(async ({ input: _input, context }) => {
+			return await context.followService.getPendingReceivedCount();
+		}),
+
 	getPendingSent: followProcedure
 		.input(followSchema.getPendingSent.input)
 		.output(followSchema.getPendingSent.output)
