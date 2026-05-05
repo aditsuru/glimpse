@@ -36,6 +36,7 @@
 		"better-auth": "^1.5.5",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
+		"date-fns": "^4.1.0",
 		"dotenv": "^17.4.1",
 		"drizzle-orm": "^0.45.1",
 		"drizzle-zod": "^0.8.3",

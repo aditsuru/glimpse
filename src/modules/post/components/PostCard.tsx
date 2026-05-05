@@ -29,6 +29,7 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { VideoPlayer } from "@/components/VideoPlayer";
+import { formatPostDate } from "@/lib/client/helpers";
 import { cn } from "@/lib/client/utils";
 import {
 	DEFAULT_PFP_URL,
@@ -86,7 +87,7 @@ const PostCard = ({ className, data, viewerUserId }: PostCardProps) => {
 								<VerifiedBadge className="size-4.5" />
 							)}
 							<p className="text-muted-foreground text-sm">
-								@{data.author.username}
+								{`@${data.author.username} · ${formatPostDate(data.createdAt)}`}
 							</p>
 						</div>
 						<DropdownMenuSubmenu
