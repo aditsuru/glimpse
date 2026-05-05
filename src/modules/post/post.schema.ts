@@ -4,7 +4,6 @@ import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 
 export const AttachmentSchema = z.object({
 	mimeType: z.enum(ALLOWED_MIME_TYPES.attachment),
-	spoiler: z.boolean(),
 	attachmentKey: z.string(),
 });
 
@@ -47,6 +46,7 @@ export const postSchema = {
 		input: z.object({
 			body: z.string().optional(),
 			attachments: z.array(AttachmentSchema).optional(),
+			spoiler: z.boolean(),
 		}),
 		output: z.object({
 			postId: z.string(),

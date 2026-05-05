@@ -29,7 +29,6 @@ type AttachmentItem = {
 	tempKey: string;
 	preview: string; // object URL
 	mimeType: string;
-	spoiler: boolean;
 };
 
 // ─── Ring Counter ─────────────────────────────────────────────────────────────
@@ -110,6 +109,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 
 	const [body, setBody] = useState("");
 	const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
+	const [spoiler, setSpoiler] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
@@ -165,7 +165,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 							file.type as (typeof ALLOWED_MIME_TYPES.attachment)[number],
 					});
 				await uploadToS3(presignedUrl, file);
-				return { tempKey: key, preview, mimeType: file.type, spoiler: false };
+				return { tempKey: key, preview, mimeType: file.type };
 			} catch {
 				URL.revokeObjectURL(preview);
 				toast.error("Upload failed, please try again");
@@ -225,7 +225,6 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 				tempKey: "", // placeholder
 				preview: URL.createObjectURL(f),
 				mimeType: f.type,
-				spoiler: false,
 			}));
 			setAttachments((prev) => [...prev, ...optimistic]);
 			setIsUploading(true);
@@ -301,12 +300,6 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 		});
 	};
 
-	const toggleSpoiler = (index: number) => {
-		setAttachments((prev) =>
-			prev.map((a, i) => (i === index ? { ...a, spoiler: !a.spoiler } : a))
-		);
-	};
-
 	// ── Submit ─────────────────────────────────────────────────────────────────
 
 	const handleSubmit = async (e: React.SubmitEvent) => {
@@ -322,13 +315,13 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 		try {
 			await createPost.mutateAsync({
 				body: trimmedBody || undefined,
+				spoiler,
 				attachments:
 					attachments.length > 0
 						? attachments.map((a) => ({
 								attachmentKey: a.tempKey,
 								mimeType:
 									a.mimeType as (typeof ALLOWED_MIME_TYPES.attachment)[number],
-								spoiler: a.spoiler,
 							}))
 						: undefined,
 			});
@@ -339,6 +332,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 				URL.revokeObjectURL(a.preview);
 			});
 			setAttachments([]);
+			setSpoiler(false);
 			onSuccess?.();
 		} catch {
 			setError("Failed to post. Please try again.");
@@ -354,7 +348,6 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 		.map((a, i) => ({
 			src: a.preview,
 			alt: `Attachment ${i + 1}`,
-			spoiler: a.spoiler,
 			unoptimized: isGif(a.mimeType),
 		}));
 
@@ -425,19 +418,14 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 						{videoAttachment && (
 							<VideoPlayer
 								src={videoAttachment.preview}
-								spoiler={videoAttachment.spoiler}
+								spoiler={spoiler}
 								className="w-full rounded-xl"
 							/>
 						)}
 
 						{/* Images */}
 						{carouselImages.length > 0 && (
-							<ImageCarousel
-								images={carouselImages}
-								spoiler={attachments
-									.filter((a) => isImage(a.mimeType))
-									.every((a) => a.spoiler)}
-							/>
+							<ImageCarousel images={carouselImages} spoiler={spoiler} />
 						)}
 					</div>
 				)}
@@ -471,38 +459,12 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 								type="button"
 								onClick={(e) => {
 									e.preventDefault();
-									console.log(
-										"before toggle",
-										attachments.map((a) => a.spoiler)
-									);
-									if (attachmentType === "video") {
-										toggleSpoiler(0);
-									} else {
-										const allSpoilered = attachments.every((a) => a.spoiler);
-										console.log("allSpoilered", allSpoilered);
-										setAttachments((prev) =>
-											prev.map((a) => ({ ...a, spoiler: !allSpoilered }))
-										);
-									}
+									setSpoiler((s) => !s);
 								}}
 								className="p-2 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-								title={
-									attachmentType === "video"
-										? attachments[0]?.spoiler
-											? "Remove spoiler"
-											: "Mark as spoiler"
-										: attachments.every((a) => a.spoiler)
-											? "Remove spoiler"
-											: "Mark as spoiler"
-								}
+								title={spoiler ? "Remove spoiler" : "Mark as spoiler"}
 							>
-								{attachmentType === "video" ? (
-									attachments[0]?.spoiler ? (
-										<EyeOff className="size-5" />
-									) : (
-										<Eye className="size-5" />
-									)
-								) : attachments.every((a) => a.spoiler) ? (
+								{spoiler ? (
 									<EyeOff className="size-5" />
 								) : (
 									<Eye className="size-5" />

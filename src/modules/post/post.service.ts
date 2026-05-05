@@ -82,6 +82,7 @@ export class PostService {
 	async create({
 		attachments,
 		body,
+		spoiler,
 	}: z.infer<typeof postSchema.create.input>): Promise<
 		z.infer<typeof postSchema.create.output>
 	> {
@@ -110,7 +111,6 @@ export class PostService {
 				attachments!.map((a) => ({
 					mimeType: a.mimeType,
 					tempKey: a.attachmentKey,
-					spoiler: a.spoiler,
 					permanentKey: getPermanentKey({ tempKey: a.attachmentKey })
 						.permanentKey,
 				}))
@@ -119,7 +119,7 @@ export class PostService {
 		const postId = await this.db.transaction(async (tsx) => {
 			const [post] = await tsx
 				.insert(postsTable)
-				.values({ userId: this.userId, hasAttachments, body })
+				.values({ userId: this.userId, hasAttachments, body, spoiler })
 				.returning();
 
 			if (hasAttachments) {
@@ -127,7 +127,6 @@ export class PostService {
 					attachmentsWithKeys.map((a) => ({
 						attachmentKey: a.permanentKey,
 						mimeType: a.mimeType,
-						spoiler: a.spoiler,
 						postId: post.id,
 					}))
 				);
@@ -195,18 +194,16 @@ export class PostService {
 				userId: postsTable.userId,
 				body: postsTable.body,
 				views: postsTable.views,
+				spoiler: postsTable.spoiler,
 				hasAttachments: postsTable.hasAttachments,
 				createdAt: postsTable.createdAt,
 				updatedAt: postsTable.updatedAt,
-				attachments: sql<
-					{ attachmentKey: string; mimeType: string; spoiler: boolean }[]
-				>`
+				attachments: sql<{ attachmentKey: string; mimeType: string }[]>`
 				COALESCE(
 				  json_agg(
 					json_build_object(
 					  'attachmentKey', ${attachmentsTable.attachmentKey},
-					  'mimeType', ${attachmentsTable.mimeType},
-					  'spoiler', ${attachmentsTable.spoiler}
+					  'mimeType', ${attachmentsTable.mimeType}
 					)
 				  ) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL),
 				  '[]'
@@ -226,7 +223,6 @@ export class PostService {
 			views: post.views + (await getPostViews(post.id)),
 			attachments: post.attachments.map((a) => ({
 				mimeType: a.mimeType as (typeof ALLOWED_MIME_TYPES.attachment)[number],
-				spoiler: a.spoiler,
 				url: constructPublicUrl({
 					key: a.attachmentKey,
 					updatedAt: post.updatedAt,
@@ -282,17 +278,15 @@ export class PostService {
 				body: postsTable.body,
 				views: postsTable.views,
 				hasAttachments: postsTable.hasAttachments,
+				spoiler: postsTable.spoiler,
 				createdAt: postsTable.createdAt,
 				updatedAt: postsTable.updatedAt,
-				attachments: sql<
-					{ attachmentKey: string; mimeType: string; spoiler: boolean }[]
-				>`
+				attachments: sql<{ attachmentKey: string; mimeType: string }[]>`
 				COALESCE(
 				  json_agg(
 					json_build_object(
 					  'attachmentKey', ${attachmentsTable.attachmentKey},
-					  'mimeType', ${attachmentsTable.mimeType},
-					  'spoiler', ${attachmentsTable.spoiler}
+					  'mimeType', ${attachmentsTable.mimeType}
 					)
 				  ) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL),
 				  '[]'
@@ -331,7 +325,6 @@ export class PostService {
 					attachments: attachments.map((a) => ({
 						mimeType:
 							a.mimeType as (typeof ALLOWED_MIME_TYPES.attachment)[number],
-						spoiler: a.spoiler,
 						url: constructPublicUrl({
 							key: a.attachmentKey,
 							updatedAt: post.updatedAt,

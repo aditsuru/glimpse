@@ -23,6 +23,7 @@ export const postsTable = pgTable(
 		body: text("body"),
 		views: integer("views").default(0).notNull(),
 		hasAttachments: boolean("has_attachments").notNull(),
+		spoiler: boolean("spoiler").default(false).notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),

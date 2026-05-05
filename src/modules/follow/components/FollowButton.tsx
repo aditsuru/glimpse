@@ -2,6 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import type { ViewerFollowStatus } from "@/lib/server/helpers";
@@ -68,6 +69,8 @@ const FollowButton = ({
 		removeFollow.isPending ||
 		(isLoading && initialStatus === undefined);
 
+	const isInitialLoading = isLoading && initialStatus === undefined;
+
 	const { label, variant } = (() => {
 		if (status === "none") return { label: "Follow", variant: "follow" };
 		if (status === "follows_you" || status === "follows_you_pending")
@@ -78,6 +81,10 @@ const FollowButton = ({
 			return { label: "Unfollow", variant: "outline-ring" };
 		return { label: "Follow", variant: "follow" };
 	})();
+
+	if (isInitialLoading) {
+		return <Skeleton className="h-9 w-24 rounded-full" />;
+	}
 
 	return (
 		<div>
