@@ -88,7 +88,7 @@ const HoverProfileCard = ({ className, username }: HoverProfileCardProps) => {
 
 const HoverProfileCardSkeleton = ({ className }: { className?: string }) => {
 	return (
-		<div className={cn("w-full p-4 flex flex-col gap-4", className)}>
+		<div className={cn("w-full p-8 flex flex-col gap-4", className)}>
 			<div className="w-full">
 				<div className="w-full flex justify-between">
 					<Skeleton className="size-15 rounded-full" />

@@ -31,8 +31,12 @@ export const useDialogStore = create<useDialogState>((set) => ({
 			},
 		}),
 
-	closeUnfollowDialog: () =>
-		set(() => ({
-			unfollowDialog: { ...initialDialogState },
-		})),
+	closeUnfollowDialog: () => {
+		set((state) => ({
+			unfollowDialog: { ...state.unfollowDialog, isOpen: false },
+		}));
+		setTimeout(() => {
+			set(() => ({ unfollowDialog: { ...initialDialogState } }));
+		}, 200);
+	},
 }));

@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/client";
 import {
 	useInfiniteQuery,
 	useMutation,
@@ -147,12 +148,14 @@ export function useRemoveFollow({
 			queryClient.setQueryData(statusKey, { status: nextStatus });
 			return { previousStatus, statusKey };
 		},
-		onError: (_err, _vars, context) => {
-			if (context?.statusKey) {
-				queryClient.setQueryData(context.statusKey, {
-					status: context.previousStatus,
-				});
-			}
+		onError: (err, _vars, context) => {
+			if (!context?.statusKey) return;
+
+			if (err instanceof ORPCError && err.code === "NOT_FOUND") return;
+
+			queryClient.setQueryData(context.statusKey, {
+				status: context.previousStatus,
+			});
 		},
 		onSettled: async (_data, _err, { targetUserId }, context) => {
 			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
