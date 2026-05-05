@@ -13,10 +13,10 @@ import type { ViewerFollowStatus } from "@/lib/server/helpers";
  * - Optimistic: follow.getStatus[targetUserId]
  * - Invalidate on settle (public target): profile.get[username:viewer], profile.get[username:target],
  *   follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search
- * - Invalidate on settle (private target): follow.getPendingSent, follow.getStatus[targetUserId], profile.search
+ * - Invalidate on settle (private target): follow.getPendingSent, follow.getStatus[targetUserId], profile.search, post.getAllByUser
  */
 
-// TODO: add getAllByUser & getFeed
+// TODO: add getFeed
 export function useSendFollow({
 	viewerUserId,
 	targetUsername,
@@ -73,6 +73,11 @@ export function useSendFollow({
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.invalidateQueries({
+					queryKey: orpc.post.getAllByUser.queryOptions({
+						input: { username: targetUsername },
+					}).queryKey,
+				}),
 			];
 
 			if (wasAccepted) {
@@ -116,10 +121,10 @@ export function useSendFollow({
  * - Optimistic: follow.getStatus[targetUserId]
  * - Invalidate on settle (was accepted/mutual): profile.get[username:viewer], profile.get[username:target],
  *   follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search
- * - Invalidate on settle (was pending): follow.getPendingSent, follow.getStatus[targetUserId], profile.search
+ * - Invalidate on settle (was pending): follow.getPendingSent, follow.getStatus[targetUserId], profile.search, post.getAllByUser
  */
 
-// TODO: add getAllByUser & getFeed
+// TODO: add getFeed
 export function useRemoveFollow({
 	viewerUserId,
 	targetUsername,
@@ -174,6 +179,11 @@ export function useRemoveFollow({
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
+				queryClient.invalidateQueries({
+					queryKey: orpc.post.getAllByUser.queryOptions({
+						input: { username: targetUsername },
+					}).queryKey,
+				}),
 			];
 
 			if (wasAccepted) {
