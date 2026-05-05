@@ -15,14 +15,14 @@ const PageHeader = ({ title, className }: PageHeaderProps) => {
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-4 px-4 border-b border-accent sticky top-0 bg-background/80 backdrop-blur-sm z-10 h-18",
+				"flex items-center gap-4 px-4 border-b border-accent sticky top-0 bg-background/80 backdrop-blur-sm z-10",
 				className
 			)}
 		>
 			<Button
 				variant="ghost"
 				onClick={() => router.back()}
-				className="rounded-full p-2 hover:bg-accent transition-colors"
+				className="rounded-full p-2 hover:bg-accent transition-colors h-18"
 			>
 				<ChevronLeft className="size-5" />
 			</Button>

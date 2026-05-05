@@ -70,6 +70,10 @@ export function useGetAttachmentPresignedUrl() {
 	return useMutation(orpc.post.getAttachmentPresignedUrl.mutationOptions());
 }
 
+export function useMarkPostSeen() {
+	return useMutation(orpc.post.markPostSeen.mutationOptions());
+}
+
 export function usePost(postId: string) {
 	return useQuery(
 		orpc.post.get.queryOptions({
