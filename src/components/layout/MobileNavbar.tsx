@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/client/utils";
 import { useProfile } from "@/modules/profile/profile.queries";
+import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { Avatar, AvatarImage } from "../ui/avatar";
 
 const mobileNavItems = [
@@ -20,6 +21,7 @@ type MobileNavbarProps = {
 
 const MobileNav = ({ userId }: MobileNavbarProps) => {
 	const pathname = usePathname();
+	const { open: openPostComposer } = usePostComposerStore();
 
 	const { data } = useProfile({
 		userId,
@@ -27,13 +29,26 @@ const MobileNav = ({ userId }: MobileNavbarProps) => {
 
 	return (
 		<nav className="shrink-0 md:hidden border-t border-accent flex justify-around items-center py-3 bg-background">
-			{mobileNavItems.map(({ href, icon: Icon }) => (
-				<Link key={href} href={href}>
-					<Icon
-						className={cn("size-7", { "stroke-[2.5px]": pathname === href })}
-					/>
-				</Link>
-			))}
+			{mobileNavItems.map(({ href, icon: Icon }) => {
+				if (href === "/create-post")
+					return (
+						<button key={href} type="button" onClick={openPostComposer}>
+							<Icon
+								className={cn("size-7", {
+									"stroke-[2.5px]": pathname === href,
+								})}
+							/>
+						</button>
+					);
+
+				return (
+					<Link key={href} href={href}>
+						<Icon
+							className={cn("size-7", { "stroke-[2.5px]": pathname === href })}
+						/>
+					</Link>
+				);
+			})}
 			<Link href={`/${data?.username}`}>
 				<Avatar className="size-7 shrink-0">
 					<AvatarImage src={data?.avatarUrl ?? "/static/default-pfp.png"} />

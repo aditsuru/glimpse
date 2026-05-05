@@ -453,7 +453,8 @@ export function VideoPlayer({
 						autoPlay &&
 						spoilerRevealed &&
 						!useMediaStore.getState().activeVideoId &&
-						!userPaused.current
+						!userPaused.current &&
+						!useMediaStore.getState().isPausedGlobally
 					) {
 						setActiveVideoId(videoId);
 						safePlay();
@@ -512,7 +513,8 @@ export function VideoPlayer({
 				autoPlay &&
 				spoilerRevealed &&
 				!userPaused.current &&
-				!autoplayFailed.current // ← THE LOOP GUARD — without this, failed autoplay → release → re-try → loop
+				!autoplayFailed.current && // ← THE LOOP GUARD — without this, failed autoplay → release → re-try → loop
+				!useMediaStore.getState().isPausedGlobally
 			) {
 				// Double-check getState() in case two subscribers fire simultaneously
 				if (!useMediaStore.getState().activeVideoId) {

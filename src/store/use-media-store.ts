@@ -14,6 +14,9 @@ interface MediaState {
 	/** src string of the currently playing video. null = nothing playing. Runtime only. */
 	activeVideoId: string | null;
 	setActiveVideoId: (id: string | null) => void;
+
+	isPausedGlobally: boolean;
+	setPausedGlobally: (isPausedGlobally: boolean) => void;
 }
 
 export const useMediaStore = create<MediaState>()(
@@ -25,6 +28,8 @@ export const useMediaStore = create<MediaState>()(
 			setVolume: (volume) => set({ volume }),
 			activeVideoId: null,
 			setActiveVideoId: (activeVideoId) => set({ activeVideoId }),
+			isPausedGlobally: false,
+			setPausedGlobally: (isPausedGlobally) => set({ isPausedGlobally }),
 		}),
 		{
 			name: LOCAL_STORAGE_KEYS.GLIMPSE_MEDIA_STORAGE,

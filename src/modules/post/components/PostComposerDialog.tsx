@@ -1,16 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { useMediaStore } from "@/store/use-media-store";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
 import PostComposer from "./PostComposer";
 
 export default function PostComposerDialog() {
 	const { isOpen, close } = usePostComposerStore();
+
+	useEffect(() => {
+		useMediaStore.getState().setPausedGlobally(isOpen);
+		if (isOpen) useMediaStore.getState().setActiveVideoId(null);
+	}, [isOpen]);
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
