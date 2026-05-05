@@ -300,7 +300,7 @@ export function VideoPlayer({
 	src,
 	autoPlay = false,
 	spoiler = false,
-	aspectRatio,
+	aspectRatio = 16 / 9,
 	className = "",
 	autoPlayThreshold = 0.8,
 }: VideoPlayerProps) {

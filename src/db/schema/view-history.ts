@@ -5,7 +5,6 @@ import {
 	primaryKey,
 	text,
 	timestamp,
-	uuid,
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 import { user } from "./auth-schema";
@@ -17,7 +16,7 @@ export const viewHistoryTable = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		postId: uuid("post_id")
+		postId: text("post_id")
 			.notNull()
 			.references(() => postsTable.id, { onDelete: "cascade" }),
 		createdAt: timestamp("created_at", { withTimezone: true })

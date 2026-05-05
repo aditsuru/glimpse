@@ -14,6 +14,8 @@ import type { ViewerFollowStatus } from "@/lib/server/helpers";
  *   follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search
  * - Invalidate on settle (private target): follow.getPendingSent, follow.getStatus[targetUserId], profile.search
  */
+
+// TODO: add getAllByUser & getFeed
 export function useSendFollow({
 	viewerUserId,
 	targetUsername,
@@ -115,6 +117,8 @@ export function useSendFollow({
  *   follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search
  * - Invalidate on settle (was pending): follow.getPendingSent, follow.getStatus[targetUserId], profile.search
  */
+
+// TODO: add getAllByUser & getFeed
 export function useRemoveFollow({
 	viewerUserId,
 	targetUsername,

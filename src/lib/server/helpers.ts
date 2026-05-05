@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { FollowStatusEnumType } from "@/db/schema";
 
 export type ViewerFollowStatus =

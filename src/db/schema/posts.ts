@@ -6,21 +6,23 @@ import {
 	pgTable,
 	text,
 	timestamp,
-	uuid,
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
+import { nanoid } from "nanoid";
 import { user } from "./auth-schema";
 
 export const postsTable = pgTable(
 	"posts",
 	{
-		id: uuid("id").defaultRandom().primaryKey(),
+		id: text("id")
+			.$defaultFn(() => nanoid())
+			.notNull(),
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
 		body: text("body"),
 		views: integer("views").default(0).notNull(),
-		hasAttachment: boolean("has_attachment").notNull(),
+		hasAttachments: boolean("has_attachments").notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),
