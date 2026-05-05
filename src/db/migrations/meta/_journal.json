@@ -5,50 +5,8 @@
 		{
 			"idx": 0,
 			"version": "7",
-			"when": 1777463063319,
-			"tag": "0000_fat_stone_men",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "7",
-			"when": 1777534745745,
-			"tag": "0001_watery_mysterio",
-			"breakpoints": true
-		},
-		{
-			"idx": 2,
-			"version": "7",
-			"when": 1777535304483,
-			"tag": "0002_ordinary_omega_sentinel",
-			"breakpoints": true
-		},
-		{
-			"idx": 3,
-			"version": "7",
-			"when": 1777570716549,
-			"tag": "0003_demonic_polaris",
-			"breakpoints": true
-		},
-		{
-			"idx": 4,
-			"version": "7",
-			"when": 1777610244823,
-			"tag": "0004_hesitant_rick_jones",
-			"breakpoints": true
-		},
-		{
-			"idx": 5,
-			"version": "7",
-			"when": 1777727545808,
-			"tag": "0005_wise_war_machine",
-			"breakpoints": true
-		},
-		{
-			"idx": 6,
-			"version": "7",
-			"when": 1777944033091,
-			"tag": "0006_clumsy_starbolt",
+			"when": 1777970303056,
+			"tag": "0000_dark_slapstick",
 			"breakpoints": true
 		}
 	]

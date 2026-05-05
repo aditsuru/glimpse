@@ -1,1 +1,0 @@
-ALTER TABLE "profiles" DROP COLUMN "avatar_mime_type";

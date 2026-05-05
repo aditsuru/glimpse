@@ -8,14 +8,15 @@ import {
 	timestamp,
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
-import { nanoid } from "nanoid";
+import { customNanoid } from "@/lib/server/helpers";
 import { user } from "./auth-schema";
 
 export const postsTable = pgTable(
 	"posts",
 	{
 		id: text("id")
-			.$defaultFn(() => nanoid())
+			.$defaultFn(() => customNanoid())
+			.primaryKey()
 			.notNull(),
 		userId: text("user_id")
 			.notNull()
