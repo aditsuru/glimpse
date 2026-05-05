@@ -337,6 +337,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 			setAttachments([]);
 			setSpoiler(false);
 			onSuccess?.();
+			toast.success("Post created successfully.");
 			router.push(`/p/${postId}`);
 		} catch {
 			setError("Failed to post. Please try again.");
