@@ -29,6 +29,7 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { VideoPlayer } from "@/components/VideoPlayer";
+import { useViewCount } from "@/hooks/useViewCount";
 import { formatPostDate } from "@/lib/client/helpers";
 import { cn } from "@/lib/client/utils";
 import {
@@ -38,7 +39,7 @@ import {
 	isVideo,
 } from "@/lib/shared/constants";
 import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
-import { useDelete } from "../post.queries";
+import { useDelete, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";
 
 interface PostCardProps {
@@ -49,13 +50,21 @@ interface PostCardProps {
 
 const PostCard = ({ className, data, viewerUserId }: PostCardProps) => {
 	const router = useRouter();
+	const updateViewCount = useMarkPostSeen();
+	const ref = useViewCount(data.id, () =>
+		updateViewCount.mutate({
+			postId: data.id,
+		})
+	);
+
 	return (
 		<div
-			className={cn("p-4 flex flex-col gap-4", className)}
+			className={cn("p-4 flex flex-col", className)}
 			role="button"
 			tabIndex={0}
 			onClick={() => router.push(`/posts/${data.id}`)}
-			onKeyDown={(e) => e.key === "Enter" && router.push(`/posts/${data.id}`)}
+			onKeyDown={(e) => e.key === "Enter" && router.push(`/p/${data.id}`)}
+			ref={ref}
 		>
 			<div className="flex gap-4 items-start">
 				<Avatar className="size-10">
@@ -96,73 +105,73 @@ const PostCard = ({ className, data, viewerUserId }: PostCardProps) => {
 							authorId={data.author.id}
 						/>
 					</div>
-
-					{/* Body */}
-					<div
-						className="flex flex-col gap-2"
-						onClick={(e) => e.stopPropagation()}
-						onKeyDown={(e) => e.stopPropagation()}
-					>
-						{data.body && (
-							<p className="whitespace-break-spaces px-1">{data.body}</p>
-						)}
-						{data.hasAttachments && isVideo(data.attachments[0].mimeType) && (
-							<VideoPlayer
-								src={data.attachments[0].url}
-								autoPlay
-								spoiler={data.spoiler}
-							/>
-						)}
-						{data.hasAttachments && isImage(data.attachments[0].mimeType) && (
-							<ImageCarousel
-								images={data.attachments.map((image, i) => {
-									return {
-										src: image.url,
-										alt: `${data.id} - image ${i}`,
-										unoptimized: isGif(image.mimeType),
-									};
-								})}
-								spoiler={data.spoiler}
-							/>
-						)}
-					</div>
-
-					{/* Toolbar */}
-					<div
-						className="flex justify-between mt-2"
-						onClick={(e) => e.stopPropagation()}
-						onKeyDown={(e) => e.stopPropagation()}
-					>
-						<Button
-							variant="ghost"
-							className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
-						>
-							<Heart className="size-4.5" />
-							<p>12k</p>
-						</Button>
-						<Button
-							variant="ghost"
-							className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
-						>
-							<MessageCircle className="size-4.5" />
-							<p>12k</p>
-						</Button>
-						<Button
-							variant="ghost"
-							className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
-						>
-							<ChartLine className="size-4.5" />
-							<p>12k</p>
-						</Button>
-						<Button
-							variant="ghost"
-							className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
-						>
-							<Bookmark className="size-4.5" />
-							<p>12k</p>
-						</Button>
-					</div>
 				</div>
+			</div>
+
+			{/* Body */}
+			<div
+				className="flex flex-col gap-2 mt-3 md:pl-14 md:-mt-2"
+				onClick={(e) => e.stopPropagation()}
+				onKeyDown={(e) => e.stopPropagation()}
+			>
+				{data.body && (
+					<p className="whitespace-break-spaces px-1">{data.body}</p>
+				)}
+				{data.hasAttachments && isVideo(data.attachments[0].mimeType) && (
+					<VideoPlayer
+						src={data.attachments[0].url}
+						autoPlay
+						spoiler={data.spoiler}
+					/>
+				)}
+				{data.hasAttachments && isImage(data.attachments[0].mimeType) && (
+					<ImageCarousel
+						images={data.attachments.map((image, i) => {
+							return {
+								src: image.url,
+								alt: `${data.id} - image ${i}`,
+								unoptimized: isGif(image.mimeType),
+							};
+						})}
+						spoiler={data.spoiler}
+					/>
+				)}
+			</div>
+
+			{/* Toolbar */}
+			<div
+				className="mt-2 flex justify-between md:pl-14"
+				onClick={(e) => e.stopPropagation()}
+				onKeyDown={(e) => e.stopPropagation()}
+			>
+				<Button
+					variant="ghost"
+					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+				>
+					<Heart className="size-4.5" />
+					<p>12k</p>
+				</Button>
+				<Button
+					variant="ghost"
+					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+				>
+					<MessageCircle className="size-4.5" />
+					<p>12k</p>
+				</Button>
+				<Button
+					variant="ghost"
+					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+				>
+					<ChartLine className="size-4.5" />
+					<p>{data.views === 0 ? "1" : data.views}</p>
+				</Button>
+				<Button
+					variant="ghost"
+					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+				>
+					<Bookmark className="size-4.5" />
+					<p>12k</p>
+				</Button>
 			</div>
 		</div>
 	);

@@ -4,8 +4,10 @@ import { ORPCError } from "@orpc/client";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import ErrorMessage from "@/components/layout/ErrorMessage";
 import PageHeader from "@/components/layout/PageHeader";
+import UserPostFeed from "@/modules/post/components/UserPostFeed";
 import MobileProfileHeader from "@/modules/profile/components/MobileProfileHeader";
 import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
+import ProfileNavbar from "@/modules/profile/components/ProfileNavbar";
 import { useProfile } from "@/modules/profile/profile.queries";
 
 const ProfilePage = ({
@@ -32,7 +34,7 @@ const ProfilePage = ({
 	if (isLoading || !data) return <ProfileSkeleton />;
 
 	return (
-		<div className="w-full h-full">
+		<div className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
 			<MobileProfileHeader
 				title={username}
 				className="sm:hidden"
@@ -40,6 +42,10 @@ const ProfilePage = ({
 			/>
 			<PageHeader title={username} className="max-sm:hidden" />
 			<Profile data={data} viewerId={viewerId} />
+			<ProfileNavbar username={username} />
+			<div className="flex-1">
+				<UserPostFeed username={username} />
+			</div>
 		</div>
 	);
 };

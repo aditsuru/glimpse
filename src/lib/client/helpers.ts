@@ -1,4 +1,4 @@
-import { differenceInSeconds } from "date-fns";
+import { differenceInSeconds, format } from "date-fns";
 
 export function formatPostDate(date: Date | string): string {
 	const seconds = differenceInSeconds(new Date(), new Date(date));
