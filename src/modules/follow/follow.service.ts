@@ -6,8 +6,8 @@ import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
 import { computeViewerStatus } from "@/lib/server/helpers";
+import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
-import { constructPublicUrl } from "@/lib/shared/s3-utils";
 import type { followSchema } from "./follow.schema";
 
 export class FollowService {

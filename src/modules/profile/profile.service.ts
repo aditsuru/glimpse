@@ -12,6 +12,7 @@ import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
 import { computeViewerStatus } from "@/lib/server/helpers";
 import {
+	constructPublicUrl,
 	constructTempKey,
 	getPermanentKey,
 	getPresignedUploadUrl,
@@ -19,7 +20,6 @@ import {
 } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
 import { RESERVED_USERNAMES } from "@/lib/shared/constants";
-import { constructPublicUrl } from "@/lib/shared/s3-utils";
 import type { profileSchema } from "./profile.schema";
 
 const matcher = new RegExpMatcher({
