@@ -1,0 +1,92 @@
+import {
+	useInfiniteQuery,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { orpc } from "@/lib/client/orpc-client";
+
+/**
+ * Side effects:
+ * - Invalidate on settle: post.GetAllByUser[username]
+ */
+export function useCreate({ viewerUserId }: { viewerUserId: string }) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		...orpc.post.create.mutationOptions(),
+		onSettled: async (_data, _err) => {
+			const username = queryClient.getQueryData<{ username?: string }>(
+				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
+					.queryKey
+			)?.username;
+
+			if (username) {
+				await Promise.all([
+					queryClient.invalidateQueries({
+						queryKey: orpc.post.getAllByUser.queryOptions({
+							input: { username },
+						}).queryKey,
+					}),
+				]);
+			}
+		},
+	});
+}
+
+/**
+ * Side effects:
+ * - Invalidate on settle: post.GetAllByUser[username], post.get[postId]
+ */
+export function useDelete({ viewerUserId }: { viewerUserId: string }) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		...orpc.post.delete.mutationOptions(),
+		onSettled: async (_data, _err, variables) => {
+			const username = queryClient.getQueryData<{ username?: string }>(
+				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
+					.queryKey
+			)?.username;
+
+			await Promise.all([
+				username &&
+					queryClient.invalidateQueries({
+						queryKey: orpc.post.getAllByUser.queryOptions({
+							input: { username },
+						}).queryKey,
+					}),
+				queryClient.invalidateQueries({
+					queryKey: orpc.post.get.queryOptions({
+						input: { postId: variables.postId },
+					}).queryKey,
+				}),
+			]);
+		},
+	});
+}
+
+export function useGetAttachmentPresignedUrl() {
+	return useMutation(orpc.post.getAttachmentPresignedUrl.mutationOptions());
+}
+
+export function usePost(postId: string) {
+	return useQuery(
+		orpc.post.get.queryOptions({
+			input: { postId },
+		})
+	);
+}
+
+export function useGetAllByUser(username: string) {
+	return useInfiniteQuery(
+		orpc.post.getAllByUser.infiniteOptions({
+			input: (pageParam) => ({
+				username,
+				cursor: pageParam as Date | undefined,
+			}),
+			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+			initialPageParam: undefined as Date | undefined,
+		})
+	);
+}

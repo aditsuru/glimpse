@@ -27,6 +27,8 @@ export const isImage = (mimeType: string) => !isVideo(mimeType);
 export const isGif = (mimeType: string) => mimeType === GIF_MIME_TYPE;
 export const isAllowedAvatarType = (mimeType: string) =>
 	(ALLOWED_MIME_TYPES.avatar as readonly string[]).includes(mimeType);
+export const isAllowedAttachmentType = (mimeType: string) =>
+	(ALLOWED_MIME_TYPES.attachment as readonly string[]).includes(mimeType);
 
 export const RESERVED_USERNAMES = new Set([
 	"admin",
@@ -62,3 +64,5 @@ export const SIDEBAR_GIFS = [
 	"https://ik.imagekit.io/aditsuru/Glimpse/banner6.gif",
 	"https://ik.imagekit.io/aditsuru/Glimpse/banner7.gif",
 ] as const;
+
+export const MAX_POST_BODY_LENGTH = 200;

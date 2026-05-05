@@ -53,12 +53,16 @@ export async function moveFile({
 		})
 	);
 
-	await s3.send(
-		new DeleteObjectCommand({
-			Bucket: config.R2_BUCKET_NAME,
-			Key: fromKey,
-		})
-	);
+	try {
+		await s3.send(
+			new DeleteObjectCommand({
+				Bucket: config.R2_BUCKET_NAME,
+				Key: fromKey,
+			})
+		);
+	} catch {
+		// temp/* auto-expires in 24h anyway, not worth failing db transactions
+	}
 
 	return { success: true };
 }

@@ -22,6 +22,7 @@ import { cn } from "@/lib/client/utils";
 import { SIDEBAR_GIFS } from "@/lib/shared/constants";
 import { usePendingReceivedCount } from "@/modules/follow/follow.queries";
 import { useProfile } from "@/modules/profile/profile.queries";
+import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { useSettingsStore } from "@/store/use-settings-store";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -58,6 +59,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 	const issidebarGifGalleryEnabled = useSettingsStore(
 		(state) => state.isSidebarGifGalleryEnabled
 	);
+	const { open: openPostComposer } = usePostComposerStore();
 
 	const { data, error, isLoading } = useProfile({
 		userId,
@@ -205,12 +207,13 @@ const Navbar = ({ userId }: NavbarProps) => {
 				})}
 
 				{/* Post Button */}
-				<Link
-					href="create-post"
+				<button
+					type="button"
 					className="mt-4 w-full bg-primary text-primary-foreground rounded-full py-4 text-lg font-bold hover:brightness-90 transition-all text-center"
+					onClick={openPostComposer}
 				>
 					Post
-				</Link>
+				</button>
 
 				{/* User Profile */}
 				<Popover>

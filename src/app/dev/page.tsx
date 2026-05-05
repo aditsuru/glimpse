@@ -1,15 +1,13 @@
 "use client";
 
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import PostComposer from "@/modules/post/components/PostComposer";
 
 function Dev() {
-	const handleClick = () => {
-		toast.success("Successfully created profile");
-	};
 	return (
 		<main className="w-screen h-dvh flex flex-col items-center justify-center">
-			<Button onClick={handleClick}>Toast</Button>
+			<div className="w-lg">
+				<PostComposer />
+			</div>
 		</main>
 	);
 }

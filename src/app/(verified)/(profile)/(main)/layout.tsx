@@ -9,6 +9,7 @@ import Snowfall from "@/components/misc/Snowfall";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
 import UnfollowConfirmDialog from "@/modules/follow/components/UnfollowConfirmDialog";
+import PostComposerDialog from "@/modules/post/components/PostComposerDialog";
 
 export default async function Layout({
 	children,
@@ -40,8 +41,13 @@ export default async function Layout({
 
 				{/* Mobile Bottom Nav */}
 				<MobileNav userId={user.id} />
+
+				{/* Misc */}
 				<Snowfall />
+
+				{/* Dialogs */}
 				<UnfollowConfirmDialog />
+				<PostComposerDialog />
 			</div>
 		</HydrationBoundary>
 	);
