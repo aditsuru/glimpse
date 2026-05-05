@@ -1,5 +1,6 @@
-import "server-only";
+// DO NOT: import "server-only";
 
+import { customAlphabet } from "nanoid";
 import type { FollowStatusEnumType } from "@/db/schema";
 
 export type ViewerFollowStatus =
@@ -30,3 +31,8 @@ export function computeViewerStatus(
 	if (theyFollow === "pending") return "follows_you_pending";
 	return "none";
 }
+
+export const customNanoid = customAlphabet(
+	"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",
+	21
+);

@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye, EyeOff, ImageIcon, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { type CarouselImage, ImageCarousel } from "@/components/ImageCarousel";
@@ -103,6 +104,8 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const { data: profile } = useProfile({ userId: session?.user.id ?? "" });
 	const createPost = useCreate({ viewerUserId: session?.user.id ?? "" });
 	const getAttachmentPresignedUrl = useGetAttachmentPresignedUrl();
+
+	const router = useRouter();
 
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -313,7 +316,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 		setIsSubmitting(true);
 
 		try {
-			await createPost.mutateAsync({
+			const { postId } = await createPost.mutateAsync({
 				body: trimmedBody || undefined,
 				spoiler,
 				attachments:
@@ -334,6 +337,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 			setAttachments([]);
 			setSpoiler(false);
 			onSuccess?.();
+			router.push(`/p/${postId}`);
 		} catch {
 			setError("Failed to post. Please try again.");
 		} finally {
@@ -409,7 +413,11 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 				</div>
 
 				{/* Error */}
-				{error && <p className="text-sm text-destructive px-1">{error}</p>}
+				{error && (
+					<p className="text-sm text-destructive px-1 mb-2 font-medium">
+						{error}
+					</p>
+				)}
 
 				{/* Attachment preview */}
 				{attachments.length > 0 && (

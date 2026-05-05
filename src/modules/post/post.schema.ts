@@ -7,7 +7,16 @@ export const AttachmentSchema = z.object({
 	attachmentKey: z.string(),
 });
 
+const postAuthorSchema = z.object({
+	id: z.string(),
+	username: z.string(),
+	displayName: z.string(),
+	isGlimpseVerified: z.boolean(),
+	avatarUrl: z.string().nullable(),
+});
+
 const getPostOutput = postSelectSchema.extend({
+	author: postAuthorSchema,
 	attachments: z.array(
 		AttachmentSchema.omit({
 			attachmentKey: true,

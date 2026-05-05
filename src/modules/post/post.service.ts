@@ -9,6 +9,7 @@ import {
 	profilesTable,
 } from "@/db/schema";
 import { viewHistoryTable } from "@/db/schema/view-history";
+import { customNanoid } from "@/lib/server/helpers";
 import {
 	getPostViews,
 	getPostViewsBatch,
@@ -66,7 +67,7 @@ export class PostService {
 	}: z.infer<typeof postSchema.getAttachmentPresignedUrl.input>): Promise<
 		z.infer<typeof postSchema.getAttachmentPresignedUrl.output>
 	> {
-		const key = constructTempKey(`attachment/${this.userId}`);
+		const key = constructTempKey(`attachment/${this.userId}/${customNanoid()}`);
 
 		const { presignedUrl } = await getPresignedUploadUrl({
 			contentType: mimeType,
@@ -199,28 +200,69 @@ export class PostService {
 				createdAt: postsTable.createdAt,
 				updatedAt: postsTable.updatedAt,
 				attachments: sql<{ attachmentKey: string; mimeType: string }[]>`
-				COALESCE(
-				  json_agg(
-					json_build_object(
-					  'attachmentKey', ${attachmentsTable.attachmentKey},
-					  'mimeType', ${attachmentsTable.mimeType}
+					COALESCE(
+					  json_agg(
+						json_build_object(
+						  'attachmentKey', ${attachmentsTable.attachmentKey},
+						  'mimeType', ${attachmentsTable.mimeType}
+						)
+					  ) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL),
+					  '[]'
 					)
-				  ) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL),
-				  '[]'
-				)
-			  `,
+				`,
+				// profile fields
+				authorId: profilesTable.userId,
+				authorUsername: profilesTable.username,
+				authorDisplayName: profilesTable.displayName,
+				authorIsGlimpseVerified: profilesTable.isGlimpseVerified,
+				authorAvatarKey: profilesTable.avatarKey,
+				authorAvatarUpdatedAt: profilesTable.updatedAt,
+				authorVisibility: profilesTable.visibility,
 			})
 			.from(postsTable)
+			.innerJoin(profilesTable, eq(profilesTable.userId, postsTable.userId))
 			.leftJoin(attachmentsTable, eq(attachmentsTable.postId, postsTable.id))
 			.where(eq(postsTable.id, postId))
-			.groupBy(postsTable.id)
+			.groupBy(postsTable.id, profilesTable.id)
 			.limit(1);
 
 		if (!post) throw new ORPCError("NOT_FOUND", { message: "Post not found" });
 
+		// visibility check
+		if (post.authorVisibility === "private" && post.userId !== this.userId) {
+			const [follow] = await this.db
+				.select({ status: followsTable.status })
+				.from(followsTable)
+				.where(
+					and(
+						eq(followsTable.followerId, this.userId),
+						eq(followsTable.followingId, post.userId),
+						eq(followsTable.status, "accepted")
+					)
+				)
+				.limit(1);
+
+			if (!follow)
+				throw new ORPCError("FORBIDDEN", {
+					message: "This profile is private",
+				});
+		}
+
 		return {
 			...post,
 			views: post.views + (await getPostViews(post.id)),
+			author: {
+				id: post.authorId,
+				username: post.authorUsername,
+				displayName: post.authorDisplayName,
+				isGlimpseVerified: post.authorIsGlimpseVerified,
+				avatarUrl: post.authorAvatarKey
+					? constructPublicUrl({
+							key: post.authorAvatarKey,
+							updatedAt: post.authorAvatarUpdatedAt,
+						}).publicUrl
+					: null,
+			},
 			attachments: post.attachments.map((a) => ({
 				mimeType: a.mimeType as (typeof ALLOWED_MIME_TYPES.attachment)[number],
 				url: constructPublicUrl({
@@ -241,6 +283,11 @@ export class PostService {
 			.select({
 				userId: profilesTable.userId,
 				visibility: profilesTable.visibility,
+				username: profilesTable.username,
+				displayName: profilesTable.displayName,
+				isGlimpseVerified: profilesTable.isGlimpseVerified,
+				avatarKey: profilesTable.avatarKey,
+				avatarUpdatedAt: profilesTable.updatedAt,
 			})
 			.from(profilesTable)
 			.where(eq(profilesTable.username, username))
@@ -249,7 +296,6 @@ export class PostService {
 		if (!profile)
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
-		// private profile check
 		if (profile.visibility === "private" && profile.userId !== this.userId) {
 			const [follow] = await this.db
 				.select({ status: followsTable.status })
@@ -269,6 +315,19 @@ export class PostService {
 				});
 		}
 
+		const author = {
+			id: profile.userId,
+			username: profile.username,
+			displayName: profile.displayName,
+			isGlimpseVerified: profile.isGlimpseVerified,
+			avatarUrl: profile.avatarKey
+				? constructPublicUrl({
+						key: profile.avatarKey,
+						updatedAt: profile.avatarUpdatedAt,
+					}).publicUrl
+				: null,
+		};
+
 		const seenIds = await getViewHistory(this.userId);
 
 		const items = await this.db
@@ -282,16 +341,16 @@ export class PostService {
 				createdAt: postsTable.createdAt,
 				updatedAt: postsTable.updatedAt,
 				attachments: sql<{ attachmentKey: string; mimeType: string }[]>`
-				COALESCE(
-				  json_agg(
-					json_build_object(
-					  'attachmentKey', ${attachmentsTable.attachmentKey},
-					  'mimeType', ${attachmentsTable.mimeType}
+					COALESCE(
+					  json_agg(
+						json_build_object(
+						  'attachmentKey', ${attachmentsTable.attachmentKey},
+						  'mimeType', ${attachmentsTable.mimeType}
+						)
+					  ) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL),
+					  '[]'
 					)
-				  ) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL),
-				  '[]'
-				)
-			  `,
+				`,
 			})
 			.from(postsTable)
 			.leftJoin(attachmentsTable, eq(attachmentsTable.postId, postsTable.id))
@@ -318,20 +377,19 @@ export class PostService {
 		const viewsMap = await getPostViewsBatch(data.map((p) => p.id));
 
 		return {
-			items: await Promise.all(
-				data.map(async ({ attachments, ...post }) => ({
-					...post,
-					views: post.views + (viewsMap.get(post.id) ?? 0),
-					attachments: attachments.map((a) => ({
-						mimeType:
-							a.mimeType as (typeof ALLOWED_MIME_TYPES.attachment)[number],
-						url: constructPublicUrl({
-							key: a.attachmentKey,
-							updatedAt: post.updatedAt,
-						}).publicUrl,
-					})),
-				}))
-			),
+			items: data.map(({ attachments, ...post }) => ({
+				...post,
+				author,
+				views: post.views + (viewsMap.get(post.id) ?? 0),
+				attachments: attachments.map((a) => ({
+					mimeType:
+						a.mimeType as (typeof ALLOWED_MIME_TYPES.attachment)[number],
+					url: constructPublicUrl({
+						key: a.attachmentKey,
+						updatedAt: post.updatedAt,
+					}).publicUrl,
+				})),
+			})),
 			nextCursor,
 		};
 	}

@@ -70,7 +70,7 @@ const FollowersPage = ({ username }: { username: string }) => {
 	);
 };
 
-export function DropdownMenuSubmenu({
+function DropdownMenuSubmenu({
 	followerId,
 	viewerUserId,
 }: {
