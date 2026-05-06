@@ -682,8 +682,12 @@ export function VideoPlayer({
 				if (e.key === "m" || e.key === "M") handleToggleMute();
 				if (e.key === "f" || e.key === "F") handleToggleFullscreen();
 			}}
-			onMouseEnter={() => setHovering(true)}
-			onMouseLeave={() => {
+			onPointerEnter={(e) => {
+				if (e.pointerType === "touch") return;
+				setHovering(true);
+			}}
+			onPointerLeave={(e) => {
+				if (e.pointerType === "touch") return;
 				setHovering(false);
 				setMenuOpen(false);
 				setMenuView("root");

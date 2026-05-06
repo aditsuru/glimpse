@@ -81,20 +81,22 @@ const PostCard = ({
 			ref={ref}
 		>
 			<div className="flex gap-4 items-start">
-				<Avatar className="size-10">
+				<Avatar
+					className="size-10"
+					onClick={(e) => e.stopPropagation()}
+					onKeyDown={(e) => e.stopPropagation()}
+				>
 					<AvatarImage src={data.author.avatarUrl || DEFAULT_PFP_URL} />
 				</Avatar>
 				<div className="flex-1 min-w-0">
-					<div
-						className="text-lg font-semibold flex justify-between gap-1 items-center -mt-1"
-						onClick={(e) => e.stopPropagation()}
-						onKeyDown={(e) => e.stopPropagation()}
-					>
+					<div className="text-lg font-semibold flex justify-between gap-1 items-center -mt-1">
 						<div
 							className={cn("flex", {
 								"flex-col": profileRow,
 								"gap-1 items-center": !profileRow,
 							})}
+							onClick={(e) => e.stopPropagation()}
+							onKeyDown={(e) => e.stopPropagation()}
 						>
 							<HoverCard>
 								<HoverCardTrigger

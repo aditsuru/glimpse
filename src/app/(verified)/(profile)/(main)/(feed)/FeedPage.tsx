@@ -6,6 +6,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
 import PostCard from "@/modules/post/components/PostCard";
 import { useGetFeed } from "@/modules/post/post.queries";
+import FeedHeader from "./FeedHeader";
 
 const FeedPage = () => {
 	const { data, fetchNextPage, hasNextPage, isFetching } = useGetFeed();
@@ -16,11 +17,8 @@ const FeedPage = () => {
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
 
 	return (
-		<div className="flex flex-col w-full h-full">
-			<div className="w-full h-16 md:h-18 border-b text-center pt-4 relative">
-				<h2 className="text-lg font-semibold pt-3 relative">For You</h2>
-				<span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-1 bg-primary rounded-full" />
-			</div>
+		<div className="flex flex-col w-full h-full relative">
+			<FeedHeader />
 			<ScrollContainer className="flex-1 overflow-y-auto no-scrollbar">
 				{posts.map((post) => (
 					<div key={post.id} className="border-b border-accent">
