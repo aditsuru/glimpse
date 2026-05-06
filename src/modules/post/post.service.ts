@@ -1,5 +1,6 @@
+/** biome-ignore-all lint/style/noNonNullAssertion: none */
 import { ORPCError } from "@orpc/server";
-import { and, desc, eq, lt, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, lt, type SQL, sql } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import {
@@ -108,8 +109,7 @@ export class PostService {
 		}
 
 		const attachmentsWithKeys = hasAttachments
-			? // biome-ignore lint/style/noNonNullAssertion: attachments is not null
-				attachments!.map((a) => ({
+			? attachments!.map((a) => ({
 					mimeType: a.mimeType,
 					tempKey: a.attachmentKey,
 					permanentKey: getPermanentKey({ tempKey: a.attachmentKey })
@@ -328,8 +328,6 @@ export class PostService {
 				: null,
 		};
 
-		const seenIds = await getViewHistory(this.userId);
-
 		const items = await this.db
 			.select({
 				id: postsTable.id,
@@ -361,17 +359,11 @@ export class PostService {
 				)
 			)
 			.groupBy(postsTable.id)
-			.orderBy(
-				seenIds.length > 0
-					? sql`CASE WHEN ${postsTable.id} = ANY(ARRAY[${sql.raw(seenIds.map((id) => `'${id}'`).join(","))}]::text[]) THEN 1 ELSE 0 END`
-					: desc(postsTable.createdAt),
-				desc(postsTable.createdAt)
-			)
+			.orderBy(desc(postsTable.createdAt))
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
 		const hasMore = items.length > config.POSTS_PAGINATION_LIMIT;
 		const data = hasMore ? items.slice(0, -1) : items;
-		// biome-ignore lint/style/noNonNullAssertion: data cannot be null
 		const nextCursor = hasMore ? data.at(-1)!.createdAt : null;
 
 		const viewsMap = await getPostViewsBatch(data.map((p) => p.id));
@@ -392,5 +384,189 @@ export class PostService {
 			})),
 			nextCursor,
 		};
+	}
+
+	async getFeed({
+		cursor,
+	}: z.infer<typeof postSchema.getFeed.input>): Promise<
+		z.infer<typeof postSchema.getFeed.output>
+	> {
+		const following = await this.db
+			.select({ userId: followsTable.followingId })
+			.from(followsTable)
+			.where(
+				and(
+					eq(followsTable.followerId, this.userId),
+					eq(followsTable.status, "accepted")
+				)
+			);
+
+		if (following.length === 0) return { items: [], nextCursor: null };
+
+		const followingIds = following.map((f) => f.userId);
+		const seenIds = await getViewHistory(this.userId);
+		const isFirstPage = !cursor;
+
+		const fetchPosts = (
+			extraWhere: SQL | undefined,
+			limit = config.POSTS_PAGINATION_LIMIT
+		) =>
+			this.db
+				.select({
+					id: postsTable.id,
+					userId: postsTable.userId,
+					body: postsTable.body,
+					views: postsTable.views,
+					spoiler: postsTable.spoiler,
+					hasAttachments: postsTable.hasAttachments,
+					createdAt: postsTable.createdAt,
+					postUpdatedAt: postsTable.updatedAt,
+					authorId: profilesTable.userId,
+					authorUsername: profilesTable.username,
+					authorDisplayName: profilesTable.displayName,
+					authorIsVerified: profilesTable.isGlimpseVerified,
+					authorAvatarKey: profilesTable.avatarKey,
+					authorAvatarUpdatedAt: profilesTable.updatedAt,
+					attachments: sql<{ attachmentKey: string; mimeType: string }[]>`
+				COALESCE(
+				  json_agg(
+					json_build_object(
+					  'attachmentKey', ${attachmentsTable.attachmentKey},
+					  'mimeType', ${attachmentsTable.mimeType}
+					)
+				  ) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL),
+				  '[]'
+				)
+			  `,
+				})
+				.from(postsTable)
+				.innerJoin(profilesTable, eq(profilesTable.userId, postsTable.userId))
+				.leftJoin(attachmentsTable, eq(attachmentsTable.postId, postsTable.id))
+				.where(extraWhere)
+				.groupBy(
+					postsTable.id,
+					profilesTable.userId,
+					profilesTable.username,
+					profilesTable.displayName,
+					profilesTable.isGlimpseVerified,
+					profilesTable.avatarKey,
+					profilesTable.updatedAt
+				)
+				.orderBy(desc(postsTable.createdAt))
+				.limit(limit + 1);
+
+		type RawPost = Awaited<ReturnType<typeof fetchPosts>>[number];
+
+		const mapItems = async (
+			raw: RawPost[]
+		): Promise<z.infer<typeof postSchema.get.output>[]> => {
+			const hasMore = raw.length > config.POSTS_PAGINATION_LIMIT;
+			const data = hasMore ? raw.slice(0, -1) : raw;
+			const viewsMap = await getPostViewsBatch(data.map((p) => p.id));
+
+			return data.map(
+				({
+					attachments,
+					authorId,
+					authorUsername,
+					authorDisplayName,
+					authorIsVerified,
+					authorAvatarKey,
+					authorAvatarUpdatedAt,
+					postUpdatedAt,
+					...post
+				}) => ({
+					...post,
+					updatedAt: postUpdatedAt,
+					views: post.views + (viewsMap.get(post.id) ?? 0),
+					author: {
+						id: authorId,
+						username: authorUsername,
+						displayName: authorDisplayName,
+						isGlimpseVerified: authorIsVerified,
+						avatarUrl: authorAvatarKey
+							? constructPublicUrl({
+									key: authorAvatarKey,
+									updatedAt: authorAvatarUpdatedAt,
+								}).publicUrl
+							: null,
+					},
+					attachments: attachments.map((a) => ({
+						mimeType:
+							a.mimeType as (typeof ALLOWED_MIME_TYPES.attachment)[number],
+						url: constructPublicUrl({
+							key: a.attachmentKey,
+							updatedAt: postUpdatedAt,
+						}).publicUrl,
+					})),
+				})
+			);
+		};
+
+		const getNextCursor = (
+			raw: RawPost[],
+			data: RawPost[],
+			limit = config.POSTS_PAGINATION_LIMIT
+		): Date | null => (raw.length > limit ? data.at(-1)!.createdAt : null);
+
+		const baseWhere = and(
+			inArray(postsTable.userId, followingIds),
+			cursor ? lt(postsTable.createdAt, cursor) : undefined
+		);
+
+		const unseenWhere =
+			seenIds.length > 0
+				? and(
+						baseWhere,
+						sql`${postsTable.id} != ALL(ARRAY[${sql.raw(seenIds.map((id) => `'${id}'`).join(","))}]::text[])`
+					)
+				: baseWhere;
+
+		const seenWhere = and(
+			baseWhere,
+			sql`${postsTable.id} = ANY(ARRAY[${sql.raw(seenIds.map((id) => `'${id}'`).join(","))}]::text[])`
+		);
+
+		// subsequent pages — unseen only
+		if (!isFirstPage) {
+			const raw = await fetchPosts(unseenWhere);
+			const data =
+				raw.length > config.POSTS_PAGINATION_LIMIT ? raw.slice(0, -1) : raw;
+			return {
+				items: await mapItems(raw),
+				nextCursor: getNextCursor(raw, data),
+			};
+		}
+
+		// first page — fetch unseen
+		const unseenRaw = await fetchPosts(unseenWhere);
+		const unseenData =
+			unseenRaw.length > config.POSTS_PAGINATION_LIMIT
+				? unseenRaw.slice(0, -1)
+				: unseenRaw;
+
+		if (unseenData.length >= config.POSTS_PAGINATION_LIMIT) {
+			// full page of unseen, no backfill needed
+			return {
+				items: await mapItems(unseenRaw),
+				nextCursor: getNextCursor(unseenRaw, unseenData),
+			};
+		}
+
+		// partial unseen — backfill with seen posts
+		const remaining = config.POSTS_PAGINATION_LIMIT - unseenData.length;
+		if (remaining > 0 && seenIds.length > 0) {
+			const seenRaw = await fetchPosts(seenWhere, remaining);
+			const seenData =
+				seenRaw.length > remaining ? seenRaw.slice(0, -1) : seenRaw;
+			const combined = [...unseenData, ...seenData];
+			const hasMore = seenRaw.length > remaining;
+			return {
+				items: await mapItems(combined),
+				nextCursor: hasMore ? combined.at(-1)!.createdAt : null,
+			};
+		}
+
+		return { items: await mapItems(unseenRaw), nextCursor: null };
 	}
 }

@@ -26,7 +26,7 @@ const UserPostFeed = ({ username }: { username: string }) => {
 	return (
 		<div className="w-full h-full">
 			{posts.map((post) => (
-				<div key={post.id} className="border-b-2 border-accent">
+				<div key={post.id} className="border-b border-accent">
 					<PostCard data={post} viewerUserId={sessionData?.user.id || ""} />
 				</div>
 			))}

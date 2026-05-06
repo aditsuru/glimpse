@@ -85,4 +85,11 @@ export const postSchema = {
 		}),
 		output: getPostListOutput,
 	},
+
+	getFeed: {
+		input: z.object({
+			cursor: z.date().optional(),
+		}),
+		output: getPostListOutput,
+	},
 };

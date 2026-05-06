@@ -4,6 +4,7 @@ import { ORPCError } from "@orpc/client";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import ErrorMessage from "@/components/layout/ErrorMessage";
 import PageHeader from "@/components/layout/PageHeader";
+import { ScrollContainer } from "@/components/VideoPlayer";
 import UserPostFeed from "@/modules/post/components/UserPostFeed";
 import MobileProfileHeader from "@/modules/profile/components/MobileProfileHeader";
 import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
@@ -34,19 +35,21 @@ const ProfilePage = ({
 	if (isLoading || !data) return <ProfileSkeleton />;
 
 	return (
-		<div className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
+		<ScrollContainer className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
+			<PageHeader title={username} className="max-sm:hidden" />
 			<MobileProfileHeader
 				title={username}
 				className="sm:hidden"
 				showMenu={data.userId === viewerId}
 			/>
-			<PageHeader title={username} className="max-sm:hidden" />
-			<Profile data={data} viewerId={viewerId} />
-			<ProfileNavbar username={username} />
-			<div className="flex-1">
-				<UserPostFeed username={username} />
+			<div className="flex-1 flex flex-col">
+				<Profile data={data} viewerId={viewerId} />
+				<ProfileNavbar username={username} />
+				<div className="flex-1">
+					<UserPostFeed username={username} />
+				</div>
 			</div>
-		</div>
+		</ScrollContainer>
 	);
 };
 

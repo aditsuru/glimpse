@@ -27,12 +27,12 @@ export default async function Layout({
 		<HydrationBoundary state={dehydrate(queryClient)}>
 			<div className="w-screen h-dvh overflow-hidden flex flex-col md:grid md:grid-cols-3 xl:grid-cols-6">
 				{/* Sidebar - hidden on mobile */}
-				<aside className="hidden md:flex border-accent border-r-2 h-full md:col-span-1 xl:col-span-2">
+				<aside className="hidden md:flex border-accent border-r h-full md:col-span-1 xl:col-span-2">
 					<Navbar userId={user.id} />
 				</aside>
 
 				{/* Main Content */}
-				<main className="flex-1 border-accent md:border-r-2 overflow-hidden h-full md:col-span-2 xl:col-span-2">
+				<main className="flex-1 border-accent md:border-r overflow-hidden h-full md:col-span-2 xl:col-span-2">
 					{children}
 				</main>
 

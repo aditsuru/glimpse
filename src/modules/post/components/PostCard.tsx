@@ -8,6 +8,7 @@ import {
 	Ellipsis,
 	Heart,
 	MessageCircle,
+	Share,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,6 +29,7 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { Separator } from "@/components/ui/separator";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { useViewCount } from "@/hooks/useViewCount";
 import { formatPostDate } from "@/lib/client/helpers";
@@ -46,9 +48,19 @@ interface PostCardProps {
 	className?: string;
 	data: z.infer<typeof postSchema.get.output>;
 	viewerUserId: string;
+	leftMargin?: boolean;
+	profileRow?: boolean;
+	separator?: boolean;
 }
 
-const PostCard = ({ className, data, viewerUserId }: PostCardProps) => {
+const PostCard = ({
+	className,
+	data,
+	viewerUserId,
+	leftMargin = true,
+	profileRow = false,
+	separator = false,
+}: PostCardProps) => {
 	const router = useRouter();
 	const updateViewCount = useMarkPostSeen();
 	const ref = useViewCount(data.id, () =>
@@ -62,7 +74,7 @@ const PostCard = ({ className, data, viewerUserId }: PostCardProps) => {
 			className={cn("p-4 flex flex-col", className)}
 			role="button"
 			tabIndex={0}
-			onClick={() => router.push(`/posts/${data.id}`)}
+			onClick={() => router.push(`/p/${data.id}`)}
 			onKeyDown={(e) => e.key === "Enter" && router.push(`/p/${data.id}`)}
 			ref={ref}
 		>
@@ -76,7 +88,12 @@ const PostCard = ({ className, data, viewerUserId }: PostCardProps) => {
 						onClick={(e) => e.stopPropagation()}
 						onKeyDown={(e) => e.stopPropagation()}
 					>
-						<div className="flex gap-1 items-center">
+						<div
+							className={cn("flex", {
+								"flex-col": profileRow,
+								"gap-1 items-center": !profileRow,
+							})}
+						>
 							<HoverCard>
 								<HoverCardTrigger
 									delay={10}
@@ -110,37 +127,56 @@ const PostCard = ({ className, data, viewerUserId }: PostCardProps) => {
 
 			{/* Body */}
 			<div
-				className="flex flex-col gap-2 mt-3 md:pl-14 md:-mt-2"
-				onClick={(e) => e.stopPropagation()}
-				onKeyDown={(e) => e.stopPropagation()}
+				className={cn("flex flex-col gap-2 mt-3", {
+					"md:pl-14 md:-mt-2": leftMargin,
+				})}
 			>
 				{data.body && (
-					<p className="whitespace-break-spaces px-1">{data.body}</p>
+					<div
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => e.stopPropagation()}
+					>
+						<p className="whitespace-break-spaces px-1">{data.body}</p>
+					</div>
 				)}
 				{data.hasAttachments && isVideo(data.attachments[0].mimeType) && (
-					<VideoPlayer
-						src={data.attachments[0].url}
-						autoPlay
-						spoiler={data.spoiler}
-					/>
+					<div
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => e.stopPropagation()}
+					>
+						<VideoPlayer
+							src={data.attachments[0].url}
+							autoPlay
+							spoiler={data.spoiler}
+						/>
+					</div>
 				)}
 				{data.hasAttachments && isImage(data.attachments[0].mimeType) && (
-					<ImageCarousel
-						images={data.attachments.map((image, i) => {
-							return {
-								src: image.url,
-								alt: `${data.id} - image ${i}`,
-								unoptimized: isGif(image.mimeType),
-							};
-						})}
-						spoiler={data.spoiler}
-					/>
+					<div
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => e.stopPropagation()}
+					>
+						<ImageCarousel
+							images={data.attachments.map((image, i) => {
+								return {
+									src: image.url,
+									alt: `${data.id} - image ${i}`,
+									unoptimized: isGif(image.mimeType),
+								};
+							})}
+							spoiler={data.spoiler}
+						/>
+					</div>
 				)}
 			</div>
 
+			{separator && <Separator className="mt-8" />}
 			{/* Toolbar */}
 			<div
-				className="mt-2 flex justify-between md:pl-14"
+				className={cn("mt-3 flex justify-between", {
+					"md:pl-14": leftMargin,
+					"mt-2 -mb-2": separator,
+				})}
 				onClick={(e) => e.stopPropagation()}
 				onKeyDown={(e) => e.stopPropagation()}
 			>
@@ -171,6 +207,12 @@ const PostCard = ({ className, data, viewerUserId }: PostCardProps) => {
 				>
 					<Bookmark className="size-4.5" />
 					<p>12k</p>
+				</Button>
+				<Button
+					variant="ghost"
+					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+				>
+					<Share className="size-4.5" />
 				</Button>
 			</div>
 		</div>

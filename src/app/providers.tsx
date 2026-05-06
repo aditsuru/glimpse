@@ -13,11 +13,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
 			new QueryClient({
 				defaultOptions: {
 					queries: {
-						staleTime: config.NEXT_PUBLIC_QUERY_STALE_TIME,
+						staleTime:
+							config.NEXT_PUBLIC_QUERY_STALE_TIME === 0
+								? Infinity
+								: config.NEXT_PUBLIC_QUERY_STALE_TIME,
 						retry: config.NEXT_PUBLIC_QUERY_MAX_RETRIES,
 						gcTime: config.NEXT_PUBLIC_QUERY_GC_TIME,
 						refetchOnWindowFocus: false,
 						refetchOnReconnect: true,
+						refetchOnMount: true,
 					},
 					mutations: {
 						retry: 0,

@@ -53,4 +53,11 @@ export const postRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.postService.getAllByUser({ ...input });
 		}),
+
+	getFeed: postProcedure
+		.input(postSchema.getFeed.input)
+		.output(postSchema.getFeed.output)
+		.handler(async ({ input, context }) => {
+			return await context.postService.getFeed({ ...input });
+		}),
 });

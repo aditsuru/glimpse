@@ -94,3 +94,15 @@ export function useGetAllByUser(username: string) {
 		})
 	);
 }
+
+export function useGetFeed() {
+	return useInfiniteQuery(
+		orpc.post.getFeed.infiniteOptions({
+			input: (pageParam) => ({
+				cursor: pageParam as Date | undefined,
+			}),
+			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+			initialPageParam: undefined as Date | undefined,
+		})
+	);
+}
