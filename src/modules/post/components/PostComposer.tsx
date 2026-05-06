@@ -156,7 +156,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 					file.type
 				)
 			) {
-				toast.error("File type not allowed");
+				toast.error("File type not allowed.");
 				return null;
 			}
 
@@ -171,7 +171,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 				return { tempKey: key, preview, mimeType: file.type };
 			} catch {
 				URL.revokeObjectURL(preview);
-				toast.error("Upload failed, please try again");
+				toast.error("Upload failed, please try again.");
 				return null;
 			}
 		},
@@ -190,11 +190,11 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 			// Video rules
 			if (isVideo(firstFile.type)) {
 				if (attachmentType === "image") {
-					toast.error("Cannot mix video and images");
+					toast.error("Cannot mix video and images.");
 					return;
 				}
 				if (attachments.length > 0 || fileArray.length > 1) {
-					toast.error("Only one video allowed");
+					toast.error("Only one video allowed.");
 					return;
 				}
 			}
@@ -202,12 +202,12 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 			// Image rules
 			if (isImage(firstFile.type)) {
 				if (attachmentType === "video") {
-					toast.error("Cannot mix images and video");
+					toast.error("Cannot mix images and video.");
 					return;
 				}
 				const anyVideo = fileArray.some((f) => isVideo(f.type));
 				if (anyVideo) {
-					toast.error("Cannot mix images and video");
+					toast.error("Cannot mix images and video.");
 					return;
 				}
 			}
@@ -218,7 +218,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 					: MAX_FILE_SIZES.image;
 				if (file.size > limit) {
 					toast.error(
-						`${isVideo(file.type) ? "Video" : "Image"} must be under ${limit / (1024 * 1024)}MB`
+						`${isVideo(file.type) ? "Video" : "Image"} must be under ${limit / (1024 * 1024)}MB.`
 					);
 					return;
 				}

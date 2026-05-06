@@ -65,7 +65,7 @@ export const useMediaUpload = ({
 		if (!file) return;
 
 		if (!(allowedMimeTypes as readonly string[]).includes(file.type)) {
-			toast.error("Invalid file type");
+			toast.error("Invalid file type.");
 			return;
 		}
 
@@ -74,7 +74,7 @@ export const useMediaUpload = ({
 			: MAX_FILE_SIZES.image;
 		const sizeLabelMB = sizeLimit / (1024 * 1024);
 		if (file.size > sizeLimit) {
-			toast.error(`File must be under ${sizeLabelMB}MB`);
+			toast.error(`File must be under ${sizeLabelMB}MB.`);
 			return;
 		}
 
@@ -90,7 +90,7 @@ export const useMediaUpload = ({
 			setTempKey(key);
 			setMimeType(file.type);
 		} catch {
-			toast.error("Upload failed, please try again");
+			toast.error("Upload failed, please try again.");
 			reset();
 		} finally {
 			setIsUploading(false);

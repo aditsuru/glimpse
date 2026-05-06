@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import type * as z from "zod";
 import { ImageCarousel } from "@/components/ImageCarousel";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
@@ -34,6 +35,7 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { useViewCount } from "@/hooks/useViewCount";
 import { formatPostDate } from "@/lib/client/helpers";
 import { cn } from "@/lib/client/utils";
+import { config } from "@/lib/shared/config";
 import {
 	DEFAULT_PFP_URL,
 	isGif,
@@ -211,6 +213,12 @@ const PostCard = ({
 				<Button
 					variant="ghost"
 					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+					onClick={() => {
+						navigator.clipboard.writeText(
+							`${config.NEXT_PUBLIC_APP_URL}/p/${data.id}`
+						);
+						toast.success("Link copied to clipboard.");
+					}}
 				>
 					<Share className="size-4.5" />
 				</Button>

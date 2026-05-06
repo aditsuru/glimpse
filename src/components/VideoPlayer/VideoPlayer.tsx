@@ -349,6 +349,8 @@ export function VideoPlayer({
 	const [menuOpen, setMenuOpen] = React.useState(false);
 	const [menuView, setMenuView] = React.useState<MenuView>("root");
 	const [isFullscreen, setIsFullscreen] = React.useState(false);
+	const hideTimer = React.useRef<ReturnType<typeof setTimeout>>(null);
+	const [controlsVisible, setControlsVisible] = React.useState(false);
 
 	/**
 	 * spoilerRevealed: local — not global, not persisted.
@@ -356,6 +358,18 @@ export function VideoPlayer({
 	 * Initialized to true when spoiler=false (no overlay needed).
 	 */
 	const [spoilerRevealed, setSpoilerRevealed] = React.useState(!spoiler);
+
+	const flashControls = () => {
+		setControlsVisible(true);
+		if (hideTimer.current) clearTimeout(hideTimer.current);
+		hideTimer.current = setTimeout(() => setControlsVisible(false), 3000);
+	};
+
+	React.useEffect(() => {
+		return () => {
+			if (hideTimer.current) clearTimeout(hideTimer.current);
+		};
+	}, []);
 
 	const showSpoiler = spoiler && !spoilerRevealed;
 
@@ -615,7 +629,7 @@ export function VideoPlayer({
 		if (menuOpen) setMenuView("root");
 	};
 
-	const showControls = hovering || !playing || menuOpen;
+	const showControls = hovering || !playing || menuOpen || controlsVisible;
 
 	// ── Render ────────────────────────────────────────────────────────────────────
 
@@ -633,7 +647,20 @@ export function VideoPlayer({
 			style={wrapperStyle}
 			aria-label="Video player"
 			tabIndex={0}
-			onClick={showSpoiler ? undefined : togglePlay}
+			onClick={
+				showSpoiler
+					? undefined
+					: () => {
+							if (!controlsVisible && !hovering) {
+								// First tap — just reveal controls
+								flashControls();
+							} else {
+								// Controls already visible — toggle play and keep them visible
+								flashControls();
+								togglePlay();
+							}
+						}
+			}
 			onKeyDown={(e) => {
 				if (showSpoiler) return;
 				if (e.key === " " || e.key === "Enter") {
