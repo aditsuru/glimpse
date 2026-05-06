@@ -440,7 +440,7 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 				)}
 
 				{/* Toolbar */}
-				<div className="flex items-center justify-between pt-1 border-t border-border/40">
+				<div className="flex items-center justify-between mt-4 border-t border-border/40">
 					<div className="flex items-center gap-1">
 						{/* Add attachment */}
 						<button

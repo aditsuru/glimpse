@@ -41,10 +41,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 				<Toaster
 					className="z-100!"
 					toastOptions={{
-						className: "bg-background! text-[16px]! w-[420px]! gap-2! p-6!",
+						className:
+							"bg-background! max-md:text-[14px]! max-md:w-[420px]! gap-2! p-6!",
 						classNames: {
-							error: "text-destructive! border-destructive/20!",
-							success: "text-success! border-success/20!",
+							error: "text-destructive!",
+							success: "text-success!",
 						},
 					}}
 				/>

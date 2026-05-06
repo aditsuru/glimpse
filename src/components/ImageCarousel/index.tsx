@@ -20,8 +20,6 @@ export interface CarouselImage {
 	src: string;
 	alt?: string;
 	unoptimized?: boolean; // pass true for GIFs
-	width?: number; // defaults to 0 (CSS-sized via className)
-	height?: number; // defaults to 0 (CSS-sized via className)
 }
 
 interface CarouselControlsProps {
@@ -97,6 +95,7 @@ interface ImageCarouselProps {
 	ratio?: number;
 	className?: string;
 	imageClassName?: string;
+	objectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
 }
 
 export function ImageCarousel({
@@ -105,6 +104,7 @@ export function ImageCarousel({
 	ratio = 16 / 9,
 	className,
 	imageClassName,
+	objectFit = "contain",
 }: ImageCarouselProps) {
 	const [current, setCurrent] = React.useState(0);
 	const [api, setApi] = React.useState<CarouselApi>();
@@ -136,24 +136,26 @@ export function ImageCarousel({
 					<CarouselContent className="h-full ml-0">
 						{images.map((image, index) => (
 							<CarouselItem key={image.src} className="relative pl-0 h-full">
-								<Image
-									src={image.src}
-									alt={image.alt ?? ""}
-									width={image.width ?? 1600}
-									height={image.height ?? Math.round(1600 / ratio)}
-									sizes="100vw"
-									priority={index === 0}
-									unoptimized={image.unoptimized}
-									className={cn(
-										"w-full h-full object-cover transition-[filter] duration-300 ease-in-out",
-										imageClassName
-									)}
-									style={{
-										filter: showSpoiler
-											? "blur(40px) brightness(0.6) saturate(0.6)"
-											: "none",
-									}}
-								/>
+								<AspectRatio ratio={ratio}>
+									<Image
+										src={image.src}
+										alt={image.alt ?? ""}
+										fill
+										sizes="100vw"
+										priority={index === 0}
+										unoptimized={image.unoptimized}
+										className={cn(
+											"transition-[filter] duration-300 ease-in-out",
+											imageClassName
+										)}
+										style={{
+											objectFit: objectFit,
+											filter: showSpoiler
+												? "blur(40px) brightness(0.6) saturate(0.6)"
+												: "none",
+										}}
+									/>
+								</AspectRatio>
 							</CarouselItem>
 						))}
 					</CarouselContent>
