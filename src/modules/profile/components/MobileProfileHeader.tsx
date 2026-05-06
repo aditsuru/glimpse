@@ -70,7 +70,8 @@ const MobileProfileHeader = ({
 										href={href}
 										className={cn(
 											"flex items-center gap-4 p-3 text-xl transition-colors hover:bg-accent w-full",
-											{ "font-bold": isActive }
+											{ "font-bold": isActive },
+											{ "px-[14px] gap-3.5": href === "/requests/received" }
 										)}
 									>
 										<Icon className="size-7 shrink-0" />

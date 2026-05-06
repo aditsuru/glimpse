@@ -101,7 +101,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 	return (
 		<nav className="w-full h-full px-8 grid xl:grid-cols-2 xl:gap-8">
 			{issidebarGifGalleryEnabled && (
-				<div className="col-span-1 border-x-2 border-foreground w-full h-full overflow-hidden relative max-xl:hidden">
+				<div className="col-span-1 border-x border-foreground w-full h-full overflow-hidden relative max-xl:hidden">
 					<Image
 						src={gifUrl}
 						alt="banner"

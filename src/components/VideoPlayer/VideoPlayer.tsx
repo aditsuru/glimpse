@@ -302,7 +302,7 @@ export function VideoPlayer({
 	spoiler = false,
 	aspectRatio = 16 / 9,
 	className = "",
-	autoPlayThreshold = 0.8,
+	autoPlayThreshold = 0.5,
 }: VideoPlayerProps) {
 	// ── Refs (never trigger re-renders) ─────────────────────────────────────────
 	const videoRef = React.useRef<HTMLVideoElement>(null);

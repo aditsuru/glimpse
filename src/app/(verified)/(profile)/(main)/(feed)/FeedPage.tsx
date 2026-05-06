@@ -17,7 +17,7 @@ const FeedPage = () => {
 
 	return (
 		<div className="flex flex-col w-full h-full">
-			<div className="w-full h-18 border-b text-center pt-4 relative">
+			<div className="w-full h-16 md:h-18 border-b text-center pt-4 relative">
 				<h2 className="text-lg font-semibold pt-3 relative">For You</h2>
 				<span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-14 h-1 bg-primary rounded-full" />
 			</div>
