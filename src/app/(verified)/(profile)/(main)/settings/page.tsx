@@ -1,6 +1,6 @@
 "use client";
 
-import { HatGlasses, Snowflake, Sparkles } from "lucide-react";
+import { HatGlasses, Presentation, Snowflake, Sparkles } from "lucide-react";
 import PageHeader from "@/components/layout/PageHeader";
 import {
 	Field,
@@ -42,6 +42,13 @@ const Settings = () => {
 	);
 	const setSnowfallEnabled = useSettingsStore(
 		(state) => state.setSnowfallEnabled
+	);
+
+	const isBillboardEnabled = useSettingsStore(
+		(state) => state.isBillboardEnabled
+	);
+	const setIsBillboardEnabled = useSettingsStore(
+		(state) => state.setIsBillboardEnabled
 	);
 
 	return (
@@ -115,6 +122,25 @@ const Settings = () => {
 								id="snow-toggle"
 								checked={isSnowfallEnabled}
 								onCheckedChange={setSnowfallEnabled}
+							/>
+						</Field>
+						<Field orientation="horizontal" className="w-full">
+							<FieldContent>
+								<FieldLabel
+									htmlFor="snow-toggle"
+									className="flex items-center gap-2 text-lg"
+								>
+									<Presentation className="size-5" />
+									Billboard
+								</FieldLabel>
+								<FieldDescription>
+									Show a live feed of daily trending posts in your sidebar.
+								</FieldDescription>
+							</FieldContent>
+							<Switch
+								id="snow-toggle"
+								checked={isBillboardEnabled}
+								onCheckedChange={setIsBillboardEnabled}
 							/>
 						</Field>
 					</div>

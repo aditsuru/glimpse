@@ -90,6 +90,11 @@ export const config = createEnv({
 		NEXT_PUBLIC_QUERY_STALE_TIME: msMs.default(0),
 		NEXT_PUBLIC_QUERY_GC_TIME: msMs.default(300000),
 		NEXT_PUBLIC_QUERY_MAX_RETRIES: z.coerce.number().nonnegative().default(1),
+
+		// ── Sotrage ───────────────────────────────────────────────
+		NEXT_PUBLIC_R2_PUBLIC_URL: z
+			.url()
+			.default("http://localhost:9000/glimpse-dev"),
 	},
 
 	experimental__runtimeEnv: {
@@ -101,5 +106,6 @@ export const config = createEnv({
 		NEXT_PUBLIC_QUERY_STALE_TIME: process.env.NEXT_PUBLIC_QUERY_STALE_TIME,
 		NEXT_PUBLIC_QUERY_GC_TIME: process.env.NEXT_PUBLIC_QUERY_GC_TIME,
 		NEXT_PUBLIC_QUERY_MAX_RETRIES: process.env.NEXT_PUBLIC_QUERY_MAX_RETRIES,
+		NEXT_PUBLIC_R2_PUBLIC_URL: process.env.NEXT_PUBLIC_R2_PUBLIC_URL,
 	},
 });

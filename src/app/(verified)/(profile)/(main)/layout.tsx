@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import MobileNav from "@/components/layout/MobileNavbar";
 import Navbar from "@/components/layout/Navbar";
+import SecondarySidebar from "@/components/layout/SecondarySidebar";
 import Snowfall from "@/components/misc/Snowfall";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
@@ -37,7 +38,9 @@ export default async function Layout({
 				</main>
 
 				{/* Secondary Sidebar */}
-				<section className="hidden xl:block xl:col-span-2" />
+				<section className="hidden xl:block xl:col-span-2">
+					<SecondarySidebar />
+				</section>
 
 				{/* Mobile Bottom Nav */}
 				<MobileNav userId={user.id} />

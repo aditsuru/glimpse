@@ -11,11 +11,6 @@ const nextConfig: NextConfig = {
 	images: {
 		unoptimized: isDev,
 		remotePatterns: [
-			{
-				protocol: "https",
-				hostname: "ik.imagekit.io",
-				pathname: "/aditsuru/**",
-			},
 			// Add dev origin for storage (MinIO bucket)
 			...(isDev
 				? [

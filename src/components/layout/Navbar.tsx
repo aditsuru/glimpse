@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { useOnboardingTooltip } from "@/hooks/useOnboardingComplete";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
-import { SIDEBAR_GIFS } from "@/lib/shared/constants";
+import { SIDEBAR_GIFS } from "@/lib/shared/static-files";
 import { usePendingReceivedCount } from "@/modules/follow/follow.queries";
 import { useProfile } from "@/modules/profile/profile.queries";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
@@ -101,7 +101,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 	return (
 		<nav className="w-full h-full px-8 grid xl:grid-cols-2 xl:gap-8">
 			{issidebarGifGalleryEnabled && (
-				<div className="col-span-1 border-x border-foreground w-full h-full overflow-hidden relative max-xl:hidden">
+				<div className="col-span-1 border-x-4 border-[#6c6c6c] w-full h-full overflow-hidden relative max-xl:hidden">
 					<Image
 						src={gifUrl}
 						alt="banner"

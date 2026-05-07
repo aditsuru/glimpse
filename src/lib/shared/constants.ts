@@ -55,14 +55,4 @@ export const LOCAL_STORAGE_KEYS = {
 	SETTINGS_STORAGE: "settings_storage",
 };
 
-export const SIDEBAR_GIFS = [
-	"https://ik.imagekit.io/aditsuru/Glimpse/banner1.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/banner2.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/banner3.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/banner4.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/banner5.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/banner6.gif",
-	"https://ik.imagekit.io/aditsuru/Glimpse/banner7.gif",
-] as const;
-
 export const MAX_POST_BODY_LENGTH = 200;
