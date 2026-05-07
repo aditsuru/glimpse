@@ -23,7 +23,7 @@ const FeedHeader = () => {
 							key={href}
 							href={href}
 							className={cn(
-								"flex-1 text-center transition-colors hover:bg-accent/40 relative text-base h-14 md:h-18 flex items-center justify-center pt-4",
+								"flex-1 text-center transition-colors hover:bg-accent/40 relative text-base h-14 md:h-18 flex items-center justify-center pt-4 font-medium",
 								active ? "font-bold text-foreground" : "text-muted-foreground"
 							)}
 						>
