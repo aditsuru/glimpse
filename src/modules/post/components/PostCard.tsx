@@ -120,11 +120,16 @@ const PostCard = ({
 								{`@${data.author.username} · ${formatPostDate(data.createdAt)}`}
 							</p>
 						</div>
-						<DropdownMenuSubmenu
-							postId={data.id}
-							viewerUserId={viewerUserId}
-							authorId={data.author.id}
-						/>
+						<div
+							onClick={(e) => e.stopPropagation()}
+							onKeyDown={(e) => e.stopPropagation()}
+						>
+							<DropdownMenuSubmenu
+								postId={data.id}
+								viewerUserId={viewerUserId}
+								authorId={data.author.id}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -152,6 +157,7 @@ const PostCard = ({
 							src={data.attachments[0].url}
 							autoPlay
 							spoiler={data.spoiler}
+							aspectRatio={3 / 2}
 						/>
 					</div>
 				)}
@@ -169,6 +175,7 @@ const PostCard = ({
 								};
 							})}
 							spoiler={data.spoiler}
+							ratio={3 / 2}
 						/>
 					</div>
 				)}

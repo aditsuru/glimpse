@@ -429,12 +429,17 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 								src={videoAttachment.preview}
 								spoiler={spoiler}
 								className="w-full rounded-xl"
+								aspectRatio={3 / 2}
 							/>
 						)}
 
 						{/* Images */}
 						{carouselImages.length > 0 && (
-							<ImageCarousel images={carouselImages} spoiler={spoiler} />
+							<ImageCarousel
+								images={carouselImages}
+								spoiler={spoiler}
+								ratio={3 / 2}
+							/>
 						)}
 					</div>
 				)}
