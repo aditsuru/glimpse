@@ -6,16 +6,20 @@ import { cn } from "@/lib/client/utils";
 
 type ProfileNavbarProps = {
 	username: string;
+	userId: string;
+	viewerId: string;
 };
 
-const ProfileNavbar = ({ username }: ProfileNavbarProps) => {
+const ProfileNavbar = ({ username, userId, viewerId }: ProfileNavbarProps) => {
 	const pathname = usePathname();
 
 	const tabs = [
 		{ label: "Posts", href: `/${username}` },
-		{ label: "Likes", href: `/${username}/likes` },
 		{ label: "Comments", href: `/${username}/comments` },
 	];
+
+	if (viewerId === userId)
+		tabs.push({ label: "Likes", href: `/${username}/likes` });
 
 	return (
 		<div className="mt-4 flex bg-background/80 border-b border-accent">

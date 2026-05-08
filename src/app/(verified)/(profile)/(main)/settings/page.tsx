@@ -127,7 +127,7 @@ const Settings = () => {
 						<Field orientation="horizontal" className="w-full">
 							<FieldContent>
 								<FieldLabel
-									htmlFor="snow-toggle"
+									htmlFor="billboard"
 									className="flex items-center gap-2 text-lg"
 								>
 									<Presentation className="size-5" />
@@ -138,7 +138,7 @@ const Settings = () => {
 								</FieldDescription>
 							</FieldContent>
 							<Switch
-								id="snow-toggle"
+								id="billboard"
 								checked={isBillboardEnabled}
 								onCheckedChange={setIsBillboardEnabled}
 							/>

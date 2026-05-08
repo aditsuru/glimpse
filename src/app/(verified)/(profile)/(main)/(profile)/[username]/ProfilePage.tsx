@@ -44,7 +44,11 @@ const ProfilePage = ({
 			/>
 			<div className="flex-1 flex flex-col">
 				<Profile data={data} viewerId={viewerId} />
-				<ProfileNavbar username={username} />
+				<ProfileNavbar
+					username={username}
+					userId={data.userId}
+					viewerId={viewerId}
+				/>
 				<div className="flex-1">
 					<UserPostFeed username={username} />
 				</div>

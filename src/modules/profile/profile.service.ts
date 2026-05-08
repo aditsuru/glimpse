@@ -1,6 +1,16 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: nextCursor can't be undefined */
 import { ORPCError } from "@orpc/server";
-import { and, count, desc, eq, ilike, lt, or, sql } from "drizzle-orm";
+import {
+	and,
+	count,
+	desc,
+	eq,
+	getTableColumns,
+	ilike,
+	lt,
+	or,
+	sql,
+} from "drizzle-orm";
 import {
 	englishDataset,
 	englishRecommendedTransformers,
@@ -49,45 +59,29 @@ export class ProfileService {
 			? eq(profilesTable.userId, userId)
 			: eq(profilesTable.username, username as string);
 
-		const [profile] = await this.db
-			.select()
+		const profile = await this.db
+			.select({
+				...getTableColumns(profilesTable),
+				followersCount: this.db.$count(
+					followsTable,
+					eq(profilesTable.userId, followsTable.followingId)
+				),
+				followingCount: this.db.$count(
+					followsTable,
+					eq(profilesTable.userId, followsTable.followerId)
+				),
+			})
 			.from(profilesTable)
 			.where(queryCondition)
-			.limit(1);
+			.groupBy(profilesTable.id)
+			.limit(1)
+			.then((i) => i[0]);
 
 		if (!profile)
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
-		const [[{ followersCount }], [{ followingCount }]] = await Promise.all([
-			this.db
-				.select({ followersCount: count() })
-				.from(followsTable)
-				.where(
-					and(
-						eq(followsTable.followingId, profile.userId),
-						eq(followsTable.status, "accepted")
-					)
-				),
-			this.db
-				.select({ followingCount: count() })
-				.from(followsTable)
-				.where(
-					and(
-						eq(followsTable.followerId, profile.userId),
-						eq(followsTable.status, "accepted")
-					)
-				),
-		]);
-
 		return {
-			id: profile.id,
-			userId: profile.userId,
-			username: profile.username,
-			displayName: profile.displayName,
-			bio: profile.bio,
-			pronouns: profile.pronouns,
-			isGlimpseVerified: profile.isGlimpseVerified,
-			visibility: profile.visibility,
+			...profile,
 			avatarUrl: profile.avatarKey
 				? constructPublicUrl({
 						key: profile.avatarKey,
@@ -100,11 +94,6 @@ export class ProfileService {
 						updatedAt: profile.updatedAt,
 					}).publicUrl
 				: null,
-			bannerMimeType: profile.bannerMimeType,
-			createdAt: profile.createdAt,
-			updatedAt: profile.updatedAt,
-			followersCount,
-			followingCount,
 		};
 	}
 
@@ -113,11 +102,12 @@ export class ProfileService {
 	}: z.infer<typeof profileSchema.isUsernameAvailable.input>): Promise<
 		z.infer<typeof profileSchema.isUsernameAvailable.output>
 	> {
-		const [result] = await this.db
+		const result = await this.db
 			.select({ username: profilesTable.username })
 			.from(profilesTable)
 			.where(eq(profilesTable.username, username))
-			.limit(1);
+			.limit(1)
+			.then((i) => i[0]);
 
 		if (
 			result ||
@@ -196,7 +186,7 @@ export class ProfileService {
 		}
 
 		try {
-			const [updated] = await this.db
+			const updated = await this.db
 				.update(profilesTable)
 				.set({
 					...(username !== undefined && { username }),
@@ -206,7 +196,8 @@ export class ProfileService {
 					...(visibility !== undefined && { visibility }),
 				})
 				.where(eq(profilesTable.userId, this.userId))
-				.returning();
+				.returning()
+				.then((i) => i[0]);
 			if (!updated)
 				throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
@@ -304,19 +295,7 @@ export class ProfileService {
 	> {
 		let items = await this.db
 			.select({
-				id: profilesTable.id,
-				userId: profilesTable.userId,
-				username: profilesTable.username,
-				displayName: profilesTable.displayName,
-				avatarKey: profilesTable.avatarKey,
-				bannerKey: profilesTable.bannerKey,
-				bannerMimeType: profilesTable.bannerMimeType,
-				isGlimpseVerified: profilesTable.isGlimpseVerified,
-				pronouns: profilesTable.pronouns,
-				bio: profilesTable.bio,
-				visibility: profilesTable.visibility,
-				createdAt: profilesTable.createdAt,
-				updatedAt: profilesTable.updatedAt,
+				...getTableColumns(profilesTable),
 				followersCount: this.db.$count(
 					followsTable,
 					and(
@@ -413,11 +392,12 @@ export class ProfileService {
 	}: z.infer<typeof profileSchema.updateVisibility.input>): Promise<
 		z.infer<typeof profileSchema.updateVisibility.output>
 	> {
-		const [updated] = await this.db
+		const updated = await this.db
 			.update(profilesTable)
 			.set({ visibility })
 			.where(eq(profilesTable.userId, this.userId))
-			.returning();
+			.returning()
+			.then((i) => i[0]);
 
 		if (!updated)
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });

@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: sliced data can't be null */
 
 import { ORPCError } from "@orpc/server";
-import { and, count, desc, eq, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, getTableColumns, lt, sql } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
@@ -24,16 +24,18 @@ export class FollowService {
 		if (this.userId === targetUserId)
 			throw new ORPCError("BAD_REQUEST", { message: "Cannot follow yourself" });
 
-		const [targetUserProfile] = await this.db
+		const targetUserProfile = await this.db
 			.select({
 				visibility: profilesTable.visibility,
 			})
 			.from(profilesTable)
 			.where(eq(profilesTable.userId, targetUserId))
-			.limit(1);
+			.limit(1)
+			.then((i) => i[0]);
 
 		if (!targetUserProfile)
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
+
 		await this.db
 			.insert(followsTable)
 			.values({
@@ -64,19 +66,21 @@ export class FollowService {
 			eq(followsTable.followerId, this.userId)
 		);
 
-		const [[targetUserProfile], [followObject]] = await Promise.all([
+		const [targetUserProfile, followObject] = await Promise.all([
 			this.db
 				.select({
 					visibility: profilesTable.visibility,
 				})
 				.from(profilesTable)
 				.where(eq(profilesTable.userId, targetUserId))
-				.limit(1),
+				.limit(1)
+				.then((i) => i[0]),
 			this.db
 				.select({ status: followsTable.status })
 				.from(followsTable)
 				.where(matchCondition)
-				.limit(1),
+				.limit(1)
+				.then((i) => i[0]),
 		]);
 
 		if (!targetUserProfile)
@@ -109,11 +113,12 @@ export class FollowService {
 			eq(followsTable.followerId, followerId)
 		);
 
-		const [followObject] = await this.db
+		const followObject = await this.db
 			.select({ status: followsTable.status })
 			.from(followsTable)
 			.where(matchCondition)
-			.limit(1);
+			.limit(1)
+			.then((i) => i[0]);
 
 		if (!followObject)
 			throw new ORPCError("NOT_FOUND", { message: "No follow request found" });
@@ -148,11 +153,12 @@ export class FollowService {
 			eq(followsTable.followerId, followerId)
 		);
 
-		const [followObject] = await this.db
+		const followObject = await this.db
 			.select({ status: followsTable.status })
 			.from(followsTable)
 			.where(matchCondition)
-			.limit(1);
+			.limit(1)
+			.then((i) => i[0]);
 
 		if (!followObject)
 			throw new ORPCError("NOT_FOUND", { message: "No follow request found" });
@@ -182,11 +188,12 @@ export class FollowService {
 			eq(followsTable.followerId, followerId)
 		);
 
-		const [followObject] = await this.db
+		const followObject = await this.db
 			.select({ status: followsTable.status })
 			.from(followsTable)
 			.where(matchCondition)
-			.limit(1);
+			.limit(1)
+			.then((i) => i[0]);
 
 		if (!followObject)
 			throw new ORPCError("NOT_FOUND", {
@@ -213,17 +220,19 @@ export class FollowService {
 			eq(followsTable.followingId, targetUserId)
 		);
 
-		const [[theyFollowMe], [theyFollowedByMe]] = await Promise.all([
+		const [theyFollowMe, theyFollowedByMe] = await Promise.all([
 			this.db
 				.select({
 					status: followsTable.status,
 				})
 				.from(followsTable)
-				.where(theyFollowMeCondition),
+				.where(theyFollowMeCondition)
+				.then((i) => i[0]),
 			this.db
 				.select({ status: followsTable.status })
 				.from(followsTable)
-				.where(theyFollowedByMeCondition),
+				.where(theyFollowedByMeCondition)
+				.then((i) => i[0]),
 		]);
 
 		const iFollow = theyFollowedByMe?.status;
@@ -240,19 +249,7 @@ export class FollowService {
 	> {
 		const items = await this.db
 			.select({
-				id: profilesTable.id,
-				userId: profilesTable.userId,
-				username: profilesTable.username,
-				displayName: profilesTable.displayName,
-				avatarKey: profilesTable.avatarKey,
-				bannerKey: profilesTable.bannerKey,
-				bannerMimeType: profilesTable.bannerMimeType,
-				isGlimpseVerified: profilesTable.isGlimpseVerified,
-				pronouns: profilesTable.pronouns,
-				bio: profilesTable.bio,
-				visibility: profilesTable.visibility,
-				updatedAt: profilesTable.updatedAt,
-				createdAt: followsTable.createdAt,
+				...getTableColumns(profilesTable),
 				viewerFollowsStatus: this.db
 					.select({ status: followsTable.status })
 					.from(followsTable)
@@ -331,19 +328,7 @@ export class FollowService {
 	> {
 		const items = await this.db
 			.select({
-				id: profilesTable.id,
-				userId: profilesTable.userId,
-				username: profilesTable.username,
-				displayName: profilesTable.displayName,
-				avatarKey: profilesTable.avatarKey,
-				bannerKey: profilesTable.bannerKey,
-				bannerMimeType: profilesTable.bannerMimeType,
-				isGlimpseVerified: profilesTable.isGlimpseVerified,
-				pronouns: profilesTable.pronouns,
-				bio: profilesTable.bio,
-				visibility: profilesTable.visibility,
-				updatedAt: profilesTable.updatedAt,
-				createdAt: followsTable.createdAt,
+				...getTableColumns(profilesTable),
 				viewerFollowsStatus: this.db
 					.select({ status: followsTable.status })
 					.from(followsTable)
@@ -421,19 +406,7 @@ export class FollowService {
 	> {
 		const items = await this.db
 			.select({
-				id: profilesTable.id,
-				userId: profilesTable.userId,
-				username: profilesTable.username,
-				displayName: profilesTable.displayName,
-				avatarKey: profilesTable.avatarKey,
-				bannerKey: profilesTable.bannerKey,
-				bannerMimeType: profilesTable.bannerMimeType,
-				isGlimpseVerified: profilesTable.isGlimpseVerified,
-				pronouns: profilesTable.pronouns,
-				bio: profilesTable.bio,
-				visibility: profilesTable.visibility,
-				updatedAt: profilesTable.updatedAt,
-				createdAt: followsTable.createdAt,
+				...getTableColumns(profilesTable),
 			})
 			.from(followsTable)
 			.innerJoin(
@@ -499,19 +472,7 @@ export class FollowService {
 	> {
 		const items = await this.db
 			.select({
-				id: profilesTable.id,
-				userId: profilesTable.userId,
-				username: profilesTable.username,
-				displayName: profilesTable.displayName,
-				avatarKey: profilesTable.avatarKey,
-				bannerKey: profilesTable.bannerKey,
-				bannerMimeType: profilesTable.bannerMimeType,
-				isGlimpseVerified: profilesTable.isGlimpseVerified,
-				pronouns: profilesTable.pronouns,
-				bio: profilesTable.bio,
-				visibility: profilesTable.visibility,
-				updatedAt: profilesTable.updatedAt,
-				createdAt: followsTable.createdAt,
+				...getTableColumns(profilesTable),
 			})
 			.from(followsTable)
 			.innerJoin(

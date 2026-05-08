@@ -40,7 +40,7 @@ export class PostService {
 	}: z.infer<typeof postSchema.markPostSeen.input>): Promise<
 		z.infer<typeof postSchema.markPostSeen.output>
 	> {
-		const [[isSeenDB], isSeenRedis] = await Promise.all([
+		const [isSeenDB, isSeenRedis] = await Promise.all([
 			this.db
 				.select()
 				.from(viewHistoryTable)
@@ -50,7 +50,8 @@ export class PostService {
 						eq(viewHistoryTable.postId, postId)
 					)
 				)
-				.limit(1),
+				.limit(1)
+				.then((i) => i[0]),
 			isPostSeen(this.userId, postId),
 		]);
 
@@ -117,10 +118,11 @@ export class PostService {
 			: [];
 
 		const postId = await this.db.transaction(async (tsx) => {
-			const [post] = await tsx
+			const post = await tsx
 				.insert(postsTable)
 				.values({ userId: this.userId, hasAttachments, body, spoiler })
-				.returning();
+				.returning()
+				.then((p) => p[0]);
 
 			if (hasAttachments) {
 				await tsx.insert(attachmentsTable).values(
