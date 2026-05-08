@@ -13,10 +13,11 @@ export default async function AuthGuard({
 	const session = await auth.api.getSession({ headers: await headers() });
 
 	if (session) {
-		const [profile] = await db
+		const profile = await db
 			.select({ username: profilesTable.username })
 			.from(profilesTable)
-			.where(eq(profilesTable.userId, session.user.id));
+			.where(eq(profilesTable.userId, session.user.id))
+			.then((i) => i[0]);
 
 		if (profile) redirect("/");
 	}
