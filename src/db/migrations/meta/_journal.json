@@ -15,6 +15,13 @@
 			"when": 1778313329061,
 			"tag": "0001_nasty_felicia_hardy",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1778337331672,
+			"tag": "0002_misty_thunderbolt_ross",
+			"breakpoints": true
 		}
 	]
 }

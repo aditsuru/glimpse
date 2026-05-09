@@ -1,3 +1,4 @@
+import { bookmarkRouter } from "@/modules/bookmark/bookmark.route";
 import { followRouter } from "@/modules/follow/follow.route";
 import { postRouter } from "@/modules/post/post.route";
 import { postLikeRouter } from "@/modules/postLike/post-like.route";
@@ -9,6 +10,7 @@ export const router = base.router({
 	follow: followRouter,
 	post: postRouter,
 	postLike: postLikeRouter,
+	bookmark: bookmarkRouter,
 });
 
 export type Router = typeof router;

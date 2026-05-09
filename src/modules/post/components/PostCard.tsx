@@ -41,6 +41,7 @@ import {
 	isImage,
 	isVideo,
 } from "@/lib/shared/constants";
+import BookmarkButton from "@/modules/bookmark/components/BookmarkButton";
 import PostLikeButton from "@/modules/postLike/components/PostLikeButton";
 import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
 import { useDelete, useMarkPostSeen } from "../post.queries";
@@ -204,22 +205,25 @@ const PostCard = ({
 					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
 				>
 					<MessageCircle className="size-4.5" />
-					<p className="min-w-8">12k</p>
+					<p className="min-w-8 text-left">12k</p>
 				</Button>
+
 				<Button
 					variant="ghost"
-					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! hover:text-muted-foreground!"
 				>
 					<ChartLine className="size-4.5" />
-					<p className="min-w-8">{data.views === 0 ? "1" : data.views}</p>
+					<span className="tabular-nums min-w-8 text-left">
+						{data.views === 0 ? "1" : data.views}
+					</span>
 				</Button>
-				<Button
-					variant="ghost"
-					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
-				>
-					<Bookmark className="size-4.5" />
-					<p className="min-w-8">12k</p>
-				</Button>
+
+				<BookmarkButton
+					postId={data.id}
+					initialCount={data.bookmarksCount}
+					initialState={data.isBookmarkedByUser}
+				/>
+
 				<Button
 					variant="ghost"
 					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"

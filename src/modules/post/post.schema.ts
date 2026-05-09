@@ -26,6 +26,9 @@ export const getPostOutput = postSelectSchema.extend({
 	),
 	likesCount: z.number(),
 	isLikedByUser: z.boolean(),
+
+	bookmarksCount: z.number(),
+	isBookmarkedByUser: z.boolean(),
 });
 
 export const getPostListOutput = z.object({

@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: same as PostService */
+
 import { ORPCError } from "@orpc/server";
 import { and, count, desc, eq, getTableColumns, lt, sql } from "drizzle-orm";
 import { DatabaseError } from "pg";
@@ -11,9 +12,9 @@ import { getPostViewsBatch } from "@/lib/server/redis-utils";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
 import type { postSchema } from "../post/post.schema";
-import type { postLikeSchema } from "./post-like.schema";
+import type { bookmarkSchema } from "./bookmark.schema";
 
-export class PostLikeService {
+export class BookmarkService {
 	constructor(
 		private db: typeof DBType,
 		private userId: string
@@ -21,76 +22,76 @@ export class PostLikeService {
 
 	async get({
 		postId,
-	}: z.infer<typeof postLikeSchema.get.input>): Promise<
-		z.infer<typeof postLikeSchema.get.output>
+	}: z.infer<typeof bookmarkSchema.get.input>): Promise<
+		z.infer<typeof bookmarkSchema.get.output>
 	> {
 		const data = await this.db
 			.select({
 				count: count(),
-				isLikedByUser: sql<boolean>`
-				bool_or(${postLikesTable.userId} = ${this.userId})
-			`,
+				isBookmarkedByUser: sql<boolean>`
+					bool_or(${bookmarksTable.userId} = ${this.userId})
+				`,
 			})
-			.from(postLikesTable)
-			.where(eq(postLikesTable.postId, postId))
+			.from(bookmarksTable)
+			.where(eq(bookmarksTable.postId, postId))
 			.then((i) => i[0]);
 
 		return data;
 	}
 
-	async getLikedPosts({
+	async getBookmarkedPosts({
 		cursor,
-	}: z.infer<typeof postLikeSchema.getLikedPosts.input>): Promise<
-		z.infer<typeof postLikeSchema.getLikedPosts.output>
+	}: z.infer<typeof bookmarkSchema.getBookmarkedPosts.input>): Promise<
+		z.infer<typeof bookmarkSchema.getBookmarkedPosts.output>
 	> {
 		const posts = await this.db
 			.select({
 				...getTableColumns(postsTable),
 				authorAvatarUpdatedAt: profilesTable.updatedAt,
 				author: sql<z.infer<typeof postSchema.get.output.shape.author>>`
-						json_build_object(
-						'id', ${profilesTable.userId},
-						'username', ${profilesTable.username},
-						'displayName', ${profilesTable.displayName},
-						'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
-						'avatarUrl', ${profilesTable.avatarKey}
-						)
-						`,
+							json_build_object(
+							'id', ${profilesTable.userId},
+							'username', ${profilesTable.username},
+							'displayName', ${profilesTable.displayName},
+							'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
+							'avatarUrl', ${profilesTable.avatarKey}
+							)
+							`,
 				attachments: sql<
 					z.infer<typeof postSchema.get.output.shape.attachments>
 				>`
-						COALESCE(
-						json_agg(
-						json_build_object(
-						'mimeType', ${attachmentsTable.mimeType},
-						'url', ${attachmentsTable.attachmentKey}
-						)
-						ORDER BY ${attachmentsTable.createdAt} DESC
-						) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
-						, '[]')
-						`,
+							COALESCE(
+							json_agg(
+							json_build_object(
+							'mimeType', ${attachmentsTable.mimeType},
+							'url', ${attachmentsTable.attachmentKey}
+							)
+							ORDER BY ${attachmentsTable.createdAt} DESC
+							) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
+							, '[]')
+							`,
 				likesCount: this.db.$count(
 					postLikesTable,
 					eq(postsTable.id, postLikesTable.postId)
 				),
+				isLikedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${postLikesTable}
+					WHERE ${postLikesTable.postId} = ${postsTable.id}
+					AND ${postLikesTable.userId} = ${this.userId}
+				)`,
 				bookmarksCount: this.db.$count(
 					bookmarksTable,
 					eq(postsTable.id, bookmarksTable.postId)
 				),
-				isBookmarkedByUser: sql<boolean>`EXISTS (
-					SELECT 1 FROM ${bookmarksTable}
-					WHERE ${bookmarksTable.postId} = ${postsTable.id}
-					AND ${bookmarksTable.userId} = ${this.userId}
-				)`,
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
 			.leftJoin(attachmentsTable, eq(postsTable.id, attachmentsTable.postId))
 			.innerJoin(
-				postLikesTable,
+				bookmarksTable,
 				and(
-					eq(sql`${this.userId}`, postLikesTable.userId),
-					eq(postsTable.id, postLikesTable.postId)
+					eq(sql`${this.userId}`, bookmarksTable.userId),
+					eq(postsTable.id, bookmarksTable.postId)
 				)
 			)
 			.where(cursor ? lt(postsTable.createdAt, cursor) : undefined)
@@ -107,7 +108,7 @@ export class PostLikeService {
 		const mappedPosts = trimmed.map((post) => {
 			return {
 				...post,
-				isLikedByUser: true,
+				isBookmarkedByUser: true,
 				views: post.views + (viewsMap.get(post.id) ?? 0),
 				author: {
 					...post.author,
@@ -136,12 +137,12 @@ export class PostLikeService {
 
 	async add({
 		postId,
-	}: z.infer<typeof postLikeSchema.add.input>): Promise<
-		z.infer<typeof postLikeSchema.add.output>
+	}: z.infer<typeof bookmarkSchema.add.input>): Promise<
+		z.infer<typeof bookmarkSchema.add.output>
 	> {
 		try {
 			await this.db
-				.insert(postLikesTable)
+				.insert(bookmarksTable)
 				.values({
 					userId: this.userId,
 					postId,
@@ -161,15 +162,15 @@ export class PostLikeService {
 
 	async remove({
 		postId,
-	}: z.infer<typeof postLikeSchema.remove.input>): Promise<
-		z.infer<typeof postLikeSchema.remove.output>
+	}: z.infer<typeof bookmarkSchema.remove.input>): Promise<
+		z.infer<typeof bookmarkSchema.remove.output>
 	> {
 		await this.db
-			.delete(postLikesTable)
+			.delete(bookmarksTable)
 			.where(
 				and(
-					eq(postLikesTable.postId, postId),
-					eq(postLikesTable.userId, this.userId)
+					eq(bookmarksTable.postId, postId),
+					eq(bookmarksTable.userId, this.userId)
 				)
 			);
 

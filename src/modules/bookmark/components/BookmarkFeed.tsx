@@ -4,11 +4,12 @@ import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
 import PostCard from "@/modules/post/components/PostCard";
-import { useGetLikedPosts } from "../post-like.queries";
+import { useGetBookmarkedPosts } from "../bookmark.queries";
 
-const PostLikedFeed = () => {
+const BookmarkFeed = () => {
 	const { data: sessionData } = authClient.useSession();
-	const { data, fetchNextPage, hasNextPage, isFetching } = useGetLikedPosts();
+	const { data, fetchNextPage, hasNextPage, isFetching } =
+		useGetBookmarkedPosts();
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
@@ -23,12 +24,12 @@ const PostLikedFeed = () => {
 			{hasNextPage && <div ref={ref} className="h-1" />}
 			{posts.length === 0 && !isFetching && (
 				<EmptyStateMessage
-					title="No posts yet"
-					description="You haven't liked anything yet"
+					title="No posts"
+					description="You haven't bookmarked anything yet"
 				/>
 			)}
 		</div>
 	);
 };
 
-export default PostLikedFeed;
+export default BookmarkFeed;

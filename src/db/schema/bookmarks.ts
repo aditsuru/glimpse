@@ -10,8 +10,8 @@ import { createSelectSchema } from "drizzle-zod";
 import { user } from "./auth-schema";
 import { postsTable } from "./posts";
 
-export const postLikesTable = pgTable(
-	"post_likes",
+export const bookmarksTable = pgTable(
+	"bookmarks",
 	{
 		userId: text("user_id")
 			.notNull()
@@ -25,11 +25,11 @@ export const postLikesTable = pgTable(
 	},
 	(table) => [
 		primaryKey({ columns: [table.userId, table.postId] }),
-		index("post_likes_user_id_idx").on(table.userId),
-		index("post_likes_post_id_idx").on(table.postId),
+		index("bookmarks_user_id_idx").on(table.userId),
+		index("bookmarks_post_id_idx").on(table.postId),
 	]
 );
 
-export type PostLike = InferSelectModel<typeof postLikesTable>;
-export type NewPostLike = InferInsertModel<typeof postLikesTable>;
-export const postLikeSelectSchema = createSelectSchema(postLikesTable);
+export type Bookmark = InferSelectModel<typeof bookmarksTable>;
+export type NewBookmark = InferInsertModel<typeof bookmarksTable>;
+export const bookmarkSelectSchema = createSelectSchema(bookmarksTable);

@@ -8,15 +8,15 @@ import { orpc } from "@/lib/client/orpc-client";
 
 /**
  * Side effects:
- * - Optimistic: postLike.get[postId]
- * - Invalidate on settle: postLike.get[postId], postLike.getLikedPosts
+ * - Optimistic: bookmark.get[postId]
+ * - Invalidate on settle: bookmark.get[postId], bookmark.getBookmarkedPosts
  */
-export function useAddPostLike() {
+export function useAddBookmark() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		...orpc.postLike.add.mutationOptions(),
+		...orpc.bookmark.add.mutationOptions(),
 		onMutate: async ({ postId }) => {
-			const getPostIdKey = orpc.postLike.get.queryOptions({
+			const getPostIdKey = orpc.bookmark.get.queryOptions({
 				input: { postId },
 			}).queryKey;
 
@@ -26,7 +26,7 @@ export function useAddPostLike() {
 
 			const nextData = {
 				count: (previousData?.count ?? 0) + 1,
-				isLikedByUser: true,
+				isBookmarkedByUser: true,
 			};
 
 			queryClient.setQueryData(getPostIdKey, nextData);
@@ -43,12 +43,12 @@ export function useAddPostLike() {
 		onSettled: async (_data, _err, { postId }, _context) => {
 			await Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: orpc.postLike.get.queryOptions({
+					queryKey: orpc.bookmark.get.queryOptions({
 						input: { postId },
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
-					queryKey: orpc.postLike.getLikedPosts.key(),
+					queryKey: orpc.bookmark.getBookmarkedPosts.key(),
 				}),
 			]);
 		},
@@ -57,15 +57,15 @@ export function useAddPostLike() {
 
 /**
  * Side effects:
- * - Optimistic: postLike.get[postId]
- * - Invalidate on settle: postLike.get[postId], postLike.getLikedPosts
+ * - Optimistic: bookmark.get[postId]
+ * - Invalidate on settle: bookmark.get[postId], bookmark.getBookmarkedPosts
  */
-export function useRemovePostLike() {
+export function useRemoveBookmark() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		...orpc.postLike.remove.mutationOptions(),
+		...orpc.bookmark.remove.mutationOptions(),
 		onMutate: async ({ postId }) => {
-			const getPostIdKey = orpc.postLike.get.queryOptions({
+			const getPostIdKey = orpc.bookmark.get.queryOptions({
 				input: { postId },
 			}).queryKey;
 
@@ -75,7 +75,7 @@ export function useRemovePostLike() {
 
 			const nextData = {
 				count: Math.max((previousData?.count ?? 0) - 1, 0),
-				isLikedByUser: false,
+				isBookmarkedByUser: false,
 			};
 
 			queryClient.setQueryData(getPostIdKey, nextData);
@@ -92,21 +92,21 @@ export function useRemovePostLike() {
 		onSettled: async (_data, _err, { postId }, _context) => {
 			await Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: orpc.postLike.get.queryOptions({
+					queryKey: orpc.bookmark.get.queryOptions({
 						input: { postId },
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
-					queryKey: orpc.postLike.getLikedPosts.key(),
+					queryKey: orpc.bookmark.getBookmarkedPosts.key(),
 				}),
 			]);
 		},
 	});
 }
 
-export function useGetLikedPosts() {
+export function useGetBookmarkedPosts() {
 	return useInfiniteQuery(
-		orpc.postLike.getLikedPosts.infiniteOptions({
+		orpc.bookmark.getBookmarkedPosts.infiniteOptions({
 			input: (pageParam) => ({ cursor: pageParam }),
 			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			initialPageParam: undefined as Date | undefined,
@@ -114,9 +114,9 @@ export function useGetLikedPosts() {
 	);
 }
 
-export function useGetPostLike(postId: string, enabled: boolean) {
+export function useGetBookmark(postId: string, enabled: boolean) {
 	return useQuery(
-		orpc.postLike.get.queryOptions({
+		orpc.bookmark.get.queryOptions({
 			input: { postId },
 			enabled,
 		})

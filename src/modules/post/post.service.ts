@@ -9,6 +9,7 @@ import {
 	postsTable,
 	profilesTable,
 } from "@/db/schema";
+import { bookmarksTable } from "@/db/schema/bookmarks";
 import { postLikesTable } from "@/db/schema/post-likes";
 import { viewHistoryTable } from "@/db/schema/view-history";
 import { customNanoid } from "@/lib/server/helpers";
@@ -227,6 +228,15 @@ export class PostService {
 					WHERE ${postLikesTable.postId} = ${postsTable.id}
 					AND ${postLikesTable.userId} = ${this.userId}
 				)`,
+				bookmarksCount: this.db.$count(
+					bookmarksTable,
+					eq(postsTable.id, bookmarksTable.postId)
+				),
+				isBookmarkedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${bookmarksTable}
+					WHERE ${bookmarksTable.postId} = ${postsTable.id}
+					AND ${bookmarksTable.userId} = ${this.userId}
+				)`,
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
@@ -350,6 +360,15 @@ export class PostService {
 					WHERE ${postLikesTable.postId} = ${postsTable.id}
 					AND ${postLikesTable.userId} = ${this.userId}
 				)`,
+				bookmarksCount: this.db.$count(
+					bookmarksTable,
+					eq(postsTable.id, bookmarksTable.postId)
+				),
+				isBookmarkedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${bookmarksTable}
+					WHERE ${bookmarksTable.postId} = ${postsTable.id}
+					AND ${bookmarksTable.userId} = ${this.userId}
+				)`,
 			})
 			.from(postsTable)
 			.leftJoin(attachmentsTable, eq(postsTable.id, attachmentsTable.postId))
@@ -451,6 +470,15 @@ export class PostService {
 					SELECT 1 FROM ${postLikesTable}
 					WHERE ${postLikesTable.postId} = ${postsTable.id}
 					AND ${postLikesTable.userId} = ${this.userId}
+				)`,
+				bookmarksCount: this.db.$count(
+					bookmarksTable,
+					eq(postsTable.id, bookmarksTable.postId)
+				),
+				isBookmarkedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${bookmarksTable}
+					WHERE ${bookmarksTable.postId} = ${postsTable.id}
+					AND ${bookmarksTable.userId} = ${this.userId}
 				)`,
 			})
 			.from(postsTable)
