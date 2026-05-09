@@ -6,7 +6,6 @@ import {
 	Bookmark,
 	ChartLine,
 	Ellipsis,
-	Heart,
 	MessageCircle,
 	Share,
 } from "lucide-react";
@@ -42,6 +41,7 @@ import {
 	isImage,
 	isVideo,
 } from "@/lib/shared/constants";
+import PostLikeButton from "@/modules/postLike/components/PostLikeButton";
 import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
 import { useDelete, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";
@@ -65,11 +65,13 @@ const PostCard = ({
 }: PostCardProps) => {
 	const router = useRouter();
 	const updateViewCount = useMarkPostSeen();
-	const ref = useViewCount(data.id, () =>
-		updateViewCount.mutate({
-			postId: data.id,
-		})
-	);
+	const ref = useViewCount<HTMLDivElement>({
+		postId: data.id,
+		callback: () =>
+			updateViewCount.mutate({
+				postId: data.id,
+			}),
+	});
 
 	return (
 		<div
@@ -100,7 +102,7 @@ const PostCard = ({
 						>
 							<HoverCard>
 								<HoverCardTrigger
-									delay={10}
+									delay={300}
 									render={
 										<Link href={`/${data.author.username}`}>
 											<p className="hover:underline hover:underline-offset-4">
@@ -191,33 +193,32 @@ const PostCard = ({
 				onClick={(e) => e.stopPropagation()}
 				onKeyDown={(e) => e.stopPropagation()}
 			>
-				<Button
-					variant="ghost"
-					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
-				>
-					<Heart className="size-4.5" />
-					<p>12k</p>
-				</Button>
+				<PostLikeButton
+					postId={data.id}
+					initialCount={data.likesCount}
+					initialState={data.isLikedByUser}
+				/>
+
 				<Button
 					variant="ghost"
 					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
 				>
 					<MessageCircle className="size-4.5" />
-					<p>12k</p>
+					<p className="min-w-8">12k</p>
 				</Button>
 				<Button
 					variant="ghost"
 					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
 				>
 					<ChartLine className="size-4.5" />
-					<p>{data.views === 0 ? "1" : data.views}</p>
+					<p className="min-w-8">{data.views === 0 ? "1" : data.views}</p>
 				</Button>
 				<Button
 					variant="ghost"
 					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
 				>
 					<Bookmark className="size-4.5" />
-					<p>12k</p>
+					<p className="min-w-8">12k</p>
 				</Button>
 				<Button
 					variant="ghost"

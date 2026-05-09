@@ -3,21 +3,13 @@ import { Lock } from "lucide-react";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
-import { useGetAllByUser } from "../post.queries";
-import PostCard from "./PostCard";
+import PostCard from "@/modules/post/components/PostCard";
+import { useGetLikedPosts } from "../post-like.queries";
 
-const UserPostFeed = ({
-	username,
-	userId,
-	viewerId,
-}: {
-	username: string;
-	userId: string;
-	viewerId: string;
-}) => {
+const PostLikedFeed = ({ username }: { username: string }) => {
 	const { data: sessionData } = authClient.useSession();
 	const { data, fetchNextPage, hasNextPage, isFetching, error } =
-		useGetAllByUser(username);
+		useGetLikedPosts();
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
@@ -42,15 +34,11 @@ const UserPostFeed = ({
 			{posts.length === 0 && !isFetching && (
 				<EmptyStateMessage
 					title="No posts yet"
-					description={
-						userId === viewerId
-							? `You haven't posted anything yet`
-							: `${username} hasn't posted anything yet`
-					}
+					description="You haven't liked anything yet"
 				/>
 			)}
 		</div>
 	);
 };
 
-export default UserPostFeed;
+export default PostLikedFeed;

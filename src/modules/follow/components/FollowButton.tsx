@@ -87,19 +87,17 @@ const FollowButton = ({
 	}
 
 	return (
-		<div>
-			<Button
-				variant={variant as any}
-				onClick={(e) => {
-					e.stopPropagation();
-					handleClick();
-				}}
-				disabled={isPending}
-				className={cn(className)}
-			>
-				{label}
-			</Button>
-		</div>
+		<Button
+			variant={variant as any}
+			onClick={(e) => {
+				e.stopPropagation();
+				handleClick();
+			}}
+			disabled={isPending}
+			className={cn(className)}
+		>
+			{label}
+		</Button>
 	);
 };
 

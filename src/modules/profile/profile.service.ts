@@ -2,7 +2,6 @@
 import { ORPCError } from "@orpc/server";
 import {
 	and,
-	count,
 	desc,
 	eq,
 	getTableColumns,

@@ -1,6 +1,12 @@
 "use client";
 
-import { HatGlasses, Presentation, Snowflake, Sparkles } from "lucide-react";
+import {
+	HatGlasses,
+	MoonStar,
+	Presentation,
+	Snowflake,
+	Sparkles,
+} from "lucide-react";
 import PageHeader from "@/components/layout/PageHeader";
 import {
 	Field,
@@ -30,33 +36,23 @@ const Settings = () => {
 		});
 	};
 
-	const isSidebarGifGalleryEnabled = useSettingsStore(
-		(state) => state.isSidebarGifGalleryEnabled
-	);
-	const setSidebarGifGalleryEnabled = useSettingsStore(
-		(state) => state.setSidebarGifGalleryEnabled
-	);
-
-	const isSnowfallEnabled = useSettingsStore(
-		(state) => state.isSnowfallEnabled
-	);
-	const setSnowfallEnabled = useSettingsStore(
-		(state) => state.setSnowfallEnabled
-	);
-
-	const isBillboardEnabled = useSettingsStore(
-		(state) => state.isBillboardEnabled
-	);
-	const setIsBillboardEnabled = useSettingsStore(
-		(state) => state.setIsBillboardEnabled
-	);
+	const {
+		isSidebarGifGalleryEnabled,
+		setSidebarGifGalleryEnabled,
+		isSnowfallEnabled,
+		setSnowfallEnabled,
+		isBillboardEnabled,
+		setIsBillboardEnabled,
+		isMeteorsEnabled,
+		setIsMeteorsEnabled,
+	} = useSettingsStore();
 
 	return (
 		<main className="w-full h-full overflow-y-auto no-scrollbar">
 			<PageHeader title="Settings" />
 			<section className="flex flex-col gap-6 py-8 px-12">
 				<div className="flex flex-col gap-4">
-					<div className="flex flex-col gap-8">
+					<div className="flex flex-col gap-4">
 						<h2 className="text-xl font-semibold">Profile</h2>
 
 						<Field orientation="horizontal" className="w-full">
@@ -86,7 +82,7 @@ const Settings = () => {
 				<div className="flex flex-col gap-4">
 					<h2 className="text-xl font-semibold">Personalization</h2>
 
-					<div className="flex flex-col gap-8">
+					<div className="flex flex-col gap-6">
 						<Field orientation="horizontal" className="w-full">
 							<FieldContent>
 								<FieldLabel
@@ -141,6 +137,23 @@ const Settings = () => {
 								id="billboard"
 								checked={isBillboardEnabled}
 								onCheckedChange={setIsBillboardEnabled}
+							/>
+						</Field>
+						<Field orientation="horizontal" className="w-full">
+							<FieldContent>
+								<FieldLabel
+									htmlFor="meteors"
+									className="flex items-center gap-2 text-lg"
+								>
+									<MoonStar className="size-5" />
+									Meteors
+								</FieldLabel>
+								<FieldDescription>Start a meteor shower.</FieldDescription>
+							</FieldContent>
+							<Switch
+								id="meteors"
+								checked={isMeteorsEnabled}
+								onCheckedChange={setIsMeteorsEnabled}
 							/>
 						</Field>
 					</div>

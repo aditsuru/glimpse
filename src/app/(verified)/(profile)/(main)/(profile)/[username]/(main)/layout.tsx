@@ -5,9 +5,16 @@ import {
 } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
-import ProfilePage from "./ProfilePage";
+import { ProfileProvider } from "./ProfileContext";
+import ProfileLayout from "./ProfileLayout";
 
-const Page = async ({ params }: { params: Promise<{ username: string }> }) => {
+const Layout = async ({
+	params,
+	children,
+}: {
+	params: Promise<{ username: string }>;
+	children: React.ReactNode;
+}) => {
 	const { username } = await params;
 	const { user } = await getRequiredSession();
 
@@ -15,11 +22,16 @@ const Page = async ({ params }: { params: Promise<{ username: string }> }) => {
 	await queryClient.prefetchQuery(
 		orpc.profile.get.queryOptions({ input: { username } })
 	);
+
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
-			<ProfilePage username={username} viewerId={user.id} />
+			<ProfileProvider username={username}>
+				<ProfileLayout username={username} viewerId={user.id}>
+					{children}
+				</ProfileLayout>
+			</ProfileProvider>
 		</HydrationBoundary>
 	);
 };
 
-export default Page;
+export default Layout;

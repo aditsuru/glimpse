@@ -8,3 +8,7 @@ export function formatPostDate(date: Date | string): string {
 	if (seconds < 604800) return `${Math.floor(seconds / 86400)}d`;
 	return format(new Date(date), "MMM d");
 }
+
+export const formatNumber = new Intl.NumberFormat("en", {
+	notation: "compact",
+});

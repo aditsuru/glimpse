@@ -1,12 +1,21 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const moduleName = process.argv[2];
+let moduleName = process.argv[2];
 
 if (!moduleName) {
 	console.error("Usage: tsx scripts/codegen.ts <module-name>");
 	process.exit(1);
 }
+
+const fileName = moduleName;
+moduleName = moduleName
+	.split("-")
+	.map((s, i) => {
+		if (i > 0) return s.charAt(0).toUpperCase() + s.slice(1);
+		return s;
+	})
+	.join("");
 
 const pascal = moduleName.charAt(0).toUpperCase() + moduleName.slice(1);
 const base = path.join("src/modules", moduleName);
@@ -17,13 +26,13 @@ fs.mkdirSync(componentsDir, { recursive: true });
 
 // ── File templates ────────────────────────────────────────────────
 const files: Record<string, string> = {
-	[`${moduleName}.schema.ts`]: `import * as z from "zod"\n\nexport const ${moduleName}Schema = {}\n`,
+	[`${fileName}.schema.ts`]: `import * as z from "zod"\n\nexport const ${moduleName}Schema = {}\n`,
 
-	[`${moduleName}.service.ts`]: `import type { db as DBType } from "@/db"\n\nexport class ${pascal}Service {\n  constructor(\n    private db: typeof DBType,\n    private userId: string\n  ) {}\n}\n`,
+	[`${fileName}.service.ts`]: `import type { db as DBType } from "@/db"\n\nexport class ${pascal}Service {\n  constructor(\n    private db: typeof DBType,\n    private userId: string\n  ) {}\n}\n`,
 
-	[`${moduleName}.route.ts`]: `import { authedProcedure, base } from "@/server/os"\nimport { ${pascal}Service } from "./${moduleName}.service";\n\nconst ${moduleName}Procedure = authedProcedure.use(({ context, next }) => {\n	const ${moduleName}Service = new ${pascal}Service(\n		context.db,\n		context.session.user.id\n	);\n	return next({		\ncontext: {			\n${moduleName}Service,		\n},	\n});\n});\nexport const ${moduleName}Router = base.router({})\n`,
+	[`${fileName}.route.ts`]: `import { authedProcedure, base } from "@/server/os"\nimport { ${pascal}Service } from "./${fileName}.service";\n\nconst ${moduleName}Procedure = authedProcedure.use(({ context, next }) => {\n	const ${moduleName}Service = new ${pascal}Service(\n		context.db,\n		context.session.user.id\n	);\n	return next({		\ncontext: {			\n${moduleName}Service,		\n},	\n});\n});\nexport const ${moduleName}Router = base.router({})\n`,
 
-	[`${moduleName}.queries.ts`]: ``,
+	[`${fileName}.queries.ts`]: ``,
 
 	[`components/${pascal}.tsx`]: `export default function ${pascal}() {\n  return null\n}\n`,
 };

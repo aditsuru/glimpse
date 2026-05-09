@@ -6,6 +6,7 @@ import {
 import MobileNav from "@/components/layout/MobileNavbar";
 import Navbar from "@/components/layout/Navbar";
 import SecondarySidebar from "@/components/layout/SecondarySidebar";
+import MeteorsComponent from "@/components/misc/MeteorsComponent";
 import Snowfall from "@/components/misc/Snowfall";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
@@ -26,14 +27,14 @@ export default async function Layout({
 
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
-			<div className="w-screen h-dvh overflow-hidden flex flex-col md:grid md:grid-cols-3 xl:grid-cols-6">
+			<div className="w-screen h-dvh relative overflow-hidden flex flex-col md:grid md:grid-cols-3 xl:grid-cols-6">
 				{/* Sidebar - hidden on mobile */}
 				<aside className="hidden md:flex border-accent border-r h-full md:col-span-1 xl:col-span-2">
 					<Navbar userId={user.id} />
 				</aside>
 
 				{/* Main Content */}
-				<main className="flex-1 border-accent md:border-r overflow-hidden h-full md:col-span-2 xl:col-span-2">
+				<main className="flex-1 border-accent md:border-r overflow-hidden h-full md:col-span-2 xl:col-span-2 bg-background">
 					{children}
 				</main>
 
@@ -47,6 +48,7 @@ export default async function Layout({
 
 				{/* Misc */}
 				<Snowfall />
+				<MeteorsComponent />
 
 				{/* Dialogs */}
 				<UnfollowConfirmDialog />

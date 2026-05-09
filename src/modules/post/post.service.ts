@@ -9,6 +9,7 @@ import {
 	postsTable,
 	profilesTable,
 } from "@/db/schema";
+import { postLikesTable } from "@/db/schema/post-likes";
 import { viewHistoryTable } from "@/db/schema/view-history";
 import { customNanoid } from "@/lib/server/helpers";
 import {
@@ -217,10 +218,19 @@ export class PostService {
 				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
 				, '[]')
 				`,
+				likesCount: this.db.$count(
+					postLikesTable,
+					eq(postsTable.id, postLikesTable.postId)
+				),
+				isLikedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${postLikesTable}
+					WHERE ${postLikesTable.postId} = ${postsTable.id}
+					AND ${postLikesTable.userId} = ${this.userId}
+				)`,
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
-			.leftJoin(attachmentsTable, eq(attachmentsTable.postId, postId))
+			.leftJoin(attachmentsTable, eq(attachmentsTable.postId, postsTable.id))
 			.where(eq(postsTable.id, postId))
 			.groupBy(postsTable.id, profilesTable.id)
 			.limit(1)
@@ -331,6 +341,15 @@ export class PostService {
 				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
 				, '[]')
 				`,
+				likesCount: this.db.$count(
+					postLikesTable,
+					eq(postsTable.id, postLikesTable.postId)
+				),
+				isLikedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${postLikesTable}
+					WHERE ${postLikesTable.postId} = ${postsTable.id}
+					AND ${postLikesTable.userId} = ${this.userId}
+				)`,
 			})
 			.from(postsTable)
 			.leftJoin(attachmentsTable, eq(postsTable.id, attachmentsTable.postId))
@@ -424,6 +443,15 @@ export class PostService {
 				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
 				, '[]')
 				`,
+				likesCount: this.db.$count(
+					postLikesTable,
+					eq(postsTable.id, postLikesTable.postId)
+				),
+				isLikedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${postLikesTable}
+					WHERE ${postLikesTable.postId} = ${postsTable.id}
+					AND ${postLikesTable.userId} = ${this.userId}
+				)`,
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))

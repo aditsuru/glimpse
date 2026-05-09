@@ -33,7 +33,7 @@ const ProfileCard = ({ data, className, action }: ProfileCardProps) => {
 						<div className="text-lg font-semibold flex gap-1 items-center">
 							<HoverCard>
 								<HoverCardTrigger
-									delay={10}
+									delay={300}
 									render={
 										<Link href={`/${data.username}`}>
 											<p className="hover:underline hover:underline-offset-4">

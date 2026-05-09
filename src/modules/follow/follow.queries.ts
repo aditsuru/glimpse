@@ -11,12 +11,9 @@ import type { ViewerFollowStatus } from "@/lib/server/helpers";
 /**
  * Side effects:
  * - Optimistic: follow.getStatus[targetUserId]
- * - Invalidate on settle (public target): profile.get[username:viewer], profile.get[username:target],
- *   follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search
- * - Invalidate on settle (private target): follow.getPendingSent, follow.getStatus[targetUserId], profile.search, post.getAllByUser
+ * - Invalidate on settle (public target): profile.get[username:viewer], profile.get[username:target], follow.getFollowing, follow.getFollowers[targetUserId], profile.search, follow.getPendingSent, follow.getStatus[targetUserId], post.getAllByUser, post.getFeed
  */
 
-// TODO: add getFeed
 export function useSendFollow({
 	viewerUserId,
 	targetUsername,
@@ -78,6 +75,7 @@ export function useSendFollow({
 						input: { username: targetUsername },
 					}).queryKey,
 				}),
+				queryClient.invalidateQueries({ queryKey: orpc.post.getFeed.key() }),
 			];
 
 			if (wasAccepted) {
@@ -119,12 +117,9 @@ export function useSendFollow({
 /**
  * Side effects:
  * - Optimistic: follow.getStatus[targetUserId]
- * - Invalidate on settle (was accepted/mutual): profile.get[username:viewer], profile.get[username:target],
- *   follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search
- * - Invalidate on settle (was pending): follow.getPendingSent, follow.getStatus[targetUserId], profile.search, post.getAllByUser
+ * - Invalidate on settle (was accepted/mutual): profile.get[username:viewer], profile.get[username:target], follow.getFollowing, follow.getFollowers, follow.getStatus[targetUserId], profile.search, follow.getPendingSent, post.getAllByUser, post.getFeed
  */
 
-// TODO: add getFeed
 export function useRemoveFollow({
 	viewerUserId,
 	targetUsername,
@@ -184,6 +179,7 @@ export function useRemoveFollow({
 						input: { username: targetUsername },
 					}).queryKey,
 				}),
+				queryClient.invalidateQueries({ queryKey: orpc.post.getFeed.key() }),
 			];
 
 			if (wasAccepted) {
@@ -224,8 +220,7 @@ export function useRemoveFollow({
 
 /**
  * Side effects:
- * - Invalidate on settle: profile.get[username:viewer], follow.getFollowers,
- *   follow.getStatus[followerId], profile.search
+ * - Invalidate on settle: profile.get[username:viewer], follow.getFollowers, follow.getStatus[followerId], profile.search
  */
 export function useRemoveFollower({ viewerUserId }: { viewerUserId: string }) {
 	const queryClient = useQueryClient();
@@ -267,8 +262,7 @@ export function useRemoveFollower({ viewerUserId }: { viewerUserId: string }) {
 
 /**
  * Side effects:
- * - Invalidate on settle: profile.get[username:viewer], follow.getPendingReceived,
- *   follow.getFollowers, follow.getStatus[followerId], profile.search
+ * - Invalidate on settle: profile.get[username:viewer], follow.getPendingReceived, follow.getFollowers, follow.getStatus[followerId], profile.search
  */
 export function useAcceptRequest({ viewerUserId }: { viewerUserId: string }) {
 	const queryClient = useQueryClient();
@@ -357,7 +351,7 @@ export function useFollowStatus(
 export function useFollowers(userId: string) {
 	return useInfiniteQuery(
 		orpc.follow.getFollowers.infiniteOptions({
-			input: (pageParam) => ({ userId, cursor: pageParam as Date | undefined }),
+			input: (pageParam) => ({ userId, cursor: pageParam }),
 			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			initialPageParam: undefined as Date | undefined,
 			enabled: !!userId,
@@ -368,7 +362,7 @@ export function useFollowers(userId: string) {
 export function useFollowing(userId: string) {
 	return useInfiniteQuery(
 		orpc.follow.getFollowing.infiniteOptions({
-			input: (pageParam) => ({ userId, cursor: pageParam as Date | undefined }),
+			input: (pageParam) => ({ userId, cursor: pageParam }),
 			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			initialPageParam: undefined as Date | undefined,
 			enabled: !!userId,
@@ -379,7 +373,7 @@ export function useFollowing(userId: string) {
 export function usePendingReceived() {
 	return useInfiniteQuery(
 		orpc.follow.getPendingReceived.infiniteOptions({
-			input: (pageParam) => ({ cursor: pageParam as Date | undefined }),
+			input: (pageParam) => ({ cursor: pageParam }),
 			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			initialPageParam: undefined as Date | undefined,
 		})
@@ -393,7 +387,7 @@ export function usePendingReceivedCount() {
 export function usePendingSent() {
 	return useInfiniteQuery(
 		orpc.follow.getPendingSent.infiniteOptions({
-			input: (pageParam) => ({ cursor: pageParam as Date | undefined }),
+			input: (pageParam) => ({ cursor: pageParam }),
 			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			initialPageParam: undefined as Date | undefined,
 		})

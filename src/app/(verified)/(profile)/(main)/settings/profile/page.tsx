@@ -2,10 +2,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, Trash } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -28,7 +28,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useMediaUpload } from "@/hooks/useMediaUpload";
 import { authClient } from "@/lib/client/auth-client";
-import { orpc } from "@/lib/client/orpc-client";
 import { cn } from "@/lib/client/utils";
 import {
 	ALLOWED_MIME_TYPES,
@@ -69,7 +68,6 @@ const FormSchema = z.object({
 
 const ProfileSettings = () => {
 	const { data: sessionData } = authClient.useSession();
-	const queryClient = useQueryClient();
 	const {
 		data: profileData,
 		isLoading: isProfileLoading,
@@ -110,8 +108,16 @@ const ProfileSettings = () => {
 		userId: sessionData?.user.id ?? "",
 		currentUsername: profileData?.username ?? "",
 	});
-	const updateAvatar = useUpdateAvatar();
-	const updateBanner = useUpdateBanner();
+	const updateAvatar = useUpdateAvatar({
+		userId: sessionData?.user.id ?? "",
+		currentUsername: profileData?.username ?? "",
+	});
+	const updateBanner = useUpdateBanner({
+		userId: sessionData?.user.id ?? "",
+		currentUsername: profileData?.username ?? "",
+	});
+
+	const router = useRouter();
 
 	const {
 		preview: avatarPreview,
@@ -206,16 +212,11 @@ const ProfileSettings = () => {
 						bannerMimeType as (typeof ALLOWED_MIME_TYPES.banner)[number],
 				});
 
-			await queryClient.refetchQueries({
-				queryKey: orpc.profile.get.queryOptions({
-					input: { userId: sessionData?.user.id },
-				}).queryKey,
-			});
-
-			toast.success("Profile updated successfully!");
-
 			avatarReset();
 			bannerReset();
+
+			router.push(`/${formData.username}`);
+			toast.success("Profile updated successfully!");
 		} catch {
 			setError("root", { message: "Something went wrong, please try again" });
 		}

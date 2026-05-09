@@ -35,9 +35,9 @@ const Explore = () => {
 		<div className="w-full h-full overflow-y-auto no-scrollbar flex flex-col">
 			<form
 				onSubmit={handleSubmit}
-				className="sticky top-0 w-full flex justify-center px-4 py-3 border-b border-accent bg-background/80 backdrop-blur-sm z-10 h-18 items-center"
+				className="sticky top-0 w-full flex justify-center px-4 py-4 border-b border-accent bg-background/80 backdrop-blur-sm z-10 h-18 items-center"
 			>
-				<InputGroup className="w-sm bg-background! rounded-full! p-4! py-5!">
+				<InputGroup className="w-sm bg-background! rounded-full! p-4! py-5! has-[[data-slot=input-group-control]:focus-visible]:ring-0!">
 					<InputGroupInput
 						value={inputValue}
 						onChange={(e) => setInputValue(e.target.value)}

@@ -15,7 +15,7 @@ const postAuthorSchema = z.object({
 	avatarUrl: z.string().nullable(),
 });
 
-const getPostOutput = postSelectSchema.extend({
+export const getPostOutput = postSelectSchema.extend({
 	author: postAuthorSchema,
 	attachments: z.array(
 		AttachmentSchema.omit({
@@ -24,9 +24,11 @@ const getPostOutput = postSelectSchema.extend({
 			url: z.string(),
 		})
 	),
+	likesCount: z.number(),
+	isLikedByUser: z.boolean(),
 });
 
-const getPostListOutput = z.object({
+export const getPostListOutput = z.object({
 	items: z.array(getPostOutput),
 	nextCursor: z.date().nullable(),
 });

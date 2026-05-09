@@ -1,26 +1,35 @@
 import { useEffect, useRef } from "react";
 
-export function useViewCount(postId: string, onView: (id: string) => void) {
-	const ref = useRef<HTMLDivElement>(null);
-	const hasFired = useRef(false);
+interface UseViewCountProps {
+	postId: string;
+	callback: (id: string) => void;
+}
+
+export function useViewCount<T extends HTMLElement>({
+	postId,
+	callback,
+}: UseViewCountProps) {
+	const ref = useRef<T>(null);
+	const isFired = useRef(false);
 
 	useEffect(() => {
-		const el = ref.current;
-		if (!el) return;
-
+		if (!ref.current) return;
 		const observer = new IntersectionObserver(
 			([entry]) => {
-				if (entry.isIntersecting && !hasFired.current) {
-					hasFired.current = true;
-					onView(postId);
+				if (entry.isIntersecting && !isFired.current) {
+					isFired.current = true;
+					callback(postId);
 				}
 			},
-			{ threshold: 0.5 } // 50% of post must be visible
+			{
+				threshold: 0.1,
+			}
 		);
 
-		observer.observe(el);
+		observer.observe(ref.current);
+
 		return () => observer.disconnect();
-	}, [postId, onView]);
+	}, [callback, postId]);
 
 	return ref;
 }

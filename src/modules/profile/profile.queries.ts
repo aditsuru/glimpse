@@ -22,12 +22,64 @@ export function useIsUsernameAvailable() {
 	return useMutation(orpc.profile.isUsernameAvailable.mutationOptions());
 }
 
-export function useUpdateAvatar() {
-	return useMutation(orpc.profile.updateAvatar.mutationOptions());
+/**
+ * Side effects:
+ * - Invalidate on settle: profile.get[userId], profile.get[username:currentUsername]
+ */
+export function useUpdateAvatar({
+	userId,
+	currentUsername,
+}: {
+	userId: string;
+	currentUsername: string;
+}) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.profile.updateAvatar.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({ input: { userId } })
+						.queryKey,
+				}),
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({
+						input: { username: currentUsername },
+					}).queryKey,
+				}),
+			]);
+		},
+	});
 }
 
-export function useUpdateBanner() {
-	return useMutation(orpc.profile.updateBanner.mutationOptions());
+/**
+ * Side effects:
+ * - Invalidate on settle: profile.get[userId], profile.get[username:currentUsername]
+ */
+export function useUpdateBanner({
+	userId,
+	currentUsername,
+}: {
+	userId: string;
+	currentUsername: string;
+}) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.profile.updateBanner.mutationOptions(),
+		onSettled: async () => {
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({ input: { userId } })
+						.queryKey,
+				}),
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({
+						input: { username: currentUsername },
+					}).queryKey,
+				}),
+			]);
+		},
+	});
 }
 
 export function useProfile(input: { username?: string; userId?: string }) {
@@ -42,7 +94,7 @@ export function useProfile(input: { username?: string; userId?: string }) {
 export function useSearchProfiles(query: string) {
 	return useInfiniteQuery(
 		orpc.profile.search.infiniteOptions({
-			input: (pageParam) => ({ query, cursor: pageParam as Date | undefined }),
+			input: (pageParam) => ({ query, cursor: pageParam }),
 			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			initialPageParam: undefined as Date | undefined,
 			enabled: query.length > 0,

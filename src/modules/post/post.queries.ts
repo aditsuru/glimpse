@@ -87,7 +87,7 @@ export function useGetAllByUser(username: string) {
 		orpc.post.getAllByUser.infiniteOptions({
 			input: (pageParam) => ({
 				username,
-				cursor: pageParam as Date | undefined,
+				cursor: pageParam,
 			}),
 			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			initialPageParam: undefined as Date | undefined,
@@ -99,7 +99,7 @@ export function useGetFeed() {
 	return useInfiniteQuery(
 		orpc.post.getFeed.infiniteOptions({
 			input: (pageParam) => ({
-				cursor: pageParam as Date | undefined,
+				cursor: pageParam,
 			}),
 			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
 			initialPageParam: undefined as Date | undefined,

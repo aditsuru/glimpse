@@ -40,6 +40,7 @@ const VerifyEmail = () => {
 
 	useEffect(() => {
 		if (searchParams.get("sent") === "true") {
+			toast.success("A verification link has been sent to your email.");
 			pageRouter.replace("/verify-email");
 		}
 	}, [pageRouter.replace, searchParams.get]);

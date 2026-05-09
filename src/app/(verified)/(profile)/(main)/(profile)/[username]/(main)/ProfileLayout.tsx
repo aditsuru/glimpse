@@ -5,18 +5,19 @@ import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import ErrorMessage from "@/components/layout/ErrorMessage";
 import PageHeader from "@/components/layout/PageHeader";
 import { ScrollContainer } from "@/components/VideoPlayer";
-import UserPostFeed from "@/modules/post/components/UserPostFeed";
 import MobileProfileHeader from "@/modules/profile/components/MobileProfileHeader";
 import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
 import ProfileNavbar from "@/modules/profile/components/ProfileNavbar";
 import { useProfile } from "@/modules/profile/profile.queries";
 
-const ProfilePage = ({
+const ProfileLayout = ({
 	username,
 	viewerId,
+	children,
 }: {
 	username: string;
 	viewerId: string;
+	children: React.ReactNode;
 }) => {
 	const { data, isLoading, error } = useProfile({ username });
 
@@ -49,12 +50,10 @@ const ProfilePage = ({
 					userId={data.userId}
 					viewerId={viewerId}
 				/>
-				<div className="flex-1">
-					<UserPostFeed username={username} />
-				</div>
+				<div className="flex-1">{children}</div>
 			</div>
 		</ScrollContainer>
 	);
 };
 
-export default ProfilePage;
+export default ProfileLayout;

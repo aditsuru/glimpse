@@ -54,11 +54,10 @@ export function Billboard({ frameSrc, children }: BillboardProps) {
 					alt="Billboard frame"
 					fill
 					priority
-					className="pointer-events-none select-none"
+					className="pointer-events-none select-none brightness-75"
 					style={{
 						objectFit: "fill", // stretch to fill — frame was designed for this exact ratio
 						zIndex: 10,
-						opacity: "70%",
 					}}
 				/>
 			</AspectRatio>

@@ -6,9 +6,11 @@ interface SettingsState {
 	isSidebarGifGalleryEnabled: boolean;
 	isSnowfallEnabled: boolean;
 	isBillboardEnabled: boolean;
+	isMeteorsEnabled: boolean;
 	setSidebarGifGalleryEnabled: (toggle: boolean) => void;
 	setSnowfallEnabled: (toggle: boolean) => void;
 	setIsBillboardEnabled: (toggle: boolean) => void;
+	setIsMeteorsEnabled: (toggle: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -18,11 +20,13 @@ export const useSettingsStore = create<SettingsState>()(
 			isSidebarGifGalleryEnabled: false,
 			isSnowfallEnabled: false,
 			isBillboardEnabled: false,
+			isMeteorsEnabled: false,
 			// Actions
 			setSidebarGifGalleryEnabled: (toggle) =>
 				set({ isSidebarGifGalleryEnabled: toggle }),
 			setSnowfallEnabled: (toggle) => set({ isSnowfallEnabled: toggle }),
 			setIsBillboardEnabled: (toggle) => set({ isBillboardEnabled: toggle }),
+			setIsMeteorsEnabled: (toggle) => set({ isMeteorsEnabled: toggle }),
 		}),
 		{
 			name: LOCAL_STORAGE_KEYS.SETTINGS_STORAGE,
