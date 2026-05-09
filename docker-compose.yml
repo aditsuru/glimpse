@@ -17,7 +17,7 @@ services:
       retries: 5
 
   pgadmin:
-    image: dpage/pgadmin4:9.8
+    image: dpage/pgadmin4:9.14
     ports:
       - 5050:80
     environment:
