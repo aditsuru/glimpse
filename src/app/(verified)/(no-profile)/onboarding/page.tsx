@@ -37,7 +37,7 @@ import {
 	useOnboard,
 } from "@/modules/profile/profile.queries";
 
-const FormSchema = z.object({
+const onboardingSchema = z.object({
 	username: z
 		.string()
 		.min(3, "Username must be at least 3 characters")
@@ -56,7 +56,7 @@ const FormSchema = z.object({
 		),
 });
 
-const Onboarding = () => {
+const Page = () => {
 	const [isRedirecting, setIsRedirecting] = useState(false);
 	const [usernameAvailable, setUsernameAvailable] = useState(false);
 	const [usernameError, setUsernameError] = useState<string | null>(null);
@@ -77,9 +77,9 @@ const Onboarding = () => {
 		});
 
 	const { formState, handleSubmit, control, setError, clearErrors } = useForm<
-		z.infer<typeof FormSchema>
+		z.infer<typeof onboardingSchema>
 	>({
-		resolver: zodResolver(FormSchema),
+		resolver: zodResolver(onboardingSchema),
 		mode: "onTouched",
 		reValidateMode: "onChange",
 		defaultValues: {
@@ -107,7 +107,9 @@ const Onboarding = () => {
 		}
 	}, 500);
 
-	const handleFormSubmit = async (formData: z.infer<typeof FormSchema>) => {
+	const handleFormSubmit = async (
+		formData: z.infer<typeof onboardingSchema>
+	) => {
 		if (usernameError || isUsernameAvailable.isPending || !usernameAvailable)
 			return;
 		try {
@@ -304,4 +306,4 @@ const Onboarding = () => {
 	);
 };
 
-export default Onboarding;
+export default Page;

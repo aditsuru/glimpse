@@ -37,7 +37,7 @@ export const commentsTable = pgTable(
 			name: "comment_parent_fk",
 		}).onDelete("cascade"),
 		index("comments_user_id_idx").on(table.userId),
-		index("comments_post_id_idx").on(table.userId),
+		index("comments_post_id_idx").on(table.postId),
 	]
 );
 

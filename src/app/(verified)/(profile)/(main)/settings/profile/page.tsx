@@ -45,7 +45,7 @@ import {
 	useUpdateProfile,
 } from "@/modules/profile/profile.queries";
 
-const FormSchema = z.object({
+const profileSettingsSchema = z.object({
 	username: z
 		.string()
 		.min(3, "Username must be at least 3 characters")
@@ -66,7 +66,7 @@ const FormSchema = z.object({
 	pronouns: z.string().max(10, "Pronouns must be at most 10 characters"),
 });
 
-const ProfileSettings = () => {
+const Page = () => {
 	const { data: sessionData } = authClient.useSession();
 	const {
 		data: profileData,
@@ -77,8 +77,8 @@ const ProfileSettings = () => {
 	});
 
 	const { formState, handleSubmit, control, setError, clearErrors, reset } =
-		useForm<z.infer<typeof FormSchema>>({
-			resolver: zodResolver(FormSchema),
+		useForm<z.infer<typeof profileSettingsSchema>>({
+			resolver: zodResolver(profileSettingsSchema),
 			mode: "onTouched",
 			reValidateMode: "onChange",
 			defaultValues: { username: "", displayName: "", bio: "", pronouns: "" },
@@ -169,7 +169,9 @@ const ProfileSettings = () => {
 		}
 	}, 500);
 
-	const handleFormSubmit = async (formData: z.infer<typeof FormSchema>) => {
+	const handleFormSubmit = async (
+		formData: z.infer<typeof profileSettingsSchema>
+	) => {
 		if (usernameError || isUsernameAvailable.isPending) return;
 
 		const trimmedBio = formData.bio.trim();
@@ -476,4 +478,4 @@ const ProfileSettings = () => {
 	);
 };
 
-export default ProfileSettings;
+export default Page;

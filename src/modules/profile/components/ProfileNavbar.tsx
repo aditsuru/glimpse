@@ -7,10 +7,14 @@ import { cn } from "@/lib/client/utils";
 type ProfileNavbarProps = {
 	username: string;
 	userId: string;
-	viewerId: string;
+	viewerUserId: string;
 };
 
-const ProfileNavbar = ({ username, userId, viewerId }: ProfileNavbarProps) => {
+const ProfileNavbar = ({
+	username,
+	userId,
+	viewerUserId,
+}: ProfileNavbarProps) => {
 	const pathname = usePathname();
 
 	const tabs = [
@@ -18,7 +22,7 @@ const ProfileNavbar = ({ username, userId, viewerId }: ProfileNavbarProps) => {
 		{ label: "Comments", href: `/${username}/comments` },
 	];
 
-	if (viewerId === userId)
+	if (viewerUserId === userId)
 		tabs.push({ label: "Likes", href: `/${username}/likes` });
 
 	return (

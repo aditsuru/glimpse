@@ -28,10 +28,10 @@ import type { getCommentOutput } from "../comment.schema";
 
 interface CommentCardProps {
 	data: z.infer<typeof getCommentOutput>;
-	viewerId: string;
+	viewerUserId: string;
 }
 
-const CommentCard = ({ data, viewerId }: CommentCardProps) => {
+const CommentCard = ({ data, viewerUserId }: CommentCardProps) => {
 	return (
 		<div className="w-full h-full py-2 p-4 flex gap-3 items-start">
 			<div className="flex flex-col items-center self-stretch">
@@ -69,7 +69,7 @@ const CommentCard = ({ data, viewerId }: CommentCardProps) => {
 					</div>
 					<DropdownMenuSubmenu
 						postId={data.id}
-						viewerUserId={viewerId}
+						viewerUserId={viewerUserId}
 						authorId={data.author.id}
 						commentId={data.id}
 					/>

@@ -1,34 +1,34 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1777970303056,
-      "tag": "0000_dark_slapstick",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1778313329061,
-      "tag": "0001_nasty_felicia_hardy",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1778337331672,
-      "tag": "0002_misty_thunderbolt_ross",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1778380545640,
-      "tag": "0003_gray_doomsday",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1777970303056,
+			"tag": "0000_dark_slapstick",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1778313329061,
+			"tag": "0001_nasty_felicia_hardy",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1778337331672,
+			"tag": "0002_misty_thunderbolt_ross",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1778380545640,
+			"tag": "0003_gray_doomsday",
+			"breakpoints": true
+		}
+	]
 }

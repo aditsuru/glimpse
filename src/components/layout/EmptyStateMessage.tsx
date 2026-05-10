@@ -1,13 +1,17 @@
 import { Ghost } from "lucide-react";
 import type React from "react";
 
-interface EmptyStateMessage {
+interface EmptyStateMessageProps {
 	title: string;
 	description?: string;
 	Icon?: React.ElementType;
 }
 
-const EmptyStateMessage = ({ title, description, Icon }: EmptyStateMessage) => {
+const EmptyStateMessage = ({
+	title,
+	description,
+	Icon,
+}: EmptyStateMessageProps) => {
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
 			{Icon ? <Icon className="size-12" /> : <Ghost className="size-12" />}

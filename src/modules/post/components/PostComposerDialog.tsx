@@ -11,7 +11,7 @@ import { useMediaStore } from "@/store/use-media-store";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
 import PostComposer from "./PostComposer";
 
-export default function PostComposerDialog() {
+export const PostComposerDialog = () => {
 	const { isOpen, close } = usePostComposerStore();
 
 	useEffect(() => {
@@ -31,4 +31,4 @@ export default function PostComposerDialog() {
 			</DialogContent>
 		</Dialog>
 	);
-}
+};

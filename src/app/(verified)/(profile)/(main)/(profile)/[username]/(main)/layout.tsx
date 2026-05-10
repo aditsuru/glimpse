@@ -26,7 +26,7 @@ const Layout = async ({
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
 			<ProfileProvider username={username}>
-				<ProfileLayout username={username} viewerId={user.id}>
+				<ProfileLayout username={username} viewerUserId={user.id}>
 					{children}
 				</ProfileLayout>
 			</ProfileProvider>

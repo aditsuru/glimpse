@@ -25,7 +25,7 @@ import { config } from "@/lib/shared/config";
 import { LOCAL_STORAGE_KEYS } from "@/lib/shared/constants";
 import OAuth from "../OAuth";
 
-const FormSchema = z
+const signUpSchema = z
 	.object({
 		email: z.email("Email must be valid"),
 		password: z
@@ -42,8 +42,8 @@ const FormSchema = z
 		path: ["confirmPassword"],
 	});
 
-const SignUp = () => {
-	const pageRouter = useRouter();
+const Page = () => {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -52,14 +52,14 @@ const SignUp = () => {
 		if (errorParam) {
 			toast.error("Authentication failed. Please try again.");
 
-			pageRouter.replace("/sign-up");
+			router.replace("/sign-up");
 		}
-	}, [searchParams, pageRouter]);
+	}, [searchParams, router]);
 
 	const { formState, handleSubmit, control, setError, clearErrors } = useForm<
-		z.infer<typeof FormSchema>
+		z.infer<typeof signUpSchema>
 	>({
-		resolver: zodResolver(FormSchema),
+		resolver: zodResolver(signUpSchema),
 		mode: "onTouched",
 		reValidateMode: "onChange",
 		defaultValues: {
@@ -69,7 +69,7 @@ const SignUp = () => {
 		},
 	});
 
-	const handleFormSubmit = async (formData: z.infer<typeof FormSchema>) => {
+	const handleFormSubmit = async (formData: z.infer<typeof signUpSchema>) => {
 		const { error, data } = await authClient.signUp.email({
 			email: formData.email,
 			password: formData.password,
@@ -87,10 +87,10 @@ const SignUp = () => {
 				LOCAL_STORAGE_KEYS.VERIFY_EMAIL_COOLDOWN,
 				(Date.now() + config.NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT).toString()
 			);
-			pageRouter.push("/verify-email?sent=true");
+			router.push("/verify-email?sent=true");
 			return;
 		}
-		pageRouter.push("/onboarding");
+		router.push("/onboarding");
 	};
 
 	return (
@@ -240,4 +240,4 @@ const SignUp = () => {
 	);
 };
 
-export default SignUp;
+export default Page;

@@ -19,7 +19,7 @@ type MobileNavbarProps = {
 	userId: string;
 };
 
-const MobileNav = ({ userId }: MobileNavbarProps) => {
+const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 	const pathname = usePathname();
 	const { open: openPostComposer } = usePostComposerStore();
 
@@ -58,4 +58,4 @@ const MobileNav = ({ userId }: MobileNavbarProps) => {
 	);
 };
 
-export default MobileNav;
+export default MobileNavbar;

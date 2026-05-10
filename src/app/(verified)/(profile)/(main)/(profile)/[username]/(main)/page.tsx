@@ -13,7 +13,7 @@ const Page = () => {
 	return (
 		<UserPostFeed
 			username={username}
-			viewerId={session?.user.id ?? ""}
+			viewerUserId={session?.user.id ?? ""}
 			userId={data?.userId ?? ""}
 		/>
 	);

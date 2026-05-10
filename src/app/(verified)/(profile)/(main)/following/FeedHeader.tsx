@@ -9,8 +9,8 @@ const FeedHeader = () => {
 	const pathname = usePathname();
 
 	const tabs = [
-		{ label: "For You", href: `/` },
-		{ label: "Trending", href: `/trending` },
+		{ label: "Trending", href: `/` },
+		{ label: "Following", href: `/following` },
 	];
 
 	return (

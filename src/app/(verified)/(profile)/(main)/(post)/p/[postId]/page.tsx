@@ -17,7 +17,7 @@ const Page = async ({ params }: { params: Promise<{ postId: string }> }) => {
 	);
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
-			<PostPage postId={postId} viewerId={user.id} />
+			<PostPage postId={postId} viewerUserId={user.id} />
 		</HydrationBoundary>
 	);
 };

@@ -28,8 +28,8 @@ import { authClient } from "@/lib/client/auth-client";
 import { config } from "@/lib/shared/config";
 import { LOCAL_STORAGE_KEYS } from "@/lib/shared/constants";
 
-const VerifyEmail = () => {
-	const pageRouter = useRouter();
+const Page = () => {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { data: session, isPending } = authClient.useSession();
 	const [isLoading, setIsLoading] = useState(false);
@@ -41,9 +41,9 @@ const VerifyEmail = () => {
 	useEffect(() => {
 		if (searchParams.get("sent") === "true") {
 			toast.success("A verification link has been sent to your email.");
-			pageRouter.replace("/verify-email");
+			router.replace("/verify-email");
 		}
-	}, [pageRouter.replace, searchParams.get]);
+	}, [router.replace, searchParams.get]);
 
 	const handleResend = async () => {
 		if (!session?.user.email) return;
@@ -66,7 +66,7 @@ const VerifyEmail = () => {
 
 	const handleSignOut = async () => {
 		await authClient.signOut();
-		pageRouter.push("/sign-in");
+		router.push("/sign-in");
 	};
 
 	if (isPending) return null;
@@ -128,4 +128,4 @@ const VerifyEmail = () => {
 	);
 };
 
-export default VerifyEmail;
+export default Page;

@@ -23,15 +23,15 @@ import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import OAuth from "../OAuth";
 
-const FormSchema = z.object({
+const signInSchema = z.object({
 	email: z.email("Email must be valid"),
 	password: z
 		.string({ error: "Password is required" })
 		.nonempty("Password is required"),
 });
 
-const SignIn = () => {
-	const pageRouter = useRouter();
+const Page = () => {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -40,14 +40,14 @@ const SignIn = () => {
 		if (errorParam) {
 			toast.error("Authentication failed. Please try again.");
 
-			pageRouter.replace("/sign-in");
+			router.replace("/sign-in");
 		}
-	}, [searchParams, pageRouter]);
+	}, [searchParams, router]);
 
 	const { formState, handleSubmit, control, setError, clearErrors } = useForm<
-		z.infer<typeof FormSchema>
+		z.infer<typeof signInSchema>
 	>({
-		resolver: zodResolver(FormSchema),
+		resolver: zodResolver(signInSchema),
 		mode: "onTouched",
 		reValidateMode: "onChange",
 		defaultValues: {
@@ -56,7 +56,7 @@ const SignIn = () => {
 		},
 	});
 
-	const handleFormSubmit = async (formData: z.infer<typeof FormSchema>) => {
+	const handleFormSubmit = async (formData: z.infer<typeof signInSchema>) => {
 		const { error, data } = await authClient.signIn.email({
 			email: formData.email,
 			password: formData.password,
@@ -72,10 +72,10 @@ const SignIn = () => {
 		setIsRedirecting(true);
 
 		if (!data.user.emailVerified) {
-			pageRouter.push("/verify-email");
+			router.push("/verify-email");
 			return;
 		}
-		pageRouter.push("/");
+		router.push("/");
 	};
 
 	return (
@@ -214,4 +214,4 @@ const SignIn = () => {
 	);
 };
 
-export default SignIn;
+export default Page;

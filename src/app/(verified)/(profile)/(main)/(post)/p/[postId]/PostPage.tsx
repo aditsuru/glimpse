@@ -12,10 +12,10 @@ import { usePost } from "@/modules/post/post.queries";
 
 const PostPage = ({
 	postId,
-	viewerId,
+	viewerUserId,
 }: {
 	postId: string;
-	viewerId: string;
+	viewerUserId: string;
 }) => {
 	const { data, error, isLoading } = usePost(postId);
 
@@ -34,7 +34,7 @@ const PostPage = ({
 			<div className="flex-1">
 				<PostCard
 					data={data}
-					viewerUserId={viewerId}
+					viewerUserId={viewerUserId}
 					leftMargin={false}
 					profileRow
 					separator
@@ -43,8 +43,8 @@ const PostPage = ({
 					<Separator />
 				</div>
 
-				<CommentComposer viewerUserId={viewerId} postId={postId} />
-				<PostComments viewerId={viewerId} postId={postId} />
+				<CommentComposer viewerUserId={viewerUserId} postId={postId} />
+				<PostComments viewerUserId={viewerUserId} postId={postId} />
 			</div>
 		</div>
 	);

@@ -11,7 +11,7 @@ import {
 	useRemoveFollow,
 	useSendFollow,
 } from "@/modules/follow/follow.queries";
-import { useDialogStore } from "@/store/use-unfollow-confirm-store";
+import { useUnfollowConfirmStore } from "@/store/use-unfollow-confirm-store";
 
 interface FollowButtonProps {
 	className?: string;
@@ -28,7 +28,9 @@ const FollowButton = ({
 	initialStatus,
 	targetVisibility,
 }: FollowButtonProps) => {
-	const openDialog = useDialogStore((state) => state.openUnfollowDialog);
+	const openDialog = useUnfollowConfirmStore(
+		(state) => state.openUnfollowDialog
+	);
 	const { data: session } = authClient.useSession();
 	const viewerUserId = session?.user.id ?? "";
 

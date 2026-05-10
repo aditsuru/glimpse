@@ -2,7 +2,7 @@ import * as z from "zod";
 import { postSelectSchema } from "@/db/schema";
 import { ALLOWED_MIME_TYPES } from "@/lib/shared/constants";
 
-export const AttachmentSchema = z.object({
+export const attachmentSchema = z.object({
 	mimeType: z.enum(ALLOWED_MIME_TYPES.attachment),
 	attachmentKey: z.string(),
 });
@@ -18,11 +18,13 @@ const postAuthorSchema = z.object({
 export const getPostOutput = postSelectSchema.extend({
 	author: postAuthorSchema,
 	attachments: z.array(
-		AttachmentSchema.omit({
-			attachmentKey: true,
-		}).extend({
-			url: z.string(),
-		})
+		attachmentSchema
+			.omit({
+				attachmentKey: true,
+			})
+			.extend({
+				url: z.string(),
+			})
 	),
 	likesCount: z.number(),
 	isLikedByUser: z.boolean(),
@@ -61,7 +63,7 @@ export const postSchema = {
 	create: {
 		input: z.object({
 			body: z.string().optional(),
-			attachments: z.array(AttachmentSchema).optional(),
+			attachments: z.array(attachmentSchema).optional(),
 			spoiler: z.boolean(),
 		}),
 		output: z.object({

@@ -23,12 +23,12 @@ import { cn } from "@/lib/client/utils";
 import { config } from "@/lib/shared/config";
 import { LOCAL_STORAGE_KEYS } from "@/lib/shared/constants";
 
-const FormSchema = z.object({
+const forgotPasswordSchema = z.object({
 	email: z.email("Enter a valid email"),
 });
 
-const ForgotPassword = () => {
-	const pageRouter = useRouter();
+const Page = () => {
+	const router = useRouter();
 	const [email, setEmail] = React.useState("");
 	const [error, setError] = React.useState<string | null>(null);
 	const [isLoading, setIsLoading] = React.useState(false);
@@ -39,7 +39,7 @@ const ForgotPassword = () => {
 
 	const handleSubmit = async (e: React.ChangeEvent) => {
 		e.preventDefault();
-		const result = FormSchema.safeParse({ email });
+		const result = forgotPasswordSchema.safeParse({ email });
 		if (!result.success) {
 			setError(result.error.issues[0].message);
 			return;
@@ -73,7 +73,7 @@ const ForgotPassword = () => {
 						<Button
 							variant="link"
 							className="px-0!"
-							onClick={() => pageRouter.push("/sign-in")}
+							onClick={() => router.push("/sign-in")}
 							disabled={isLoading}
 						>
 							<ChevronLeft />
@@ -110,7 +110,7 @@ const ForgotPassword = () => {
 									setError(null);
 								}}
 								onBlur={() => {
-									const result = FormSchema.safeParse({ email });
+									const result = forgotPasswordSchema.safeParse({ email });
 									if (!result.success) setError(result.error.issues[0].message);
 								}}
 								autoComplete="email"
@@ -142,4 +142,4 @@ const ForgotPassword = () => {
 	);
 };
 
-export default ForgotPassword;
+export default Page;

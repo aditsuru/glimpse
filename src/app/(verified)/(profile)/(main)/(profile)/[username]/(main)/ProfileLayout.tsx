@@ -12,11 +12,11 @@ import { useProfile } from "@/modules/profile/profile.queries";
 
 const ProfileLayout = ({
 	username,
-	viewerId,
+	viewerUserId,
 	children,
 }: {
 	username: string;
-	viewerId: string;
+	viewerUserId: string;
 	children: React.ReactNode;
 }) => {
 	const { data, isLoading, error } = useProfile({ username });
@@ -41,14 +41,14 @@ const ProfileLayout = ({
 			<MobileProfileHeader
 				title={username}
 				className="sm:hidden"
-				showMenu={data.userId === viewerId}
+				showMenu={data.userId === viewerUserId}
 			/>
 			<div className="flex-1 flex flex-col">
-				<Profile data={data} viewerId={viewerId} />
+				<Profile data={data} viewerUserId={viewerUserId} />
 				<ProfileNavbar
 					username={username}
 					userId={data.userId}
-					viewerId={viewerId}
+					viewerUserId={viewerUserId}
 				/>
 				<div className="flex-1">{children}</div>
 			</div>

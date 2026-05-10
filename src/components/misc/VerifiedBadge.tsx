@@ -1,4 +1,3 @@
-// components/ui/VerifiedBadge.tsx
 import { cn } from "@/lib/client/utils";
 
 export function VerifiedBadge({

@@ -8,7 +8,7 @@ import { usePendingSent } from "@/modules/follow/follow.queries";
 import ProfileCard from "@/modules/profile/components/ProfileCard";
 import RequestsHeader from "../RequestsHeader";
 
-const SentPage = () => {
+const Page = () => {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingSent();
 	const { data: sessionData } = authClient.useSession();
 
@@ -46,4 +46,4 @@ const SentPage = () => {
 	);
 };
 
-export default SentPage;
+export default Page;

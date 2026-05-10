@@ -14,7 +14,7 @@ import FollowButton from "@/modules/follow/components/FollowButton";
 import ProfileCard from "@/modules/profile/components/ProfileCard";
 import { useSearchProfiles } from "@/modules/profile/profile.queries";
 
-const Explore = () => {
+const Page = () => {
 	const [inputValue, setInputValue] = useState("");
 	const [searchQuery, setSearchQuery] = useState("");
 
@@ -85,4 +85,4 @@ const Explore = () => {
 	);
 };
 
-export default Explore;
+export default Page;

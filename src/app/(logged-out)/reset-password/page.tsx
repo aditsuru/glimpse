@@ -27,7 +27,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 
-const FormSchema = z
+const resetPasswordSchema = z
 	.object({
 		password: z
 			.string({ error: "Password is required" })
@@ -43,8 +43,8 @@ const FormSchema = z
 		path: ["confirmPassword"],
 	});
 
-const ResetPassword = () => {
-	const pageRouter = useRouter();
+const Page = () => {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
 	const [isRedirecting, setIsRedirecting] = useState(false);
@@ -52,14 +52,14 @@ const ResetPassword = () => {
 	useEffect(() => {
 		if (!token) {
 			toast.error("Invalid or missing reset token.");
-			pageRouter.replace("/forgot-password");
+			router.replace("/forgot-password");
 		}
-	}, [token, pageRouter]);
+	}, [token, router]);
 
 	const { formState, handleSubmit, control, setError, clearErrors } = useForm<
-		z.infer<typeof FormSchema>
+		z.infer<typeof resetPasswordSchema>
 	>({
-		resolver: zodResolver(FormSchema),
+		resolver: zodResolver(resetPasswordSchema),
 		mode: "onTouched",
 		reValidateMode: "onChange",
 		defaultValues: {
@@ -68,7 +68,9 @@ const ResetPassword = () => {
 		},
 	});
 
-	const handleFormSubmit = async (formData: z.infer<typeof FormSchema>) => {
+	const handleFormSubmit = async (
+		formData: z.infer<typeof resetPasswordSchema>
+	) => {
 		if (!token) return;
 
 		const { error } = await authClient.resetPassword({
@@ -85,7 +87,7 @@ const ResetPassword = () => {
 
 		setIsRedirecting(true);
 		toast.success("Password updated successfully! You can now sign in.");
-		pageRouter.push("/sign-in");
+		router.push("/sign-in");
 	};
 
 	if (!token) return null;
@@ -202,4 +204,4 @@ const ResetPassword = () => {
 	);
 };
 
-export default ResetPassword;
+export default Page;

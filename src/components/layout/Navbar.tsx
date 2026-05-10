@@ -16,7 +16,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useOnboardingTooltip } from "@/hooks/useOnboardingComplete";
+import { useOnboardingTooltip } from "@/hooks/useOnboardingTooltip";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import { SIDEBAR_GIFS } from "@/lib/shared/static-files";
@@ -56,7 +56,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 	const pathname = usePathname();
 	const router = useRouter();
 
-	const issidebarGifGalleryEnabled = useSettingsStore(
+	const isSidebarGifGalleryEnabled = useSettingsStore(
 		(state) => state.isSidebarGifGalleryEnabled
 	);
 	const { open: openPostComposer } = usePostComposerStore();
@@ -84,12 +84,12 @@ const Navbar = ({ userId }: NavbarProps) => {
 		setCurrentIndex(Math.floor(Math.random() * SIDEBAR_GIFS.length));
 
 		const interval = setInterval(() => {
-			if (!issidebarGifGalleryEnabled) return;
+			if (!isSidebarGifGalleryEnabled) return;
 			setCurrentIndex((i) => (i + 1) % SIDEBAR_GIFS.length);
 		}, 15000);
 
 		return () => clearInterval(interval);
-	}, [issidebarGifGalleryEnabled]);
+	}, [isSidebarGifGalleryEnabled]);
 
 	const gifUrl = SIDEBAR_GIFS[currentIndex];
 
@@ -100,7 +100,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 
 	return (
 		<nav className="w-full h-full px-8 grid xl:grid-cols-2 xl:gap-8">
-			{issidebarGifGalleryEnabled && (
+			{isSidebarGifGalleryEnabled && (
 				<div className="col-span-1 border-x-4 border-[#6c6c6c] w-full h-full overflow-hidden relative max-xl:hidden">
 					<Image
 						src={gifUrl}
@@ -127,7 +127,6 @@ const Navbar = ({ userId }: NavbarProps) => {
 				{/* Nav Items */}
 				{navItems.map(({ label, href, icon: Icon }) => {
 					const isActive = pathname === href;
-					href = label === "Profile" ? `/${data?.username || ""}` : href;
 
 					const resolvedHref =
 						label === "Profile" ? `/${data?.username || ""}` : href;
@@ -144,7 +143,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 								<TooltipTrigger
 									render={
 										<Link
-											href={href}
+											href={resolvedHref}
 											onMouseEnter={onHoverStart}
 											onMouseLeave={onHoverEnd}
 											onFocus={onHoverStart}
@@ -172,7 +171,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 						return (
 							<Link
 								key={label}
-								href={href}
+								href={resolvedHref}
 								className={cn(
 									"flex items-center gap-4 px-[14px] py-3 rounded-full text-xl transition-colors hover:bg-accent w-full",
 									{ "font-bold": isActive }
@@ -194,7 +193,7 @@ const Navbar = ({ userId }: NavbarProps) => {
 					return (
 						<Link
 							key={label}
-							href={href}
+							href={resolvedHref}
 							className={cn(
 								"flex items-center gap-4 px-3 py-3 rounded-full text-xl transition-colors hover:bg-accent w-full",
 								{ "font-bold": isActive }

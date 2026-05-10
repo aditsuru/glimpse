@@ -23,7 +23,7 @@ import {
 } from "@/modules/profile/profile.queries";
 import { useSettingsStore } from "@/store/use-settings-store";
 
-const Settings = () => {
+const Page = () => {
 	const { data: sessionData } = authClient.useSession();
 	const { data: profileData } = useProfile({ userId: sessionData?.user.id });
 	const updateVisibility = useUpdateVisibility({
@@ -163,4 +163,4 @@ const Settings = () => {
 	);
 };
 
-export default Settings;
+export default Page;

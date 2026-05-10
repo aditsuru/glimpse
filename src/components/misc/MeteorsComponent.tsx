@@ -4,9 +4,9 @@ import { useSettingsStore } from "@/store/use-settings-store";
 import { Meteors } from "../ui/meteors";
 
 const MeteorsComponent = () => {
-	const isMeteorsEnabeld = useSettingsStore((state) => state.isMeteorsEnabled);
+	const isMeteorsEnabled = useSettingsStore((state) => state.isMeteorsEnabled);
 
-	if (!isMeteorsEnabeld) return null;
+	if (!isMeteorsEnabled) return null;
 
 	return <Meteors className="-z-20" />;
 };

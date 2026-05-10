@@ -12,7 +12,7 @@ import {
 import ProfileCard from "@/modules/profile/components/ProfileCard";
 import RequestsHeader from "../RequestsHeader";
 
-const ReceivedPage = () => {
+const Page = () => {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingReceived();
 	const { data: sessionData } = authClient.useSession();
 	const rejectRequest = useRejectRequest();
@@ -67,4 +67,4 @@ const ReceivedPage = () => {
 	);
 };
 
-export default ReceivedPage;
+export default Page;

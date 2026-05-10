@@ -14,10 +14,10 @@ import type { profileSchema } from "../profile.schema";
 
 interface ProfileProps {
 	data: z.infer<typeof profileSchema.get.output>;
-	viewerId: string;
+	viewerUserId: string;
 }
 
-const Profile = ({ data, viewerId }: ProfileProps) => {
+const Profile = ({ data, viewerUserId }: ProfileProps) => {
 	return (
 		<div className="w-full">
 			<div className="relative">
@@ -38,7 +38,7 @@ const Profile = ({ data, viewerId }: ProfileProps) => {
 						<AvatarImage src={data.avatarUrl ?? DEFAULT_PFP_URL} />
 					</Avatar>
 				</div>
-				{viewerId === data.userId && (
+				{viewerUserId === data.userId && (
 					<Button
 						variant="outline-ring"
 						nativeButton={false}
@@ -48,7 +48,7 @@ const Profile = ({ data, viewerId }: ProfileProps) => {
 						Edit Profile
 					</Button>
 				)}
-				{viewerId !== data.userId && (
+				{viewerUserId !== data.userId && (
 					<FollowButton
 						targetUserId={data.userId}
 						targetUsername={data.username}

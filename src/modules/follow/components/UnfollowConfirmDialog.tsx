@@ -9,11 +9,15 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { useDialogStore } from "@/store/use-unfollow-confirm-store";
+import { useUnfollowConfirmStore } from "@/store/use-unfollow-confirm-store";
 
 const UnfollowConfirmDialog = () => {
-	const unfollowDialogState = useDialogStore((state) => state.unfollowDialog);
-	const closeDialog = useDialogStore((state) => state.closeUnfollowDialog);
+	const unfollowDialogState = useUnfollowConfirmStore(
+		(state) => state.unfollowDialog
+	);
+	const closeDialog = useUnfollowConfirmStore(
+		(state) => state.closeUnfollowDialog
+	);
 
 	const handleConfirm = () => {
 		unfollowDialogState.onConfirm();

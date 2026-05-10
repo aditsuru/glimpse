@@ -37,7 +37,7 @@ import {
 } from "@/lib/shared/constants";
 import BookmarkButton from "@/modules/bookmark/components/BookmarkButton";
 import CommentButton from "@/modules/comment/components/CommentButton";
-import PostLikeButton from "@/modules/postLike/components/PostLikeButton";
+import PostLikeButton from "@/modules/post-like/components/PostLikeButton";
 import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
 import { useDelete, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";

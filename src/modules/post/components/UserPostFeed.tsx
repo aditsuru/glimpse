@@ -9,11 +9,11 @@ import PostCard from "./PostCard";
 const UserPostFeed = ({
 	username,
 	userId,
-	viewerId,
+	viewerUserId,
 }: {
 	username: string;
 	userId: string;
-	viewerId: string;
+	viewerUserId: string;
 }) => {
 	const { data: sessionData } = authClient.useSession();
 	const { data, fetchNextPage, hasNextPage, isFetching, error } =
@@ -43,7 +43,7 @@ const UserPostFeed = ({
 				<EmptyStateMessage
 					title="No posts yet"
 					description={
-						userId === viewerId
+						userId === viewerUserId
 							? `You haven't posted anything yet`
 							: `${username} hasn't posted anything yet`
 					}

@@ -1,5 +1,3 @@
-"use client";
-
 import FeedPage from "./FeedPage";
 
 function Page() {
