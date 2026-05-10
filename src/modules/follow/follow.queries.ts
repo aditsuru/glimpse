@@ -338,14 +338,17 @@ export function useRejectRequest() {
 
 export function useFollowStatus(
 	input: { targetUserId: string },
-	enabled = true
+	initialStatus?: ViewerFollowStatus
 ) {
-	return useQuery(
-		orpc.follow.getStatus.queryOptions({
+	return useQuery({
+		...orpc.follow.getStatus.queryOptions({
 			input,
-			enabled,
-		})
-	);
+		}),
+		...(initialStatus !== undefined && {
+			initialData: { status: initialStatus },
+			staleTime: Infinity,
+		}),
+	});
 }
 
 export function useFollowers(userId: string) {

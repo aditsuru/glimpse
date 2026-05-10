@@ -4,6 +4,9 @@ import { ORPCError } from "@orpc/client";
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import ErrorMessage from "@/components/layout/ErrorMessage";
 import PageHeader from "@/components/layout/PageHeader";
+import { Separator } from "@/components/ui/separator";
+import CommentComposer from "@/modules/comment/components/CommentComposer";
+import PostComments from "@/modules/comment/components/PostComments";
 import PostCard from "@/modules/post/components/PostCard";
 import { usePost } from "@/modules/post/post.queries";
 
@@ -35,8 +38,13 @@ const PostPage = ({
 					leftMargin={false}
 					profileRow
 					separator
-					className="border-b"
 				/>
+				<div className="px-8">
+					<Separator />
+				</div>
+
+				<CommentComposer viewerUserId={viewerId} postId={postId} />
+				<PostComments viewerId={viewerId} postId={postId} />
 			</div>
 		</div>
 	);

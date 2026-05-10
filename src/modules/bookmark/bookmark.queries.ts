@@ -114,11 +114,18 @@ export function useGetBookmarkedPosts() {
 	);
 }
 
-export function useGetBookmark(postId: string, enabled: boolean) {
-	return useQuery(
-		orpc.bookmark.get.queryOptions({
+export function useGetBookmark(
+	postId: string,
+	initialData: {
+		count: number;
+		isBookmarkedByUser: boolean;
+	}
+) {
+	return useQuery({
+		...orpc.bookmark.get.queryOptions({
 			input: { postId },
-			enabled,
-		})
-	);
+		}),
+		staleTime: Infinity,
+		initialData,
+	});
 }

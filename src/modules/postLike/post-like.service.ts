@@ -6,6 +6,7 @@ import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { attachmentsTable, postsTable, profilesTable } from "@/db/schema";
 import { bookmarksTable } from "@/db/schema/bookmarks";
+import { commentsTable } from "@/db/schema/comments";
 import { postLikesTable } from "@/db/schema/post-likes";
 import { getPostViewsBatch } from "@/lib/server/redis-utils";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
@@ -82,6 +83,10 @@ export class PostLikeService {
 					WHERE ${bookmarksTable.postId} = ${postsTable.id}
 					AND ${bookmarksTable.userId} = ${this.userId}
 				)`,
+				commentsCount: this.db.$count(
+					commentsTable,
+					eq(postsTable.id, commentsTable.postId)
+				),
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
@@ -94,8 +99,8 @@ export class PostLikeService {
 				)
 			)
 			.where(cursor ? lt(postsTable.createdAt, cursor) : undefined)
-			.groupBy(postsTable.id, profilesTable.id)
-			.orderBy(desc(postsTable.createdAt))
+			.groupBy(postsTable.id, profilesTable.id, postLikesTable.createdAt)
+			.orderBy(desc(postLikesTable.createdAt))
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
 		const hasNext = posts.length > config.POSTS_PAGINATION_LIMIT;

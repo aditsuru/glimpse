@@ -114,11 +114,18 @@ export function useGetLikedPosts() {
 	);
 }
 
-export function useGetPostLike(postId: string, enabled: boolean) {
-	return useQuery(
-		orpc.postLike.get.queryOptions({
+export function useGetPostLike(
+	postId: string,
+	initialData: {
+		count: number;
+		isLikedByUser: boolean;
+	}
+) {
+	return useQuery({
+		...orpc.postLike.get.queryOptions({
 			input: { postId },
-			enabled,
-		})
-	);
+		}),
+		staleTime: Infinity,
+		initialData,
+	});
 }

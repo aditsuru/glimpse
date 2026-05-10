@@ -32,12 +32,9 @@ const FollowButton = ({
 	const { data: session } = authClient.useSession();
 	const viewerUserId = session?.user.id ?? "";
 
-	const { data, isLoading } = useFollowStatus(
-		{ targetUserId },
-		initialStatus === undefined
-	);
+	const { data, isLoading } = useFollowStatus({ targetUserId }, initialStatus);
 
-	const status = data?.status ?? initialStatus ?? "none";
+	const status = data?.status ?? "none";
 
 	const sendFollow = useSendFollow({
 		viewerUserId,

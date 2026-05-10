@@ -29,6 +29,8 @@ export const getPostOutput = postSelectSchema.extend({
 
 	bookmarksCount: z.number(),
 	isBookmarkedByUser: z.boolean(),
+
+	commentsCount: z.number(),
 });
 
 export const getPostListOutput = z.object({

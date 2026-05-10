@@ -21,18 +21,22 @@ const BookmarkButton = ({
 	initialState,
 	postId,
 }: BookmarkButtonProps) => {
-	const { data } = useGetBookmark(postId, initialState === undefined);
+	const { data } = useGetBookmark(postId, {
+		count: initialCount,
+		isBookmarkedByUser: initialState,
+	});
 	const addBookmark = useAddBookmark();
 	const removeBookmark = useRemoveBookmark();
 
 	const isBookmarkedByUser = data?.isBookmarkedByUser ?? initialCount;
-	const count = data?.count ?? initialCount;
+	const count = data.count;
 	const formattedCount = count === 0 ? "" : formatNumber.format(count);
 
 	return (
 		<Button
 			variant="ghost"
-			className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! hover:text-primary"
+			className="flex gap-1 text-muted-foreground/80 text-xs items-center rounded-2xl hover:bg-transparent! hover:text-primary"
+			title="Bookmark"
 			onClick={() => {
 				if (isBookmarkedByUser) removeBookmark.mutate({ postId });
 				else addBookmark.mutate({ postId });

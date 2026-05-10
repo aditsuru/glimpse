@@ -10,6 +10,7 @@ import {
 	profilesTable,
 } from "@/db/schema";
 import { bookmarksTable } from "@/db/schema/bookmarks";
+import { commentsTable } from "@/db/schema/comments";
 import { postLikesTable } from "@/db/schema/post-likes";
 import { viewHistoryTable } from "@/db/schema/view-history";
 import { customNanoid } from "@/lib/server/helpers";
@@ -237,6 +238,10 @@ export class PostService {
 					WHERE ${bookmarksTable.postId} = ${postsTable.id}
 					AND ${bookmarksTable.userId} = ${this.userId}
 				)`,
+				commentsCount: this.db.$count(
+					commentsTable,
+					eq(postsTable.id, commentsTable.postId)
+				),
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
@@ -369,6 +374,10 @@ export class PostService {
 					WHERE ${bookmarksTable.postId} = ${postsTable.id}
 					AND ${bookmarksTable.userId} = ${this.userId}
 				)`,
+				commentsCount: this.db.$count(
+					commentsTable,
+					eq(postsTable.id, commentsTable.postId)
+				),
 			})
 			.from(postsTable)
 			.leftJoin(attachmentsTable, eq(postsTable.id, attachmentsTable.postId))
@@ -480,6 +489,10 @@ export class PostService {
 					WHERE ${bookmarksTable.postId} = ${postsTable.id}
 					AND ${bookmarksTable.userId} = ${this.userId}
 				)`,
+				commentsCount: this.db.$count(
+					commentsTable,
+					eq(postsTable.id, commentsTable.postId)
+				),
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
@@ -495,12 +508,14 @@ export class PostService {
 			.where(cursor ? lt(postsTable.createdAt, cursor) : undefined)
 			.groupBy(postsTable.id, profilesTable.id)
 			.orderBy(
-				seenPostIds.length > 0
-					? sql`CASE WHEN ${postsTable.id} = ANY(ARRAY[${sql.join(
-							seenPostIds.map((id) => sql`${id}`),
-							sql`, `
-						)}]) THEN 1 ELSE 0 END`
-					: sql`0`,
+				...(seenPostIds.length > 0
+					? [
+							sql`CASE WHEN ${postsTable.id} = ANY(ARRAY[${sql.join(
+								seenPostIds.map((id) => sql`${id}`),
+								sql`, `
+							)}]) THEN 1 ELSE 0 END`,
+						]
+					: []),
 				desc(postsTable.createdAt)
 			)
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);

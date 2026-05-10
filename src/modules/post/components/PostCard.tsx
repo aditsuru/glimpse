@@ -2,13 +2,7 @@
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: these divs are not interactive */
 "use client";
 
-import {
-	Bookmark,
-	ChartLine,
-	Ellipsis,
-	MessageCircle,
-	Share,
-} from "lucide-react";
+import { ChartLine, Ellipsis, Share } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -42,6 +36,7 @@ import {
 	isVideo,
 } from "@/lib/shared/constants";
 import BookmarkButton from "@/modules/bookmark/components/BookmarkButton";
+import CommentButton from "@/modules/comment/components/CommentButton";
 import PostLikeButton from "@/modules/postLike/components/PostLikeButton";
 import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
 import { useDelete, useMarkPostSeen } from "../post.queries";
@@ -76,7 +71,7 @@ const PostCard = ({
 
 	return (
 		<div
-			className={cn("p-4 flex flex-col", className)}
+			className={cn("p-4 py-2 flex flex-col", className)}
 			role="button"
 			tabIndex={0}
 			onClick={() => router.push(`/p/${data.id}`)}
@@ -184,12 +179,16 @@ const PostCard = ({
 				)}
 			</div>
 
-			{separator && <Separator className="mt-8" />}
+			{separator && (
+				<div className="px-4">
+					<Separator className="mt-4" />
+				</div>
+			)}
 			{/* Toolbar */}
 			<div
-				className={cn("mt-3 flex justify-between", {
+				className={cn("mt-1 flex justify-between", {
 					"md:pl-14": leftMargin,
-					"mt-2 -mb-2": separator,
+					"px-4": separator,
 				})}
 				onClick={(e) => e.stopPropagation()}
 				onKeyDown={(e) => e.stopPropagation()}
@@ -200,17 +199,12 @@ const PostCard = ({
 					initialState={data.isLikedByUser}
 				/>
 
-				<Button
-					variant="ghost"
-					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
-				>
-					<MessageCircle className="size-4.5" />
-					<p className="min-w-8 text-left">12k</p>
-				</Button>
+				<CommentButton postId={data.id} initialCount={data.commentsCount} />
 
 				<Button
 					variant="ghost"
-					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! hover:text-muted-foreground!"
+					className="flex gap-1 text-muted-foreground/80 text-xs items-center rounded-2xl hover:bg-transparent! hover:text-red-500"
+					title="Views"
 				>
 					<ChartLine className="size-4.5" />
 					<span className="tabular-nums min-w-8 text-left">
@@ -226,7 +220,8 @@ const PostCard = ({
 
 				<Button
 					variant="ghost"
-					className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+					className="flex gap-1 text-muted-foreground/80 text-sm items-center rounded-2xl hover:bg-transparent!"
+					title="Share"
 					onClick={() => {
 						navigator.clipboard.writeText(
 							`${config.NEXT_PUBLIC_APP_URL}/p/${data.id}`

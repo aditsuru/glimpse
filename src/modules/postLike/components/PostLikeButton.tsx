@@ -21,7 +21,10 @@ const PostLikeButton = ({
 	initialState,
 	postId,
 }: PostLikeButtonProps) => {
-	const { data } = useGetPostLike(postId, initialState === undefined);
+	const { data } = useGetPostLike(postId, {
+		count: initialCount,
+		isLikedByUser: initialState,
+	});
 	const addPostLike = useAddPostLike();
 	const removePostLike = useRemovePostLike();
 
@@ -32,7 +35,8 @@ const PostLikeButton = ({
 	return (
 		<Button
 			variant="ghost"
-			className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! hover:text-pink-500"
+			className="flex gap-1 text-muted-foreground/80 text-xs items-center rounded-2xl hover:bg-transparent! hover:text-pink-500"
+			title="Like"
 			onClick={() => {
 				if (isLikedByUser) removePostLike.mutate({ postId });
 				else addPostLike.mutate({ postId });
