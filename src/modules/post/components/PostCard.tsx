@@ -71,7 +71,7 @@ const PostCard = ({
 
 	return (
 		<div
-			className={cn("p-4 py-2 flex flex-col", className)}
+			className={cn("p-4 py-2 pt-4 flex flex-col", className)}
 			role="button"
 			tabIndex={0}
 			onClick={() => router.push(`/p/${data.id}`)}

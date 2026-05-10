@@ -44,7 +44,9 @@ const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 				return (
 					<Link key={href} href={href}>
 						<Icon
-							className={cn("size-7", { "stroke-[2.5px]": pathname === href })}
+							className={cn("size-7", {
+								"stroke-[2.5px] fill-current": pathname === href,
+							})}
 						/>
 					</Link>
 				);

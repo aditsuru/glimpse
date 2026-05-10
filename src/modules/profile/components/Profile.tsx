@@ -99,7 +99,7 @@ const ProfileSkeleton = () => {
 		<div className="w-full">
 			<div className="relative">
 				<AspectRatio ratio={3 / 1}>
-					<Skeleton className="w-full h-full" />
+					<Skeleton className="w-full h-full mt-18" />
 				</AspectRatio>
 				<div className="px-4">
 					<Skeleton className="absolute -translate-y-1/2 size-30 rounded-full ring-4 ring-background" />

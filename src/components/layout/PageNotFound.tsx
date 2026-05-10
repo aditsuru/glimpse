@@ -13,9 +13,9 @@ function PageNotFound() {
 					to home.
 				</p>
 			</div>
-			<Button className="rounded-lg text-base">
-				<Link href="/">Back to home page</Link>
-			</Button>
+			<Link href="/">
+				<Button className="rounded-lg text-base">Back to home page</Button>
+			</Link>
 		</div>
 	);
 }

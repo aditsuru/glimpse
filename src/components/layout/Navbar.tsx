@@ -126,10 +126,10 @@ const Navbar = ({ userId }: NavbarProps) => {
 
 				{/* Nav Items */}
 				{navItems.map(({ label, href, icon: Icon }) => {
-					const isActive = pathname === href;
-
 					const resolvedHref =
 						label === "Profile" ? `/${data?.username || ""}` : href;
+
+					const isActive = pathname === resolvedHref;
 
 					if (resolvedHref === "/settings") {
 						return (
