@@ -10,7 +10,7 @@ import { orpc } from "@/lib/client/orpc-client";
  * Side effects:
  * - Invalidate on settle: post.GetAllByUser[username]
  */
-export function useCreate({ viewerUserId }: { viewerUserId: string }) {
+export function useCreatePost({ viewerUserId }: { viewerUserId: string }) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -38,7 +38,7 @@ export function useCreate({ viewerUserId }: { viewerUserId: string }) {
  * Side effects:
  * - Invalidate on settle: post.GetAllByUser[username], post.get[postId]
  */
-export function useDelete({ viewerUserId }: { viewerUserId: string }) {
+export function useDeletePost({ viewerUserId }: { viewerUserId: string }) {
 	const queryClient = useQueryClient();
 
 	return useMutation({

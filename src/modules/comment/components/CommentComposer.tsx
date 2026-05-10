@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/client/utils";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import { useProfile } from "@/modules/profile/profile.queries";
-import { useCreate } from "../comment.queries";
+import { useCreateComment } from "../comment.queries";
 
 interface CommentComposerProps {
 	viewerUserId: string;
@@ -18,7 +18,7 @@ interface CommentComposerProps {
 
 const CommentComposer = ({ viewerUserId, postId }: CommentComposerProps) => {
 	const { data: profile } = useProfile({ userId: viewerUserId });
-	const createComment = useCreate(postId);
+	const createComment = useCreateComment(postId);
 
 	const [body, setBody] = useState("");
 	const [isLoading, setIsLoading] = useState(false);

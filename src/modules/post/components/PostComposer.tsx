@@ -22,7 +22,7 @@ import {
 	MAX_POST_BODY_LENGTH,
 } from "@/lib/shared/constants";
 import { useProfile } from "@/modules/profile/profile.queries";
-import { useCreate, useGetAttachmentPresignedUrl } from "../post.queries";
+import { useCreatePost, useGetAttachmentPresignedUrl } from "../post.queries";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -102,7 +102,7 @@ function CharRing({ count, max }: { count: number; max: number }) {
 const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 	const { data: session } = authClient.useSession();
 	const { data: profile } = useProfile({ userId: session?.user.id ?? "" });
-	const createPost = useCreate({ viewerUserId: session?.user.id ?? "" });
+	const createPost = useCreatePost({ viewerUserId: session?.user.id ?? "" });
 	const getAttachmentPresignedUrl = useGetAttachmentPresignedUrl();
 
 	const router = useRouter();

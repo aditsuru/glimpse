@@ -39,7 +39,7 @@ import BookmarkButton from "@/modules/bookmark/components/BookmarkButton";
 import CommentButton from "@/modules/comment/components/CommentButton";
 import PostLikeButton from "@/modules/post-like/components/PostLikeButton";
 import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
-import { useDelete, useMarkPostSeen } from "../post.queries";
+import { useDeletePost, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";
 
 interface PostCardProps {
@@ -245,7 +245,7 @@ function DropdownMenuSubmenu({
 	authorId: string;
 	viewerUserId: string;
 }) {
-	const deletePost = useDelete({ viewerUserId });
+	const deletePost = useDeletePost({ viewerUserId });
 
 	const handleDelete = () => {
 		deletePost.mutate({

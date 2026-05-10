@@ -37,7 +37,7 @@ export function useGetPostComments(
  * Side effects:
  * - Invalidate on settle: comment.getCount[postId], comment.getPostComments[postId]
  */
-export function useCreate(postId: string) {
+export function useCreateComment(postId: string) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -61,7 +61,7 @@ export function useCreate(postId: string) {
  * Side effects:
  * - Invalidate on settle: comment.getCount[postId], comment.getPostComments[postId]
  */
-export function useDelete({ postId }: { postId: string }) {
+export function useDeleteComment({ postId }: { postId: string }) {
 	const queryClient = useQueryClient();
 
 	return useMutation({

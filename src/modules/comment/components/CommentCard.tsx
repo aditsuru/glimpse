@@ -23,7 +23,7 @@ import { formatPostDate } from "@/lib/client/helpers";
 import { config } from "@/lib/shared/config";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
-import { useDelete } from "../comment.queries";
+import { useDeleteComment } from "../comment.queries";
 import type { getCommentOutput } from "../comment.schema";
 
 interface CommentCardProps {
@@ -119,7 +119,7 @@ function DropdownMenuSubmenu({
 	authorId: string;
 	viewerUserId: string;
 }) {
-	const deletePost = useDelete({ postId });
+	const deletePost = useDeleteComment({ postId });
 
 	const handleDelete = () => {
 		deletePost.mutate({
