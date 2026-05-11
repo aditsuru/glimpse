@@ -68,7 +68,7 @@ export const PostCard = ({
 				postId: data.id,
 			}),
 	});
-
+	data.author.isGlimpseVerified = true;
 	return (
 		<div
 			className={cn("p-4 py-2 pt-4 flex flex-col", className)}
@@ -96,24 +96,26 @@ export const PostCard = ({
 							onClick={(e) => e.stopPropagation()}
 							onKeyDown={(e) => e.stopPropagation()}
 						>
-							<HoverCard>
-								<HoverCardTrigger
-									delay={300}
-									render={
-										<Link href={`/${data.author.username}`}>
-											<p className="hover:underline hover:underline-offset-4">
-												{data.author.displayName}
-											</p>
-										</Link>
-									}
-								/>
-								<HoverCardContent className="w-xs rounded-xl bg-background">
-									<HoverProfileCard username={data.author.username} />
-								</HoverCardContent>
-							</HoverCard>
-							{data.author.isGlimpseVerified && (
-								<VerifiedBadge className="size-4.5" />
-							)}
+							<div className="flex gap-1 items-center">
+								<HoverCard>
+									<HoverCardTrigger
+										delay={300}
+										render={
+											<Link href={`/${data.author.username}`}>
+												<p className="hover:underline hover:underline-offset-4">
+													{data.author.displayName}
+												</p>
+											</Link>
+										}
+									/>
+									<HoverCardContent className="w-xs rounded-xl bg-background">
+										<HoverProfileCard username={data.author.username} />
+									</HoverCardContent>
+								</HoverCard>
+								{data.author.isGlimpseVerified && (
+									<VerifiedBadge className="size-4.5" />
+								)}
+							</div>
 							<p className="text-muted-foreground text-sm">
 								{`@${data.author.username} · ${formatPostDate(data.createdAt)}`}
 							</p>
