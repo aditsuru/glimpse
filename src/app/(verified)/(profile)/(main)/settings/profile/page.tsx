@@ -230,7 +230,7 @@ const Page = () => {
 	const isAnythingUploading = isAvatarUploading || isBannerUploading;
 
 	return (
-		<div className="w-full h-full overflow-y-auto no-scrollbar">
+		<main className="w-full h-full overflow-y-auto no-scrollbar">
 			<PageHeader title="Edit Profile" />
 			<div className="relative">
 				{/* Banner */}
@@ -474,7 +474,7 @@ const Page = () => {
 					</FieldGroup>
 				</fieldset>
 			</form>
-		</div>
+		</main>
 	);
 };
 

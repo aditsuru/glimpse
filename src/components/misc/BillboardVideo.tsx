@@ -59,20 +59,22 @@ export function BillboardVideo({
 	};
 
 	return (
-		<video
-			key={videoKey}
-			src={currentSrc}
-			autoPlay
-			muted
-			playsInline
-			onEnded={handleEnded}
-			style={{
-				width: "100%",
-				height: "100%",
-				objectFit: "cover",
-				objectPosition: "center",
-				display: "block",
-			}}
-		/>
+		<figure aria-label="Billboard video">
+			<video
+				key={videoKey}
+				src={currentSrc}
+				autoPlay
+				muted
+				playsInline
+				onEnded={handleEnded}
+				style={{
+					width: "100%",
+					height: "100%",
+					objectFit: "cover",
+					objectPosition: "center",
+					display: "block",
+				}}
+			/>
+		</figure>
 	);
 }

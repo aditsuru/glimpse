@@ -27,7 +27,7 @@ const RequestsHeader = () => {
 				</Button>
 				<h1 className="text-xl font-bold">Follow Requests</h1>
 			</div>
-			<div className="flex w-full">
+			<nav aria-label="Requests navigation" className="flex w-full">
 				{tabs.map(({ label, href }) => {
 					const active = pathname === href;
 					return (
@@ -46,7 +46,7 @@ const RequestsHeader = () => {
 						</Link>
 					);
 				})}
-			</div>
+			</nav>
 		</div>
 	);
 };

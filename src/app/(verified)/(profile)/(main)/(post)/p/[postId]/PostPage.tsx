@@ -5,6 +5,7 @@ import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
 import ErrorMessage from "@/components/layout/ErrorMessage";
 import PageHeader from "@/components/layout/PageHeader";
 import { Separator } from "@/components/ui/separator";
+import { ScrollContainer } from "@/components/VideoPlayer";
 import CommentComposer from "@/modules/comment/components/CommentComposer";
 import PostComments from "@/modules/comment/components/PostComments";
 import PostCard from "@/modules/post/components/PostCard";
@@ -29,7 +30,7 @@ const PostPage = ({
 	if (!data || isLoading) return;
 
 	return (
-		<div className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
+		<ScrollContainer className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
 			<PageHeader title="Post" />
 			<div className="flex-1">
 				<PostCard
@@ -46,7 +47,7 @@ const PostPage = ({
 				<CommentComposer viewerUserId={viewerUserId} postId={postId} />
 				<PostComments viewerUserId={viewerUserId} postId={postId} />
 			</div>
-		</div>
+		</ScrollContainer>
 	);
 };
 

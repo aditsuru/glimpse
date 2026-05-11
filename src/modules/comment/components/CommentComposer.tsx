@@ -40,46 +40,44 @@ const CommentComposer = ({ viewerUserId, postId }: CommentComposerProps) => {
 	};
 
 	return (
-		<div>
-			<form
-				onSubmit={handleSubmit}
-				className="flex items-start p-4 border-b gap-1"
+		<form
+			onSubmit={handleSubmit}
+			className="flex items-start p-4 border-b gap-1"
+		>
+			<Avatar
+				size="lg"
+				className={cn({
+					"brightness-70": isLoading,
+				})}
 			>
-				<Avatar
-					size="lg"
-					className={cn({
-						"brightness-70": isLoading,
-					})}
-				>
-					<AvatarImage src={profile?.avatarUrl ?? DEFAULT_PFP_URL} />
-				</Avatar>
+				<AvatarImage src={profile?.avatarUrl ?? DEFAULT_PFP_URL} />
+			</Avatar>
 
-				<label htmlFor="comment-body" className="sr-only">
-					Comment content
-				</label>
+			<label htmlFor="comment-body" className="sr-only">
+				Comment content
+			</label>
 
-				<Textarea
-					id="comment-body"
-					placeholder="Post your reply"
-					className={
-						"resize-none min-h-[20px] max-h-40 overflow-y-auto text-lg! border-none shadow-none focus-visible:ring-0 bg-transparent! -mt-1"
-					}
-					value={body}
-					onChange={(e) => {
-						setBody(e.target.value);
-					}}
-					disabled={isLoading}
-				/>
-				<Button
-					type="submit"
-					size="sm"
-					disabled={isLoading}
-					className="rounded-full px-5"
-				>
-					{isLoading ? "Replying..." : "Reply"}
-				</Button>
-			</form>
-		</div>
+			<Textarea
+				id="comment-body"
+				placeholder="Post your reply"
+				className={
+					"resize-none min-h-[20px] max-h-40 overflow-y-auto text-lg! border-none shadow-none focus-visible:ring-0 bg-transparent! -mt-1"
+				}
+				value={body}
+				onChange={(e) => {
+					setBody(e.target.value);
+				}}
+				disabled={isLoading}
+			/>
+			<Button
+				type="submit"
+				size="sm"
+				disabled={isLoading}
+				className="rounded-full px-5"
+			>
+				{isLoading ? "Replying..." : "Reply"}
+			</Button>
+		</form>
 	);
 };
 

@@ -17,7 +17,7 @@ const SecondarySidebar = () => {
 	);
 
 	return (
-		<div className="w-full h-full px-20">
+		<aside className="w-full h-full px-20">
 			{isBillboardEnabled && (
 				<Billboard frameSrc={BILLBOARD_FRAME}>
 					<BillboardVideo
@@ -26,7 +26,7 @@ const SecondarySidebar = () => {
 					/>
 				</Billboard>
 			)}
-		</div>
+		</aside>
 	);
 };
 

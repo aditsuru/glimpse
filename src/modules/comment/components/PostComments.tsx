@@ -26,7 +26,7 @@ const PostComments = ({
 	return (
 		<div>
 			{comments.map((comment) => (
-				<div key={comment.id} className="border-b border-accent w-full h-full">
+				<div key={comment.id} className="border-b border-accent">
 					<CommentCard data={comment} viewerUserId={viewerUserId} />
 				</div>
 			))}

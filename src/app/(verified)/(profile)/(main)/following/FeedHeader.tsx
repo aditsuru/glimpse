@@ -15,7 +15,7 @@ const FeedHeader = () => {
 
 	return (
 		<div className="flex flex-col sticky top-0 bg-background/80 backdrop-blur-sm z-10 border-b border-accent justify-end">
-			<div className="flex w-full items-center">
+			<nav aria-label="Feed navigation" className="flex w-full items-center">
 				{tabs.map(({ label, href }) => {
 					const active = pathname === href;
 					return (
@@ -34,7 +34,7 @@ const FeedHeader = () => {
 						</Link>
 					);
 				})}
-			</div>
+			</nav>
 		</div>
 	);
 };

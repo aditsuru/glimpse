@@ -1,6 +1,7 @@
 "use client";
 
 import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
 import PostCard from "@/modules/post/components/PostCard";
@@ -15,7 +16,7 @@ const BookmarkFeed = () => {
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
 
 	return (
-		<div className="w-full h-full">
+		<ScrollContainer className="w-full h-full">
 			{posts.map((post) => (
 				<div key={post.id} className="border-b border-accent">
 					<PostCard data={post} viewerUserId={sessionData?.user.id || ""} />
@@ -28,7 +29,7 @@ const BookmarkFeed = () => {
 					description="You haven't bookmarked anything yet"
 				/>
 			)}
-		</div>
+		</ScrollContainer>
 	);
 };
 
