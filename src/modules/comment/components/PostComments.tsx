@@ -34,7 +34,7 @@ export const PostComments = ({ postId, viewerUserId }: PostCommentsProps) => {
 				<div className="flex-1 mt-20 md:mt-10 mb-4">
 					<EmptyStateMessage
 						title="No comments yet"
-						description="Be the first to comment"
+						description="Start the conversation"
 					/>
 				</div>
 			)}

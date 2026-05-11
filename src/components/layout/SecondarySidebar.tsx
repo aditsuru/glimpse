@@ -9,7 +9,6 @@ import { BillboardVideo } from "../misc/BillboardVideo";
 export const SecondarySidebar = () => {
 	const hardcodedTrendingVideos = [
 		"attachment/ANiZSxOWCskW7XRynbsruqjap0bvftLP/JPj7yJW21pYvRdLdmoBuK",
-		"attachment/ANiZSxOWCskW7XRynbsruqjap0bvftLP/rPUKF7Vo9MGXhKydUsrXc",
 	].map((i) => `${config.NEXT_PUBLIC_R2_PUBLIC_URL}/${i}`);
 
 	const isBillboardEnabled = useSettingsStore(

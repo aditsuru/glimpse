@@ -13,7 +13,7 @@ export const s3 = new S3Client(
 					accessKeyId: config.R2_ACCESS_KEY_ID,
 					secretAccessKey: config.R2_SECRET_ACCESS_KEY,
 				},
-				forcePathStyle: true, // required for MinIO
+				forcePathStyle: true,
 			}
 		: // Staging/Prod — Cloudflare R2
 			{
@@ -23,5 +23,6 @@ export const s3 = new S3Client(
 					accessKeyId: config.R2_ACCESS_KEY_ID,
 					secretAccessKey: config.R2_SECRET_ACCESS_KEY,
 				},
+				forcePathStyle: true,
 			}
 );
