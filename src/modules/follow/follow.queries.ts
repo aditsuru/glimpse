@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
 import type { ViewerFollowStatus } from "@/lib/server/helpers";
+import { useViewerStore } from "@/store/use-viewer-store";
 
 /**
  * Side effects:
@@ -15,15 +16,14 @@ import type { ViewerFollowStatus } from "@/lib/server/helpers";
  */
 
 export function useSendFollow({
-	viewerUserId,
 	targetUsername,
 	targetVisibility = "public",
 }: {
-	viewerUserId: string;
 	targetUsername: string;
 	targetVisibility?: "public" | "private";
 }) {
 	const queryClient = useQueryClient();
+	const viewerData = useViewerStore.getState();
 
 	return useMutation({
 		...orpc.follow.send.mutationOptions(),
@@ -56,11 +56,6 @@ export function useSendFollow({
 			}
 		},
 		onSettled: async (_data, _err, { targetUserId }) => {
-			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
-				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
-					.queryKey
-			)?.username;
-
 			const wasAccepted = targetVisibility === "public";
 
 			const refetches: Promise<unknown>[] = [
@@ -92,15 +87,14 @@ export function useSendFollow({
 						queryKey: orpc.follow.getFollowers.key(),
 					})
 				);
-				if (viewerUsername) {
-					refetches.push(
-						queryClient.invalidateQueries({
-							queryKey: orpc.profile.get.queryOptions({
-								input: { username: viewerUsername },
-							}).queryKey,
-						})
-					);
-				}
+
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.profile.get.queryOptions({
+							input: { username: viewerData.username },
+						}).queryKey,
+					})
+				);
 			} else {
 				refetches.push(
 					queryClient.invalidateQueries({
@@ -121,13 +115,12 @@ export function useSendFollow({
  */
 
 export function useRemoveFollow({
-	viewerUserId,
 	targetUsername,
 }: {
-	viewerUserId: string;
 	targetUsername: string;
 }) {
 	const queryClient = useQueryClient();
+	const viewerData = useViewerStore.getState();
 
 	return useMutation({
 		...orpc.follow.remove.mutationOptions(),
@@ -158,11 +151,6 @@ export function useRemoveFollow({
 			});
 		},
 		onSettled: async (_data, _err, { targetUserId }, context) => {
-			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
-				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
-					.queryKey
-			)?.username;
-
 			const previousStatus = context?.previousStatus ?? "none";
 			const wasAccepted =
 				previousStatus === "accepted" || previousStatus === "mutual";
@@ -196,15 +184,14 @@ export function useRemoveFollow({
 						queryKey: orpc.follow.getFollowers.key(),
 					})
 				);
-				if (viewerUsername) {
-					refetches.push(
-						queryClient.invalidateQueries({
-							queryKey: orpc.profile.get.queryOptions({
-								input: { username: viewerUsername },
-							}).queryKey,
-						})
-					);
-				}
+
+				refetches.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.profile.get.queryOptions({
+							input: { username: viewerData.username },
+						}).queryKey,
+					})
+				);
 			} else {
 				refetches.push(
 					queryClient.invalidateQueries({
@@ -222,17 +209,13 @@ export function useRemoveFollow({
  * Side effects:
  * - Invalidate on settle: profile.get[username:viewer], follow.getFollowers, follow.getStatus[followerId], profile.search
  */
-export function useRemoveFollower({ viewerUserId }: { viewerUserId: string }) {
+export function useRemoveFollower() {
 	const queryClient = useQueryClient();
+	const viewerData = useViewerStore.getState();
 
 	return useMutation({
 		...orpc.follow.removeFollower.mutationOptions(),
 		onSettled: async (_data, _err, { followerId }) => {
-			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
-				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
-					.queryKey
-			)?.username;
-
 			const refetches: Promise<unknown>[] = [
 				queryClient.invalidateQueries({
 					queryKey: orpc.follow.getStatus.queryOptions({
@@ -245,15 +228,13 @@ export function useRemoveFollower({ viewerUserId }: { viewerUserId: string }) {
 				}),
 			];
 
-			if (viewerUsername) {
-				refetches.push(
-					queryClient.invalidateQueries({
-						queryKey: orpc.profile.get.queryOptions({
-							input: { username: viewerUsername },
-						}).queryKey,
-					})
-				);
-			}
+			refetches.push(
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({
+						input: { username: viewerData.username },
+					}).queryKey,
+				})
+			);
 
 			await Promise.all(refetches);
 		},
@@ -264,17 +245,13 @@ export function useRemoveFollower({ viewerUserId }: { viewerUserId: string }) {
  * Side effects:
  * - Invalidate on settle: profile.get[username:viewer], follow.getPendingReceived, follow.getFollowers, follow.getStatus[followerId], profile.search
  */
-export function useAcceptRequest({ viewerUserId }: { viewerUserId: string }) {
+export function useAcceptRequest() {
 	const queryClient = useQueryClient();
+	const viewerData = useViewerStore.getState();
 
 	return useMutation({
 		...orpc.follow.accept.mutationOptions(),
 		onSettled: async (_data, _err, { followerId }) => {
-			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
-				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
-					.queryKey
-			)?.username;
-
 			const refetches: Promise<unknown>[] = [
 				queryClient.invalidateQueries({
 					queryKey: orpc.follow.getStatus.queryOptions({
@@ -293,15 +270,13 @@ export function useAcceptRequest({ viewerUserId }: { viewerUserId: string }) {
 				}),
 			];
 
-			if (viewerUsername) {
-				refetches.push(
-					queryClient.invalidateQueries({
-						queryKey: orpc.profile.get.queryOptions({
-							input: { username: viewerUsername },
-						}).queryKey,
-					})
-				);
-			}
+			refetches.push(
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({
+						input: { username: viewerData.username },
+					}).queryKey,
+				})
+			);
 
 			await Promise.all(refetches);
 		},

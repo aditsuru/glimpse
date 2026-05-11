@@ -3,26 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/client/utils";
+import { useViewerStore } from "@/store/use-viewer-store";
 
 type ProfileNavbarProps = {
 	username: string;
 	userId: string;
-	viewerUserId: string;
 };
 
-export const ProfileNavbar = ({
-	username,
-	userId,
-	viewerUserId,
-}: ProfileNavbarProps) => {
+export const ProfileNavbar = ({ username, userId }: ProfileNavbarProps) => {
 	const pathname = usePathname();
+	const viewerData = useViewerStore.getState();
 
 	const tabs = [
 		{ label: "Posts", href: `/${username}` },
 		{ label: "Comments", href: `/${username}/comments` },
 	];
 
-	if (viewerUserId === userId)
+	if (viewerData.userId === userId)
 		tabs.push({ label: "Likes", href: `/${username}/likes` });
 
 	return (

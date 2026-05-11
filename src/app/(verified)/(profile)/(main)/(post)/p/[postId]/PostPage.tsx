@@ -13,10 +13,9 @@ import { usePost } from "@/modules/post/post.queries";
 
 interface PostPageProps {
 	postId: string;
-	viewerUserId: string;
 }
 
-export const PostPage = ({ postId, viewerUserId }: PostPageProps) => {
+export const PostPage = ({ postId }: PostPageProps) => {
 	const { data, error, isLoading } = usePost(postId);
 
 	if (error) {
@@ -32,19 +31,13 @@ export const PostPage = ({ postId, viewerUserId }: PostPageProps) => {
 		<ScrollContainer className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
 			<PageHeader title="Post" />
 			<div className="flex-1">
-				<PostCard
-					data={data}
-					viewerUserId={viewerUserId}
-					leftMargin={false}
-					profileRow
-					separator
-				/>
+				<PostCard data={data} leftMargin={false} profileRow separator />
 				<div className="px-8">
 					<Separator />
 				</div>
 
-				<CommentComposer viewerUserId={viewerUserId} postId={postId} />
-				<PostComments viewerUserId={viewerUserId} postId={postId} />
+				<CommentComposer postId={postId} />
+				<PostComments postId={postId} />
 			</div>
 		</ScrollContainer>
 	);

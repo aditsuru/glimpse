@@ -3,7 +3,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import type { ViewerFollowStatus } from "@/lib/server/helpers";
 import {
@@ -31,19 +30,16 @@ export const FollowButton = ({
 	const openDialog = useUnfollowConfirmStore(
 		(state) => state.openUnfollowDialog
 	);
-	const { data: session } = authClient.useSession();
-	const viewerUserId = session?.user.id ?? "";
 
 	const { data, isLoading } = useFollowStatus({ targetUserId }, initialStatus);
 
 	const status = data?.status ?? "none";
 
 	const sendFollow = useSendFollow({
-		viewerUserId,
 		targetUsername,
 		targetVisibility,
 	});
-	const removeFollow = useRemoveFollow({ viewerUserId, targetUsername });
+	const removeFollow = useRemoveFollow({ targetUsername });
 
 	const handleClick = () => {
 		if (

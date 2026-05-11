@@ -4,7 +4,6 @@ import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { authClient } from "@/lib/client/auth-client";
 import {
 	useAcceptRequest,
 	usePendingReceived,
@@ -15,11 +14,9 @@ import { RequestsHeader } from "../RequestsHeader";
 
 export default function Page() {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingReceived();
-	const { data: sessionData } = authClient.useSession();
+
 	const rejectRequest = useRejectRequest();
-	const acceptRequest = useAcceptRequest({
-		viewerUserId: sessionData?.user.id ?? "",
-	});
+	const acceptRequest = useAcceptRequest();
 	const disabledCondition = rejectRequest.isPending || acceptRequest.isPending;
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
@@ -27,7 +24,7 @@ export default function Page() {
 
 	return (
 		<main className="w-full h-full">
-			<ScrollContainer className="overflow-y-auto no-scrollbar flex flex-col">
+			<ScrollContainer className="overflow-y-auto no-scrollbar flex flex-col w-full h-full">
 				<RequestsHeader />
 				<div className="flex-1">
 					{profiles.map((profile) => (

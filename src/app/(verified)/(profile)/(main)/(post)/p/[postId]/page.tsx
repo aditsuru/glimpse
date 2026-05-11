@@ -4,7 +4,6 @@ import {
 	QueryClient,
 } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
-import { getRequiredSession } from "@/lib/server/auth-utils";
 import { PostPage } from "./PostPage";
 
 export default async function Page({
@@ -13,7 +12,6 @@ export default async function Page({
 	params: Promise<{ postId: string }>;
 }) {
 	const { postId } = await params;
-	const { user } = await getRequiredSession();
 
 	const queryClient = new QueryClient();
 	await queryClient.prefetchQuery(
@@ -21,7 +19,7 @@ export default async function Page({
 	);
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
-			<PostPage postId={postId} viewerUserId={user.id} />
+			<PostPage postId={postId} />
 		</HydrationBoundary>
 	);
 }

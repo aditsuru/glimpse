@@ -7,10 +7,10 @@ import { ErrorMessage } from "@/components/layout/ErrorMessage";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import { FollowButton } from "@/modules/follow/components/FollowButton";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { useProfile } from "../profile.queries";
 
 interface HoverProfileCardProps {
@@ -23,7 +23,8 @@ export const HoverProfileCard = ({
 	username,
 }: HoverProfileCardProps) => {
 	const { data, isLoading, error } = useProfile({ username });
-	const { data: sessionData } = authClient.useSession();
+	const viewerData = useViewerStore.getState();
+
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {
 			return (
@@ -45,7 +46,7 @@ export const HoverProfileCard = ({
 					<Avatar className="size-15">
 						<AvatarImage src={data.avatarUrl || DEFAULT_PFP_URL} />
 					</Avatar>
-					{data.userId !== sessionData?.user.id && (
+					{data.userId !== viewerData.userId && (
 						<FollowButton
 							targetUserId={data.userId}
 							targetUsername={data.username}

@@ -4,7 +4,6 @@ import {
 	QueryClient,
 } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
-import { getRequiredSession } from "@/lib/server/auth-utils";
 import { ProfileProvider } from "./ProfileContext";
 import { ProfileLayout } from "./ProfileLayout";
 
@@ -16,7 +15,6 @@ const Layout = async ({
 	children: React.ReactNode;
 }) => {
 	const { username } = await params;
-	const { user } = await getRequiredSession();
 
 	const queryClient = new QueryClient();
 	await queryClient.prefetchQuery(
@@ -26,9 +24,7 @@ const Layout = async ({
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
 			<ProfileProvider username={username}>
-				<ProfileLayout username={username} viewerUserId={user.id}>
-					{children}
-				</ProfileLayout>
+				<ProfileLayout username={username}>{children}</ProfileLayout>
 			</ProfileProvider>
 		</HydrationBoundary>
 	);

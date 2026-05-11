@@ -9,7 +9,6 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { VideoPlayer } from "@/components/VideoPlayer";
-import { authClient } from "@/lib/client/auth-client";
 import { uploadToS3 } from "@/lib/client/upload-utils";
 import { cn } from "@/lib/client/utils";
 import {
@@ -23,6 +22,7 @@ import {
 } from "@/lib/shared/constants";
 import { useProfile } from "@/modules/profile/profile.queries";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { useCreatePost, useGetAttachmentPresignedUrl } from "../post.queries";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -105,9 +105,10 @@ interface PostComposerProps {
 }
 
 export const PostComposer = ({ onSuccess }: PostComposerProps) => {
-	const { data: session } = authClient.useSession();
-	const { data: profile } = useProfile({ userId: session?.user.id ?? "" });
-	const createPost = useCreatePost({ username: profile?.username ?? "" });
+	const viewerData = useViewerStore.getState();
+
+	const { data: profile } = useProfile({ userId: viewerData.userId });
+	const createPost = useCreatePost();
 	const getAttachmentPresignedUrl = useGetAttachmentPresignedUrl();
 
 	const router = useRouter();

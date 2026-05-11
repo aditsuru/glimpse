@@ -10,14 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_PFP_URL, isGif } from "@/lib/shared/constants";
 import { FollowButton } from "@/modules/follow/components/FollowButton";
+import { useViewerStore } from "@/store/use-viewer-store";
 import type { profileSchema } from "../profile.schema";
 
 interface ProfileProps {
 	data: z.infer<typeof profileSchema.get.output>;
-	viewerUserId: string;
 }
 
-export const Profile = ({ data, viewerUserId }: ProfileProps) => {
+export const Profile = ({ data }: ProfileProps) => {
+	const viewerData = useViewerStore.getState();
+
 	return (
 		<div className="w-full">
 			<div className="relative">
@@ -38,7 +40,7 @@ export const Profile = ({ data, viewerUserId }: ProfileProps) => {
 						<AvatarImage src={data.avatarUrl ?? DEFAULT_PFP_URL} />
 					</Avatar>
 				</div>
-				{viewerUserId === data.userId && (
+				{viewerData.userId === data.userId && (
 					<Button
 						variant="outline-ring"
 						nativeButton={false}
@@ -48,7 +50,7 @@ export const Profile = ({ data, viewerUserId }: ProfileProps) => {
 						Edit Profile
 					</Button>
 				)}
-				{viewerUserId !== data.userId && (
+				{viewerData.userId !== data.userId && (
 					<FollowButton
 						targetUserId={data.userId}
 						targetUsername={data.username}

@@ -9,16 +9,16 @@ import {
 	InputGroupInput,
 } from "@/components/ui/input-group";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { authClient } from "@/lib/client/auth-client";
 import { FollowButton } from "@/modules/follow/components/FollowButton";
 import { ProfileCard } from "@/modules/profile/components/ProfileCard";
 import { useSearchProfiles } from "@/modules/profile/profile.queries";
+import { useViewerStore } from "@/store/use-viewer-store";
 
 export default function Page() {
 	const [inputValue, setInputValue] = useState("");
 	const [searchQuery, setSearchQuery] = useState("");
 
-	const { data: sessionData } = authClient.useSession();
+	const viewerData = useViewerStore.getState();
 	const { data, fetchNextPage, hasNextPage, isFetching } =
 		useSearchProfiles(searchQuery);
 
@@ -61,7 +61,7 @@ export default function Page() {
 					>
 						<ProfileCard data={profile} />
 
-						{profile.userId !== sessionData?.user.id && (
+						{profile.userId !== viewerData.userId && (
 							<FollowButton
 								initialStatus={profile.viewerStatus}
 								targetUserId={profile.userId}
