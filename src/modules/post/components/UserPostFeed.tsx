@@ -2,22 +2,17 @@ import { ORPCError } from "@orpc/client";
 import { Lock } from "lucide-react";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { authClient } from "@/lib/client/auth-client";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { useGetAllByUser } from "../post.queries";
 import { PostCard } from "./PostCard";
 
 interface UserPostFeedProps {
 	username: string;
 	userId: string;
-	viewerUserId: string;
 }
 
-export const UserPostFeed = ({
-	username,
-	userId,
-	viewerUserId,
-}: UserPostFeedProps) => {
-	const { data: sessionData } = authClient.useSession();
+export const UserPostFeed = ({ username, userId }: UserPostFeedProps) => {
+	const viewerData = useViewerStore((state) => state);
 	const { data, fetchNextPage, hasNextPage, isFetching, error } =
 		useGetAllByUser(username);
 
@@ -37,7 +32,7 @@ export const UserPostFeed = ({
 		<div className="w-full h-full">
 			{posts.map((post) => (
 				<div key={post.id} className="border-b border-accent">
-					<PostCard data={post} viewerUserId={sessionData?.user.id || ""} />
+					<PostCard data={post} />
 				</div>
 			))}
 			{hasNextPage && <div ref={ref} className="h-1" />}
@@ -45,7 +40,7 @@ export const UserPostFeed = ({
 				<EmptyStateMessage
 					title="No posts yet"
 					description={
-						userId === viewerUserId
+						userId === viewerData.userId
 							? `You haven't posted anything yet`
 							: `${username} hasn't posted anything yet`
 					}

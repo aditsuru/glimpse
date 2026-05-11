@@ -11,7 +11,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { authClient } from "@/lib/client/auth-client";
 import { FollowButton } from "@/modules/follow/components/FollowButton";
 import {
 	useFollowers,
@@ -19,13 +18,15 @@ import {
 } from "@/modules/follow/follow.queries";
 import { ProfileCard } from "@/modules/profile/components/ProfileCard";
 import { useProfile } from "@/modules/profile/profile.queries";
+import { useViewerStore } from "@/store/use-viewer-store";
 
 interface FollowersPageProps {
 	username: string;
 }
 
 export const FollowersPage = ({ username }: FollowersPageProps) => {
-	const { data: sessionData } = authClient.useSession();
+	const viewerData = useViewerStore((state) => state);
+
 	const { data: profileData } = useProfile({ username });
 	const { data, fetchNextPage, hasNextPage, isFetching } = useFollowers(
 		profileData?.userId ?? ""
@@ -44,7 +45,7 @@ export const FollowersPage = ({ username }: FollowersPageProps) => {
 					>
 						<ProfileCard data={profile} />
 
-						{profile.userId !== sessionData?.user.id && (
+						{profile.userId !== viewerData.userId && (
 							<FollowButton
 								initialStatus={profile.viewerStatus}
 								targetUserId={profile.userId}
@@ -53,12 +54,9 @@ export const FollowersPage = ({ username }: FollowersPageProps) => {
 								className="mr-4"
 							/>
 						)}
-						{profileData?.userId === sessionData?.user.id &&
-							profile.userId !== sessionData?.user.id && (
-								<DropdownMenuSubmenu
-									followerId={profile.userId}
-									viewerUserId={sessionData?.user.id ?? ""}
-								/>
+						{profileData?.userId === viewerData.userId &&
+							profile.userId !== viewerData.userId && (
+								<DropdownMenuSubmenu followerId={profile.userId} />
 							)}
 					</div>
 				))}
@@ -76,13 +74,11 @@ export const FollowersPage = ({ username }: FollowersPageProps) => {
 
 interface DropdownMenuSubmenuProps {
 	followerId: string;
-	viewerUserId: string;
 }
-const DropdownMenuSubmenu = ({
-	followerId,
-	viewerUserId,
-}: DropdownMenuSubmenuProps) => {
-	const removeFollower = useRemoveFollower({ viewerUserId });
+const DropdownMenuSubmenu = ({ followerId }: DropdownMenuSubmenuProps) => {
+	const viewerData = useViewerStore((state) => state);
+
+	const removeFollower = useRemoveFollower({ viewerUserId: viewerData.userId });
 
 	const handleRemoveFollower = () => {
 		removeFollower.mutate({

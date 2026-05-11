@@ -18,7 +18,7 @@ export default function Page() {
 
 	return (
 		<main className="w-full h-full">
-			<ScrollContainer className="overflow-y-auto no-scrollbar flex flex-col">
+			<ScrollContainer className="overflow-y-auto no-scrollbar flex flex-col w-full h-full">
 				<RequestsHeader />
 				<div className="flex-1">
 					{profiles.map((profile) => (

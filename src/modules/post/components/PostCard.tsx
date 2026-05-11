@@ -39,14 +39,14 @@ import { BookmarkButton } from "@/modules/bookmark/components/BookmarkButton";
 import { CommentButton } from "@/modules/comment/components/CommentButton";
 import { PostLikeButton } from "@/modules/post-like/components/PostLikeButton";
 import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
-import { useProfile } from "@/modules/profile/profile.queries";
+import { useDeletePostConfirmStore } from "@/store/use-delete-post-confirm-store";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { useDeletePost, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";
 
 interface PostCardProps {
 	className?: string;
 	data: z.infer<typeof postSchema.get.output>;
-	viewerUserId: string;
 	leftMargin?: boolean;
 	profileRow?: boolean;
 	separator?: boolean;
@@ -55,7 +55,6 @@ interface PostCardProps {
 export const PostCard = ({
 	className,
 	data,
-	viewerUserId,
 	leftMargin = true,
 	profileRow = false,
 	separator = false,
@@ -69,8 +68,6 @@ export const PostCard = ({
 				postId: data.id,
 			}),
 	});
-
-	const { data: profile } = useProfile({ userId: viewerUserId });
 
 	return (
 		<div
@@ -125,12 +122,7 @@ export const PostCard = ({
 							onClick={(e) => e.stopPropagation()}
 							onKeyDown={(e) => e.stopPropagation()}
 						>
-							<DropdownMenuSubmenu
-								postId={data.id}
-								username={profile?.username ?? ""}
-								viewerUserId={viewerUserId}
-								authorId={data.author.id}
-							/>
+							<DropdownMenuSubmenu postId={data.id} authorId={data.author.id} />
 						</div>
 					</div>
 				</div>
@@ -243,21 +235,23 @@ export const PostCard = ({
 interface DropdownMenuSubmenu {
 	postId: string;
 	authorId: string;
-	username: string;
-	viewerUserId: string;
 }
 
-const DropdownMenuSubmenu = ({
-	postId,
-	username,
-	viewerUserId,
-	authorId,
-}: DropdownMenuSubmenu) => {
-	const deletePost = useDeletePost({ username });
+const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
+	const viewerData = useViewerStore((state) => state);
+
+	const deletePost = useDeletePost({ username: viewerData.username });
+	const router = useRouter();
+
+	const openDeleteDialog = useDeletePostConfirmStore(
+		(state) => state.openDialog
+	);
 
 	const handleDelete = () => {
-		deletePost.mutate({
-			postId,
+		openDeleteDialog(() => {
+			deletePost.mutate({ postId });
+			router.push("/");
+			toast.success("Post was deleted.");
 		});
 	};
 
@@ -277,7 +271,7 @@ const DropdownMenuSubmenu = ({
 			/>
 			<DropdownMenuContent className="w-auto">
 				<DropdownMenuGroup>
-					{authorId === viewerUserId && (
+					{authorId === viewerData.userId && (
 						<DropdownMenuItem
 							onClick={handleDelete}
 							className="text-destructive hover:text-destructive!"
@@ -285,7 +279,7 @@ const DropdownMenuSubmenu = ({
 							Delete
 						</DropdownMenuItem>
 					)}
-					{authorId !== viewerUserId && (
+					{authorId !== viewerData.userId && (
 						<DropdownMenuItem
 							onClick={handleReport}
 							className="text-destructive hover:text-destructive!"

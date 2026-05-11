@@ -4,21 +4,22 @@ import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { authClient } from "@/lib/client/auth-client";
 import {
 	useAcceptRequest,
 	usePendingReceived,
 	useRejectRequest,
 } from "@/modules/follow/follow.queries";
 import { ProfileCard } from "@/modules/profile/components/ProfileCard";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { RequestsHeader } from "../RequestsHeader";
 
 export default function Page() {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingReceived();
-	const { data: sessionData } = authClient.useSession();
+	const viewerData = useViewerStore((state) => state);
+
 	const rejectRequest = useRejectRequest();
 	const acceptRequest = useAcceptRequest({
-		viewerUserId: sessionData?.user.id ?? "",
+		viewerUserId: viewerData.userId,
 	});
 	const disabledCondition = rejectRequest.isPending || acceptRequest.isPending;
 
@@ -27,7 +28,7 @@ export default function Page() {
 
 	return (
 		<main className="w-full h-full">
-			<ScrollContainer className="overflow-y-auto no-scrollbar flex flex-col">
+			<ScrollContainer className="overflow-y-auto no-scrollbar flex flex-col w-full h-full">
 				<RequestsHeader />
 				<div className="flex-1">
 					{profiles.map((profile) => (

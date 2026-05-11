@@ -8,10 +8,9 @@ import { CommentCard } from "./CommentCard";
 
 interface PostCommentsProps {
 	postId: string;
-	viewerUserId: string;
 }
 
-export const PostComments = ({ postId, viewerUserId }: PostCommentsProps) => {
+export const PostComments = ({ postId }: PostCommentsProps) => {
 	const searchParams = useSearchParams();
 	const highlight = searchParams.get("highlight");
 
@@ -26,7 +25,7 @@ export const PostComments = ({ postId, viewerUserId }: PostCommentsProps) => {
 		<div>
 			{comments.map((comment) => (
 				<div key={comment.id} className="border-b border-accent">
-					<CommentCard data={comment} viewerUserId={viewerUserId} />
+					<CommentCard data={comment} />
 				</div>
 			))}
 			{hasNextPage && <div ref={ref} className="h-1" />}

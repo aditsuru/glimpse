@@ -9,18 +9,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/client/utils";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import { useProfile } from "@/modules/profile/profile.queries";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { useCreateComment } from "../comment.queries";
 
 interface CommentComposerProps {
-	viewerUserId: string;
 	postId: string;
 }
 
-export const CommentComposer = ({
-	viewerUserId,
-	postId,
-}: CommentComposerProps) => {
-	const { data: profile } = useProfile({ userId: viewerUserId });
+export const CommentComposer = ({ postId }: CommentComposerProps) => {
+	const viewerData = useViewerStore((state) => state);
+
+	const { data: profile } = useProfile({ userId: viewerData.userId });
 	const createComment = useCreateComment(postId);
 
 	const [body, setBody] = useState("");

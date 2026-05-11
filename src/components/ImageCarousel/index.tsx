@@ -132,7 +132,7 @@ export function ImageCarousel({
 					className
 				)}
 			>
-				<Carousel setApi={setApi} className="w-full h-full">
+				<Carousel setApi={setApi} className="w-full h-full bg-background">
 					<CarouselContent className="h-full ml-0">
 						{images.map((image, index) => (
 							<CarouselItem key={image.src} className="relative pl-0 h-full">

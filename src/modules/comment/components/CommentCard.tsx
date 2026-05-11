@@ -23,15 +23,15 @@ import { formatPostDate } from "@/lib/client/helpers";
 import { config } from "@/lib/shared/config";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { useDeleteComment } from "../comment.queries";
 import type { getCommentOutput } from "../comment.schema";
 
 interface CommentCardProps {
 	data: z.infer<typeof getCommentOutput>;
-	viewerUserId: string;
 }
 
-export const CommentCard = ({ data, viewerUserId }: CommentCardProps) => {
+export const CommentCard = ({ data }: CommentCardProps) => {
 	return (
 		<div className="w-full h-full py-2 p-4 flex gap-3 items-start">
 			<div className="flex flex-col items-center self-stretch">
@@ -69,7 +69,6 @@ export const CommentCard = ({ data, viewerUserId }: CommentCardProps) => {
 					</div>
 					<DropdownMenuSubmenu
 						postId={data.id}
-						viewerUserId={viewerUserId}
 						authorId={data.author.id}
 						commentId={data.id}
 					/>
@@ -110,15 +109,15 @@ interface DropdownMenuSubmenu {
 	commentId: string;
 	postId: string;
 	authorId: string;
-	viewerUserId: string;
 }
 
 const DropdownMenuSubmenu = ({
 	commentId,
 	postId,
-	viewerUserId,
 	authorId,
 }: DropdownMenuSubmenu) => {
+	const viewerData = useViewerStore((state) => state);
+
 	const deletePost = useDeleteComment({ postId });
 
 	const handleDelete = () => {
@@ -143,7 +142,7 @@ const DropdownMenuSubmenu = ({
 			/>
 			<DropdownMenuContent className="w-auto">
 				<DropdownMenuGroup>
-					{authorId === viewerUserId && (
+					{authorId === viewerData.userId && (
 						<DropdownMenuItem
 							onClick={handleDelete}
 							className="text-destructive hover:text-destructive!"
@@ -151,7 +150,7 @@ const DropdownMenuSubmenu = ({
 							Delete
 						</DropdownMenuItem>
 					)}
-					{authorId !== viewerUserId && (
+					{authorId !== viewerData.userId && (
 						<DropdownMenuItem
 							onClick={handleReport}
 							className="text-destructive hover:text-destructive!"

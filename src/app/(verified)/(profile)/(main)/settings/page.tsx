@@ -16,18 +16,19 @@ import {
 } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { authClient } from "@/lib/client/auth-client";
 import {
 	useProfile,
 	useUpdateVisibility,
 } from "@/modules/profile/profile.queries";
 import { useSettingsStore } from "@/store/use-settings-store";
+import { useViewerStore } from "@/store/use-viewer-store";
 
 export default function Page() {
-	const { data: sessionData } = authClient.useSession();
-	const { data: profileData } = useProfile({ userId: sessionData?.user.id });
+	const viewerData = useViewerStore((state) => state);
+
+	const { data: profileData } = useProfile({ userId: viewerData.userId });
 	const updateVisibility = useUpdateVisibility({
-		viewerUserId: sessionData?.user.id ?? "",
+		viewerUserId: viewerData.userId,
 	});
 
 	const handleVisibilityChange = async (checked: boolean) => {
@@ -80,8 +81,12 @@ export default function Page() {
 				</div>
 				<Separator />
 				<div className="flex flex-col gap-4">
-					<h2 className="text-xl font-semibold">Personalization</h2>
-
+					<div>
+						<h2 className="text-xl font-semibold">Personalization</h2>
+						<p className="text-destructive md:hidden">
+							Some of these options are only effective on desktop devices
+						</p>
+					</div>
 					<div className="flex flex-col gap-6">
 						<Field orientation="horizontal" className="w-full">
 							<FieldContent>
