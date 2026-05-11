@@ -12,7 +12,7 @@ interface UserPostFeedProps {
 }
 
 export const UserPostFeed = ({ username, userId }: UserPostFeedProps) => {
-	const viewerData = useViewerStore((state) => state);
+	const viewerData = useViewerStore.getState();
 	const { data, fetchNextPage, hasNextPage, isFetching, error } =
 		useGetAllByUser(username);
 

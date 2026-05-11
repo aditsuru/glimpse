@@ -5,6 +5,7 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
+import { useViewerStore } from "@/store/use-viewer-store";
 
 export function useOnboard() {
 	return useMutation(orpc.profile.onboard.mutationOptions());
@@ -26,25 +27,22 @@ export function useIsUsernameAvailable() {
  * Side effects:
  * - Invalidate on settle: profile.get[userId], profile.get[username:currentUsername]
  */
-export function useUpdateAvatar({
-	userId,
-	currentUsername,
-}: {
-	userId: string;
-	currentUsername: string;
-}) {
+export function useUpdateAvatar() {
 	const queryClient = useQueryClient();
+	const viewerData = useViewerStore.getState();
+
 	return useMutation({
 		...orpc.profile.updateAvatar.mutationOptions(),
 		onSettled: async () => {
 			await Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: orpc.profile.get.queryOptions({ input: { userId } })
-						.queryKey,
+					queryKey: orpc.profile.get.queryOptions({
+						input: { userId: viewerData.userId },
+					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: currentUsername },
+						input: { username: viewerData.username },
 					}).queryKey,
 				}),
 			]);
@@ -56,25 +54,21 @@ export function useUpdateAvatar({
  * Side effects:
  * - Invalidate on settle: profile.get[userId], profile.get[username:currentUsername]
  */
-export function useUpdateBanner({
-	userId,
-	currentUsername,
-}: {
-	userId: string;
-	currentUsername: string;
-}) {
+export function useUpdateBanner() {
+	const viewerData = useViewerStore.getState();
 	const queryClient = useQueryClient();
 	return useMutation({
 		...orpc.profile.updateBanner.mutationOptions(),
 		onSettled: async () => {
 			await Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: orpc.profile.get.queryOptions({ input: { userId } })
-						.queryKey,
+					queryKey: orpc.profile.get.queryOptions({
+						input: { userId: viewerData.userId },
+					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: currentUsername },
+						input: { username: viewerData.username },
 					}).queryKey,
 				}),
 			]);
@@ -106,25 +100,29 @@ export function useSearchProfiles(query: string) {
  * Side effects:
  * - Invalidate on settle: profile.get[userId], profile.get[username:currentUsername]
  */
-export function useUpdateProfile({
-	userId,
-	currentUsername,
-}: {
-	userId: string;
-	currentUsername: string;
-}) {
+export function useUpdateProfile() {
+	const viewerData = useViewerStore.getState();
+
 	const queryClient = useQueryClient();
 	return useMutation({
 		...orpc.profile.update.mutationOptions(),
+		onSuccess: (_data, variables) => {
+			if (variables.username) {
+				useViewerStore
+					.getState()
+					.setViewer(viewerData.userId, variables.username);
+			}
+		},
 		onSettled: async () => {
 			await Promise.all([
 				queryClient.invalidateQueries({
-					queryKey: orpc.profile.get.queryOptions({ input: { userId } })
-						.queryKey,
+					queryKey: orpc.profile.get.queryOptions({
+						input: { userId: viewerData.userId },
+					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: currentUsername },
+						input: { username: viewerData.username },
 					}).queryKey,
 				}),
 			]);
@@ -137,38 +135,29 @@ export function useUpdateProfile({
  * - Invalidate on settle: profile.get[userId], profile.get[username:viewer],
  *   profile.search (viewerStatus changes for accounts interacting with viewer)
  */
-export function useUpdateVisibility({
-	viewerUserId,
-}: {
-	viewerUserId: string;
-}) {
+export function useUpdateVisibility() {
+	const viewerData = useViewerStore.getState();
+
 	const queryClient = useQueryClient();
 	return useMutation({
 		...orpc.profile.updateVisibility.mutationOptions(),
 		onSettled: async () => {
-			const viewerUsername = queryClient.getQueryData<{ username?: string }>(
-				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
-					.queryKey
-			)?.username;
-
 			const refetches: Promise<unknown>[] = [
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { userId: viewerUserId },
+						input: { userId: viewerData.userId },
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
 			];
 
-			if (viewerUsername) {
-				refetches.push(
-					queryClient.invalidateQueries({
-						queryKey: orpc.profile.get.queryOptions({
-							input: { username: viewerUsername },
-						}).queryKey,
-					})
-				);
-			}
+			refetches.push(
+				queryClient.invalidateQueries({
+					queryKey: orpc.profile.get.queryOptions({
+						input: { username: viewerData.username },
+					}).queryKey,
+				})
+			);
 
 			await Promise.all(refetches);
 		},

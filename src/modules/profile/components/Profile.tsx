@@ -18,7 +18,7 @@ interface ProfileProps {
 }
 
 export const Profile = ({ data }: ProfileProps) => {
-	const viewerData = useViewerStore((state) => state);
+	const viewerData = useViewerStore.getState();
 
 	return (
 		<div className="w-full">

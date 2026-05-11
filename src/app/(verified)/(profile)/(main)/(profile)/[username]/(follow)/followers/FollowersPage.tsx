@@ -25,7 +25,7 @@ interface FollowersPageProps {
 }
 
 export const FollowersPage = ({ username }: FollowersPageProps) => {
-	const viewerData = useViewerStore((state) => state);
+	const viewerData = useViewerStore.getState();
 
 	const { data: profileData } = useProfile({ username });
 	const { data, fetchNextPage, hasNextPage, isFetching } = useFollowers(
@@ -76,9 +76,7 @@ interface DropdownMenuSubmenuProps {
 	followerId: string;
 }
 const DropdownMenuSubmenu = ({ followerId }: DropdownMenuSubmenuProps) => {
-	const viewerData = useViewerStore((state) => state);
-
-	const removeFollower = useRemoveFollower({ viewerUserId: viewerData.userId });
+	const removeFollower = useRemoveFollower();
 
 	const handleRemoveFollower = () => {
 		removeFollower.mutate({

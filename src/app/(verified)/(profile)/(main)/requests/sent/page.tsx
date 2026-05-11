@@ -3,15 +3,15 @@
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { authClient } from "@/lib/client/auth-client";
 import { FollowButton } from "@/modules/follow/components/FollowButton";
 import { usePendingSent } from "@/modules/follow/follow.queries";
 import { ProfileCard } from "@/modules/profile/components/ProfileCard";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { RequestsHeader } from "../RequestsHeader";
 
 export default function Page() {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingSent();
-	const { data: sessionData } = authClient.useSession();
+	const viewerData = useViewerStore.getState();
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
@@ -28,7 +28,7 @@ export default function Page() {
 						>
 							<ProfileCard data={profile} />
 
-							{profile.userId !== sessionData?.user.id && (
+							{profile.userId !== viewerData.userId && (
 								<FollowButton
 									initialStatus={"pending"}
 									targetUserId={profile.userId}

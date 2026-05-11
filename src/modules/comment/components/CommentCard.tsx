@@ -116,7 +116,7 @@ const DropdownMenuSubmenu = ({
 	postId,
 	authorId,
 }: DropdownMenuSubmenu) => {
-	const viewerData = useViewerStore((state) => state);
+	const viewerData = useViewerStore.getState();
 
 	const deletePost = useDeleteComment({ postId });
 

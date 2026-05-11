@@ -5,13 +5,15 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
+import { useViewerStore } from "@/store/use-viewer-store";
 
 /**
  * Side effects:
  * - Invalidate on settle: post.GetAllByUser[username]
  */
-export function useCreatePost({ username }: { username: string }) {
+export function useCreatePost() {
 	const queryClient = useQueryClient();
+	const viewerData = useViewerStore.getState();
 
 	return useMutation({
 		...orpc.post.create.mutationOptions(),
@@ -19,7 +21,7 @@ export function useCreatePost({ username }: { username: string }) {
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: orpc.post.getAllByUser.queryOptions({
-						input: { username },
+						input: { username: viewerData.username },
 					}).queryKey,
 				}),
 			]);
@@ -31,8 +33,9 @@ export function useCreatePost({ username }: { username: string }) {
  * Side effects:
  * - Invalidate on settle: post.GetAllByUser[username], post.get[postId]
  */
-export function useDeletePost({ username }: { username: string }) {
+export function useDeletePost() {
 	const queryClient = useQueryClient();
+	const viewerData = useViewerStore.getState();
 
 	return useMutation({
 		...orpc.post.delete.mutationOptions(),
@@ -40,7 +43,7 @@ export function useDeletePost({ username }: { username: string }) {
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: orpc.post.getAllByUser.queryOptions({
-						input: { username },
+						input: { username: viewerData.username },
 					}).queryKey,
 				}),
 			]);

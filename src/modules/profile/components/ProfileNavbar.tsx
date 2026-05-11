@@ -12,7 +12,7 @@ type ProfileNavbarProps = {
 
 export const ProfileNavbar = ({ username, userId }: ProfileNavbarProps) => {
 	const pathname = usePathname();
-	const viewerData = useViewerStore((state) => state);
+	const viewerData = useViewerStore.getState();
 
 	const tabs = [
 		{ label: "Posts", href: `/${username}` },

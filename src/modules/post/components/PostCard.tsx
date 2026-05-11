@@ -238,9 +238,9 @@ interface DropdownMenuSubmenu {
 }
 
 const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
-	const viewerData = useViewerStore((state) => state);
+	const viewerData = useViewerStore.getState();
 
-	const deletePost = useDeletePost({ username: viewerData.username });
+	const deletePost = useDeletePost();
 	const router = useRouter();
 
 	const openDeleteDialog = useDeletePostConfirmStore(

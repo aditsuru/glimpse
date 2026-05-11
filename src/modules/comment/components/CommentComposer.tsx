@@ -17,7 +17,7 @@ interface CommentComposerProps {
 }
 
 export const CommentComposer = ({ postId }: CommentComposerProps) => {
-	const viewerData = useViewerStore((state) => state);
+	const viewerData = useViewerStore.getState();
 
 	const { data: profile } = useProfile({ userId: viewerData.userId });
 	const createComment = useCreateComment(postId);

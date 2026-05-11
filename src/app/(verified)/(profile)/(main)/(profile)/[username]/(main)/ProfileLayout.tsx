@@ -18,7 +18,7 @@ interface ProfileLayoutProps {
 
 export const ProfileLayout = ({ username, children }: ProfileLayoutProps) => {
 	const { data, isLoading, error } = useProfile({ username });
-	const viewerData = useViewerStore((state) => state);
+	const viewerData = useViewerStore.getState();
 
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {

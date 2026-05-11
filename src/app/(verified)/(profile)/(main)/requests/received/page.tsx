@@ -10,17 +10,13 @@ import {
 	useRejectRequest,
 } from "@/modules/follow/follow.queries";
 import { ProfileCard } from "@/modules/profile/components/ProfileCard";
-import { useViewerStore } from "@/store/use-viewer-store";
 import { RequestsHeader } from "../RequestsHeader";
 
 export default function Page() {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingReceived();
-	const viewerData = useViewerStore((state) => state);
 
 	const rejectRequest = useRejectRequest();
-	const acceptRequest = useAcceptRequest({
-		viewerUserId: viewerData.userId,
-	});
+	const acceptRequest = useAcceptRequest();
 	const disabledCondition = rejectRequest.isPending || acceptRequest.isPending;
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);

@@ -27,7 +27,6 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { useMediaUpload } from "@/hooks/useMediaUpload";
-import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import {
 	ALLOWED_MIME_TYPES,
@@ -44,6 +43,7 @@ import {
 	useUpdateBanner,
 	useUpdateProfile,
 } from "@/modules/profile/profile.queries";
+import { useViewerStore } from "@/store/use-viewer-store";
 
 const profileSettingsSchema = z.object({
 	username: z
@@ -67,13 +67,14 @@ const profileSettingsSchema = z.object({
 });
 
 export default function Page() {
-	const { data: sessionData } = authClient.useSession();
+	const viewerData = useViewerStore.getState();
+
 	const {
 		data: profileData,
 		isLoading: isProfileLoading,
 		error: profileError,
 	} = useProfile({
-		userId: sessionData?.user.id,
+		userId: viewerData.userId,
 	});
 
 	const { formState, handleSubmit, control, setError, clearErrors, reset } =
@@ -104,18 +105,9 @@ export default function Page() {
 	const isUsernameAvailable = useIsUsernameAvailable();
 	const getAvatarPresignedUrl = useGetAvatarPresignedUrl();
 	const getBannerPresignedUrl = useGetBannerPresignedUrl();
-	const updateProfile = useUpdateProfile({
-		userId: sessionData?.user.id ?? "",
-		currentUsername: profileData?.username ?? "",
-	});
-	const updateAvatar = useUpdateAvatar({
-		userId: sessionData?.user.id ?? "",
-		currentUsername: profileData?.username ?? "",
-	});
-	const updateBanner = useUpdateBanner({
-		userId: sessionData?.user.id ?? "",
-		currentUsername: profileData?.username ?? "",
-	});
+	const updateProfile = useUpdateProfile();
+	const updateAvatar = useUpdateAvatar();
+	const updateBanner = useUpdateBanner();
 
 	const router = useRouter();
 
