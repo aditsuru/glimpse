@@ -1,14 +1,18 @@
 "use client";
 
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
-import FollowButton from "@/modules/follow/components/FollowButton";
+import { FollowButton } from "@/modules/follow/components/FollowButton";
 import { useFollowing } from "@/modules/follow/follow.queries";
-import ProfileCard from "@/modules/profile/components/ProfileCard";
+import { ProfileCard } from "@/modules/profile/components/ProfileCard";
 import { useProfile } from "@/modules/profile/profile.queries";
 
-const FollowingPage = ({ username }: { username: string }) => {
+interface FollowingPageProps {
+	username: string;
+}
+
+export const FollowingPage = ({ username }: FollowingPageProps) => {
 	const { data: sessionData } = authClient.useSession();
 	const { data: profileData } = useProfile({ username });
 	const { data, fetchNextPage, hasNextPage, isFetching } = useFollowing(
@@ -47,5 +51,3 @@ const FollowingPage = ({ username }: { username: string }) => {
 		</div>
 	);
 };
-
-export default FollowingPage;

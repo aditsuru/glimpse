@@ -1,7 +1,11 @@
-import FollowHeader from "../FollowHeader";
-import FollowersPage from "./FollowersPage";
+import { FollowHeader } from "../FollowHeader";
+import { FollowersPage } from "./FollowersPage";
 
-const Page = async ({ params }: { params: Promise<{ username: string }> }) => {
+export default async function Page({
+	params,
+}: {
+	params: Promise<{ username: string }>;
+}) {
 	const { username } = await params;
 	return (
 		<main className="w-full h-full overflow-y-auto no-scrollbar flex flex-col">
@@ -11,6 +15,4 @@ const Page = async ({ params }: { params: Promise<{ username: string }> }) => {
 			</div>
 		</main>
 	);
-};
-
-export default Page;
+}

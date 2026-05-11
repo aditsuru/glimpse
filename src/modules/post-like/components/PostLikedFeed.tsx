@@ -1,12 +1,12 @@
 "use client";
 
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
-import PostCard from "@/modules/post/components/PostCard";
+import { PostCard } from "@/modules/post/components/PostCard";
 import { useGetLikedPosts } from "../post-like.queries";
 
-const PostLikedFeed = () => {
+export const PostLikedFeed = () => {
 	const { data: sessionData } = authClient.useSession();
 	const { data, fetchNextPage, hasNextPage, isFetching } = useGetLikedPosts();
 
@@ -30,5 +30,3 @@ const PostLikedFeed = () => {
 		</div>
 	);
 };
-
-export default PostLikedFeed;

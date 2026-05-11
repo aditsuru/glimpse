@@ -1,4 +1,4 @@
-import PageNotFound from "@/components/layout/PageNotFound";
+import { PageNotFound } from "@/components/layout/PageNotFound";
 import { config } from "@/lib/shared/config";
 
 export default async function AuthGuard({

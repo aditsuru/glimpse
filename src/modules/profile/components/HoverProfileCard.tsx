@@ -2,15 +2,15 @@
 
 import { ORPCError } from "@orpc/client";
 import Link from "next/link";
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
-import ErrorMessage from "@/components/layout/ErrorMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { ErrorMessage } from "@/components/layout/ErrorMessage";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
-import FollowButton from "@/modules/follow/components/FollowButton";
+import { FollowButton } from "@/modules/follow/components/FollowButton";
 import { useProfile } from "../profile.queries";
 
 interface HoverProfileCardProps {
@@ -18,7 +18,10 @@ interface HoverProfileCardProps {
 	username: string;
 }
 
-const HoverProfileCard = ({ className, username }: HoverProfileCardProps) => {
+export const HoverProfileCard = ({
+	className,
+	username,
+}: HoverProfileCardProps) => {
 	const { data, isLoading, error } = useProfile({ username });
 	const { data: sessionData } = authClient.useSession();
 	if (error) {
@@ -86,7 +89,13 @@ const HoverProfileCard = ({ className, username }: HoverProfileCardProps) => {
 	);
 };
 
-const HoverProfileCardSkeleton = ({ className }: { className?: string }) => {
+interface HoverProfileCardSkeletonProps {
+	className?: string;
+}
+
+const HoverProfileCardSkeleton = ({
+	className,
+}: HoverProfileCardSkeletonProps) => {
 	return (
 		<div className={cn("w-full p-4 flex flex-col gap-4", className)}>
 			<div className="w-full">
@@ -108,5 +117,3 @@ const HoverProfileCardSkeleton = ({ className }: { className?: string }) => {
 		</div>
 	);
 };
-
-export default HoverProfileCard;

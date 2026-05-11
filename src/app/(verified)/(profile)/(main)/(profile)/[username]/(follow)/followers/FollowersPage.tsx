@@ -1,7 +1,7 @@
 "use client";
 
 import { EllipsisVertical } from "lucide-react";
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -12,15 +12,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
-import FollowButton from "@/modules/follow/components/FollowButton";
+import { FollowButton } from "@/modules/follow/components/FollowButton";
 import {
 	useFollowers,
 	useRemoveFollower,
 } from "@/modules/follow/follow.queries";
-import ProfileCard from "@/modules/profile/components/ProfileCard";
+import { ProfileCard } from "@/modules/profile/components/ProfileCard";
 import { useProfile } from "@/modules/profile/profile.queries";
 
-const FollowersPage = ({ username }: { username: string }) => {
+interface FollowersPageProps {
+	username: string;
+}
+
+export const FollowersPage = ({ username }: FollowersPageProps) => {
 	const { data: sessionData } = authClient.useSession();
 	const { data: profileData } = useProfile({ username });
 	const { data, fetchNextPage, hasNextPage, isFetching } = useFollowers(
@@ -70,13 +74,14 @@ const FollowersPage = ({ username }: { username: string }) => {
 	);
 };
 
-function DropdownMenuSubmenu({
-	followerId,
-	viewerUserId,
-}: {
+interface DropdownMenuSubmenuProps {
 	followerId: string;
 	viewerUserId: string;
-}) {
+}
+const DropdownMenuSubmenu = ({
+	followerId,
+	viewerUserId,
+}: DropdownMenuSubmenuProps) => {
 	const removeFollower = useRemoveFollower({ viewerUserId });
 
 	const handleRemoveFollower = () => {
@@ -106,6 +111,4 @@ function DropdownMenuSubmenu({
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
-}
-
-export default FollowersPage;
+};

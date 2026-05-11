@@ -1,14 +1,14 @@
 "use client";
 
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
-import PostCard from "@/modules/post/components/PostCard";
+import { PostCard } from "@/modules/post/components/PostCard";
 import { useGetFeed } from "@/modules/post/post.queries";
-import FeedHeader from "./FeedHeader";
+import { FeedHeader } from "./FeedHeader";
 
-const FeedPage = () => {
+export const FeedPage = () => {
 	const { data, fetchNextPage, hasNextPage, isFetching } = useGetFeed();
 
 	const { data: sessionData } = authClient.useSession();
@@ -41,5 +41,3 @@ const FeedPage = () => {
 		</div>
 	);
 };
-
-export default FeedPage;

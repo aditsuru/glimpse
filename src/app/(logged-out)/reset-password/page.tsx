@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import AnimatedFieldError from "@/components/misc/AnimatedFieldError";
+import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -43,7 +43,7 @@ const resetPasswordSchema = z
 		path: ["confirmPassword"],
 	});
 
-const Page = () => {
+export default function Page() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
@@ -202,6 +202,4 @@ const Page = () => {
 			</Card>
 		</main>
 	);
-};
-
-export default Page;
+}

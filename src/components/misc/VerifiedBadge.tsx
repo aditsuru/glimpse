@@ -1,12 +1,11 @@
 import { cn } from "@/lib/client/utils";
 
-export function VerifiedBadge({
-	size = 20,
-	className,
-}: {
+interface VerifiedBadge {
 	size?: number;
 	className?: string;
-}) {
+}
+
+export const VerifiedBadge = ({ size = 20, className }: VerifiedBadge) => {
 	return (
 		<svg
 			width={size}
@@ -32,4 +31,4 @@ export function VerifiedBadge({
 			/>
 		</svg>
 	);
-}
+};

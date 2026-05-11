@@ -11,7 +11,7 @@ interface CommentButtonProps {
 	initialCount: number;
 }
 
-const CommentButton = ({ initialCount, postId }: CommentButtonProps) => {
+export const CommentButton = ({ initialCount, postId }: CommentButtonProps) => {
 	const { data } = useGetCommentsCount(postId, initialCount);
 
 	const count = data.count;
@@ -32,5 +32,3 @@ const CommentButton = ({ initialCount, postId }: CommentButtonProps) => {
 		</Link>
 	);
 };
-
-export default CommentButton;

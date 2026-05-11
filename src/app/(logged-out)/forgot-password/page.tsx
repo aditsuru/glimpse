@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 import * as z from "zod";
-import AnimatedFieldError from "@/components/misc/AnimatedFieldError";
+import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -27,7 +27,7 @@ const forgotPasswordSchema = z.object({
 	email: z.email("Enter a valid email"),
 });
 
-const Page = () => {
+export default function Page() {
 	const router = useRouter();
 	const [email, setEmail] = React.useState("");
 	const [error, setError] = React.useState<string | null>(null);
@@ -140,6 +140,4 @@ const Page = () => {
 			</Card>
 		</main>
 	);
-};
-
-export default Page;
+}

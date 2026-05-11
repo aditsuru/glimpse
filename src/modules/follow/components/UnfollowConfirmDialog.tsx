@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useUnfollowConfirmStore } from "@/store/use-unfollow-confirm-store";
 
-const UnfollowConfirmDialog = () => {
+export const UnfollowConfirmDialog = () => {
 	const unfollowDialogState = useUnfollowConfirmStore(
 		(state) => state.unfollowDialog
 	);
@@ -49,5 +49,3 @@ const UnfollowConfirmDialog = () => {
 		</Dialog>
 	);
 };
-
-export default UnfollowConfirmDialog;

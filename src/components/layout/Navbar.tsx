@@ -52,7 +52,7 @@ type NavbarProps = {
 	userId: string;
 };
 
-const Navbar = ({ userId }: NavbarProps) => {
+export const Navbar = ({ userId }: NavbarProps) => {
 	const pathname = usePathname();
 	const router = useRouter();
 
@@ -292,5 +292,3 @@ const Navbar = ({ userId }: NavbarProps) => {
 		</nav>
 	);
 };
-
-export default Navbar;

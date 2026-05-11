@@ -16,7 +16,7 @@ interface PostLikeButtonProps {
 	initialState: boolean;
 }
 
-const PostLikeButton = ({
+export const PostLikeButton = ({
 	initialCount,
 	initialState,
 	postId,
@@ -53,5 +53,3 @@ const PostLikeButton = ({
 		</Button>
 	);
 };
-
-export default PostLikeButton;

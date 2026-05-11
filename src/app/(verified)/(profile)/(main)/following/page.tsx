@@ -1,7 +1,5 @@
-import FeedPage from "./FeedPage";
+import { FeedPage } from "./FeedPage";
 
-function Page() {
+export default function Page() {
 	return <FeedPage />;
 }
-
-export default Page;

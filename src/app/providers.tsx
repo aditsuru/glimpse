@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { config } from "@/lib/shared/config";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export const Providers = ({ children }: { children: React.ReactNode }) => {
 	const [queryClient] = useState(
 		() =>
 			new QueryClient({
@@ -51,6 +51,4 @@ export function Providers({ children }: { children: React.ReactNode }) {
 			</NextThemesProvider>
 		</QueryClientProvider>
 	);
-}
-
-export default Providers;
+};

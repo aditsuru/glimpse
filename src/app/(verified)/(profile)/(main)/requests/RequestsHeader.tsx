@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/client/utils";
 
-const RequestsHeader = () => {
+export const RequestsHeader = () => {
 	const pathname = usePathname();
 	const router = useRouter();
 
@@ -50,5 +50,3 @@ const RequestsHeader = () => {
 		</div>
 	);
 };
-
-export default RequestsHeader;

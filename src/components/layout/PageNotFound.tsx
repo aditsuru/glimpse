@@ -2,7 +2,7 @@ import { Meh } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-function PageNotFound() {
+export const PageNotFound = () => {
 	return (
 		<main className="w-screen h-dvh flex flex-col items-center justify-center gap-3 text-muted-foreground">
 			<Meh className="size-12" />
@@ -18,6 +18,4 @@ function PageNotFound() {
 			</Link>
 		</main>
 	);
-}
-
-export default PageNotFound;
+};

@@ -2,7 +2,7 @@
 
 import { Search } from "lucide-react";
 import { useState } from "react";
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import {
 	InputGroup,
 	InputGroupAddon,
@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/input-group";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
-import FollowButton from "@/modules/follow/components/FollowButton";
-import ProfileCard from "@/modules/profile/components/ProfileCard";
+import { FollowButton } from "@/modules/follow/components/FollowButton";
+import { ProfileCard } from "@/modules/profile/components/ProfileCard";
 import { useSearchProfiles } from "@/modules/profile/profile.queries";
 
-const Page = () => {
+export default function Page() {
 	const [inputValue, setInputValue] = useState("");
 	const [searchQuery, setSearchQuery] = useState("");
 
@@ -83,6 +83,4 @@ const Page = () => {
 			</div>
 		</div>
 	);
-};
-
-export default Page;
+}

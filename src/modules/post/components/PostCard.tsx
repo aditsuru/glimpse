@@ -35,10 +35,10 @@ import {
 	isImage,
 	isVideo,
 } from "@/lib/shared/constants";
-import BookmarkButton from "@/modules/bookmark/components/BookmarkButton";
-import CommentButton from "@/modules/comment/components/CommentButton";
-import PostLikeButton from "@/modules/post-like/components/PostLikeButton";
-import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
+import { BookmarkButton } from "@/modules/bookmark/components/BookmarkButton";
+import { CommentButton } from "@/modules/comment/components/CommentButton";
+import { PostLikeButton } from "@/modules/post-like/components/PostLikeButton";
+import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
 import { useDeletePost, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";
 
@@ -51,7 +51,7 @@ interface PostCardProps {
 	separator?: boolean;
 }
 
-const PostCard = ({
+export const PostCard = ({
 	className,
 	data,
 	viewerUserId,
@@ -236,15 +236,17 @@ const PostCard = ({
 	);
 };
 
-function DropdownMenuSubmenu({
-	postId,
-	viewerUserId,
-	authorId,
-}: {
+interface DropdownMenuSubmenu {
 	postId: string;
 	authorId: string;
 	viewerUserId: string;
-}) {
+}
+
+const DropdownMenuSubmenu = ({
+	postId,
+	viewerUserId,
+	authorId,
+}: DropdownMenuSubmenu) => {
 	const deletePost = useDeletePost({ viewerUserId });
 
 	const handleDelete = () => {
@@ -289,6 +291,4 @@ function DropdownMenuSubmenu({
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
-}
-
-export default PostCard;
+};

@@ -10,7 +10,7 @@ type FollowHeaderProps = {
 	username: string;
 };
 
-const FollowHeader = ({ username }: FollowHeaderProps) => {
+export const FollowHeader = ({ username }: FollowHeaderProps) => {
 	const pathname = usePathname();
 	const router = useRouter();
 
@@ -54,5 +54,3 @@ const FollowHeader = ({ username }: FollowHeaderProps) => {
 		</div>
 	);
 };
-
-export default FollowHeader;

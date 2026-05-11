@@ -38,7 +38,7 @@ const RING_RADIUS = 10;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 const WARN_THRESHOLD = 0.8; // 80% = 160 chars
 
-function CharRing({ count, max }: { count: number; max: number }) {
+const CharRing = ({ count, max }: { count: number; max: number }) => {
 	const progress = count / max;
 	const dashoffset = RING_CIRCUMFERENCE * (1 - progress);
 	const isWarn = progress >= WARN_THRESHOLD;
@@ -95,11 +95,15 @@ function CharRing({ count, max }: { count: number; max: number }) {
 			</svg>
 		</div>
 	);
-}
+};
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
+interface PostComposerProps {
+	onSuccess?: () => void;
+}
+
+export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 	const { data: session } = authClient.useSession();
 	const { data: profile } = useProfile({ userId: session?.user.id ?? "" });
 	const createPost = useCreatePost({ viewerUserId: session?.user.id ?? "" });
@@ -531,5 +535,3 @@ const PostComposer = ({ onSuccess }: { onSuccess?: () => void }) => {
 		</div>
 	);
 };
-
-export default PostComposer;

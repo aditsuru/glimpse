@@ -1,7 +1,5 @@
-import PostLikedFeed from "@/modules/post-like/components/PostLikedFeed";
+import { PostLikedFeed } from "@/modules/post-like/components/PostLikedFeed";
 
-const Page = () => {
+export default function Page() {
 	return <PostLikedFeed />;
-};
-
-export default Page;
+}

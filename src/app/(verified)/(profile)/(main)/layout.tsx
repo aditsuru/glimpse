@@ -3,14 +3,14 @@ import {
 	HydrationBoundary,
 	QueryClient,
 } from "@tanstack/react-query";
-import MobileNavbar from "@/components/layout/MobileNavbar";
-import Navbar from "@/components/layout/Navbar";
-import SecondarySidebar from "@/components/layout/SecondarySidebar";
-import MeteorsComponent from "@/components/misc/MeteorsComponent";
-import Snowfall from "@/components/misc/Snowfall";
+import { MobileNavbar } from "@/components/layout/MobileNavbar";
+import { Navbar } from "@/components/layout/Navbar";
+import { SecondarySidebar } from "@/components/layout/SecondarySidebar";
+import { MeteorsComponent } from "@/components/misc/MeteorsComponent";
+import { Snowfall } from "@/components/misc/Snowfall";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
-import UnfollowConfirmDialog from "@/modules/follow/components/UnfollowConfirmDialog";
+import { UnfollowConfirmDialog } from "@/modules/follow/components/UnfollowConfirmDialog";
 import { PostComposerDialog } from "@/modules/post/components/PostComposerDialog";
 
 export default async function Layout({

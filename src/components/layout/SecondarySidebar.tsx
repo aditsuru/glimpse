@@ -6,7 +6,7 @@ import { useSettingsStore } from "@/store/use-settings-store";
 import { Billboard } from "../misc/Billboard";
 import { BillboardVideo } from "../misc/BillboardVideo";
 
-const SecondarySidebar = () => {
+export const SecondarySidebar = () => {
 	const hardcodedTrendingVideos = [
 		"attachment/ANiZSxOWCskW7XRynbsruqjap0bvftLP/JPj7yJW21pYvRdLdmoBuK",
 		"attachment/ANiZSxOWCskW7XRynbsruqjap0bvftLP/rPUKF7Vo9MGXhKydUsrXc",
@@ -29,5 +29,3 @@ const SecondarySidebar = () => {
 		</aside>
 	);
 };
-
-export default SecondarySidebar;

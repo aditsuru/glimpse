@@ -1,20 +1,22 @@
 import { ORPCError } from "@orpc/client";
 import { Lock } from "lucide-react";
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
 import { useGetAllByUser } from "../post.queries";
-import PostCard from "./PostCard";
+import { PostCard } from "./PostCard";
 
-const UserPostFeed = ({
-	username,
-	userId,
-	viewerUserId,
-}: {
+interface UserPostFeedProps {
 	username: string;
 	userId: string;
 	viewerUserId: string;
-}) => {
+}
+
+export const UserPostFeed = ({
+	username,
+	userId,
+	viewerUserId,
+}: UserPostFeedProps) => {
 	const { data: sessionData } = authClient.useSession();
 	const { data, fetchNextPage, hasNextPage, isFetching, error } =
 		useGetAllByUser(username);
@@ -52,5 +54,3 @@ const UserPostFeed = ({
 		</div>
 	);
 };
-
-export default UserPostFeed;

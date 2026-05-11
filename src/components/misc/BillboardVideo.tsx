@@ -11,10 +11,10 @@ interface BillboardVideoProps {
 	timeBreakVideos: string[];
 }
 
-export function BillboardVideo({
+export const BillboardVideo = ({
 	trendingVideos,
 	timeBreakVideos,
-}: BillboardVideoProps) {
+}: BillboardVideoProps) => {
 	const [trendingIdx, setTrendingIdx] = useState(0);
 	const [timeBreakIdx, setTimeBreakIdx] = useState(0);
 	const [repeat, setRepeat] = useState(0);
@@ -77,4 +77,4 @@ export function BillboardVideo({
 			/>
 		</figure>
 	);
-}
+};

@@ -3,7 +3,7 @@
 import SnowfallComponent from "react-snowfall";
 import { useSettingsStore } from "@/store/use-settings-store";
 
-const Snowfall = () => {
+export const Snowfall = () => {
 	const isSnowfallEnabled = useSettingsStore(
 		(state) => state.isSnowfallEnabled
 	);
@@ -16,5 +16,3 @@ const Snowfall = () => {
 		</div>
 	);
 };
-
-export default Snowfall;

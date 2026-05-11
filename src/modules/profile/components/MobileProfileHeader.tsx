@@ -25,7 +25,7 @@ type MobileProfileHeaderProps = {
 	showMenu: boolean;
 };
 
-const MobileProfileHeader = ({
+export const MobileProfileHeader = ({
 	title,
 	className,
 	showMenu,
@@ -86,5 +86,3 @@ const MobileProfileHeader = ({
 		</div>
 	);
 };
-
-export default MobileProfileHeader;

@@ -10,7 +10,7 @@ type PageHeaderProps = {
 	className?: string;
 };
 
-const PageHeader = ({ title, className }: PageHeaderProps) => {
+export const PageHeader = ({ title, className }: PageHeaderProps) => {
 	const router = useRouter();
 	return (
 		<div
@@ -32,5 +32,3 @@ const PageHeader = ({ title, className }: PageHeaderProps) => {
 		</div>
 	);
 };
-
-export default PageHeader;

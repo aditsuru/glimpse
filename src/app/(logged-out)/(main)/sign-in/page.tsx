@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import AnimatedFieldError from "@/components/misc/AnimatedFieldError";
+import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,7 @@ const signInSchema = z.object({
 		.nonempty("Password is required"),
 });
 
-const Page = () => {
+export default function Page() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const [isRedirecting, setIsRedirecting] = useState(false);
@@ -212,6 +212,4 @@ const Page = () => {
 			</FieldGroup>
 		</main>
 	);
-};
-
-export default Page;
+}

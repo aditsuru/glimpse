@@ -22,7 +22,7 @@ import {
 import { formatPostDate } from "@/lib/client/helpers";
 import { config } from "@/lib/shared/config";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
-import HoverProfileCard from "@/modules/profile/components/HoverProfileCard";
+import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
 import { useDeleteComment } from "../comment.queries";
 import type { getCommentOutput } from "../comment.schema";
 
@@ -31,7 +31,7 @@ interface CommentCardProps {
 	viewerUserId: string;
 }
 
-const CommentCard = ({ data, viewerUserId }: CommentCardProps) => {
+export const CommentCard = ({ data, viewerUserId }: CommentCardProps) => {
 	return (
 		<div className="w-full h-full py-2 p-4 flex gap-3 items-start">
 			<div className="flex flex-col items-center self-stretch">
@@ -106,19 +106,19 @@ const CommentCard = ({ data, viewerUserId }: CommentCardProps) => {
 	);
 };
 
-export default CommentCard;
-
-function DropdownMenuSubmenu({
-	commentId,
-	postId,
-	viewerUserId,
-	authorId,
-}: {
+interface DropdownMenuSubmenu {
 	commentId: string;
 	postId: string;
 	authorId: string;
 	viewerUserId: string;
-}) {
+}
+
+const DropdownMenuSubmenu = ({
+	commentId,
+	postId,
+	viewerUserId,
+	authorId,
+}: DropdownMenuSubmenu) => {
 	const deletePost = useDeleteComment({ postId });
 
 	const handleDelete = () => {
@@ -163,4 +163,4 @@ function DropdownMenuSubmenu({
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
-}
+};

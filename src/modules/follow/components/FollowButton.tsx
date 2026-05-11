@@ -21,7 +21,7 @@ interface FollowButtonProps {
 	targetVisibility: "public" | "private";
 }
 
-const FollowButton = ({
+export const FollowButton = ({
 	className,
 	targetUserId,
 	targetUsername,
@@ -99,5 +99,3 @@ const FollowButton = ({
 		</Button>
 	);
 };
-
-export default FollowButton;

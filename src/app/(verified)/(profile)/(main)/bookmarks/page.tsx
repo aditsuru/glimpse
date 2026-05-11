@@ -1,7 +1,7 @@
-import PageHeader from "@/components/layout/PageHeader";
-import BookmarkFeed from "@/modules/bookmark/components/BookmarkFeed";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { BookmarkFeed } from "@/modules/bookmark/components/BookmarkFeed";
 
-const Page = () => {
+export default function Page() {
 	return (
 		<main className="w-full h-full overflow-y-auto no-scrollbar flex flex-col">
 			<PageHeader title="Bookmarks" />
@@ -10,6 +10,4 @@ const Page = () => {
 			</div>
 		</main>
 	);
-};
-
-export default Page;
+}

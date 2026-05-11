@@ -10,7 +10,7 @@ type ProfileNavbarProps = {
 	viewerUserId: string;
 };
 
-const ProfileNavbar = ({
+export const ProfileNavbar = ({
 	username,
 	userId,
 	viewerUserId,
@@ -48,5 +48,3 @@ const ProfileNavbar = ({
 		</div>
 	);
 };
-
-export default ProfileNavbar;

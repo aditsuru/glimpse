@@ -7,7 +7,7 @@ interface EmptyStateMessageProps {
 	Icon?: React.ElementType;
 }
 
-const EmptyStateMessage = ({
+export const EmptyStateMessage = ({
 	title,
 	description,
 	Icon,
@@ -22,4 +22,3 @@ const EmptyStateMessage = ({
 		</div>
 	);
 };
-export default EmptyStateMessage;

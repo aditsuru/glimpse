@@ -1,6 +1,6 @@
 import { Meh } from "lucide-react";
 
-const ErrorMessage = () => {
+export const ErrorMessage = () => {
 	return (
 		<div className="w-full h-full flex flex-col items-center justify-center gap-3 text-muted-foreground">
 			<Meh className="size-12" />
@@ -13,5 +13,3 @@ const ErrorMessage = () => {
 		</div>
 	);
 };
-
-export default ErrorMessage;

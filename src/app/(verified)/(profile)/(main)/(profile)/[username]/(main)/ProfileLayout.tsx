@@ -1,24 +1,26 @@
 "use client";
 
 import { ORPCError } from "@orpc/client";
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
-import ErrorMessage from "@/components/layout/ErrorMessage";
-import PageHeader from "@/components/layout/PageHeader";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { ErrorMessage } from "@/components/layout/ErrorMessage";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { ScrollContainer } from "@/components/VideoPlayer";
-import MobileProfileHeader from "@/modules/profile/components/MobileProfileHeader";
+import { MobileProfileHeader } from "@/modules/profile/components/MobileProfileHeader";
 import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
-import ProfileNavbar from "@/modules/profile/components/ProfileNavbar";
+import { ProfileNavbar } from "@/modules/profile/components/ProfileNavbar";
 import { useProfile } from "@/modules/profile/profile.queries";
 
-const ProfileLayout = ({
-	username,
-	viewerUserId,
-	children,
-}: {
+interface ProfileLayoutProps {
 	username: string;
 	viewerUserId: string;
 	children: React.ReactNode;
-}) => {
+}
+
+export const ProfileLayout = ({
+	username,
+	viewerUserId,
+	children,
+}: ProfileLayoutProps) => {
 	const { data, isLoading, error } = useProfile({ username });
 
 	if (error) {
@@ -55,5 +57,3 @@ const ProfileLayout = ({
 		</ScrollContainer>
 	);
 };
-
-export default ProfileLayout;

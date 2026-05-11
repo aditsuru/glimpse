@@ -10,7 +10,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import * as z from "zod";
-import AnimatedFieldError from "@/components/misc/AnimatedFieldError";
+import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,7 +56,7 @@ const onboardingSchema = z.object({
 		),
 });
 
-const Page = () => {
+export default function Page() {
 	const [isRedirecting, setIsRedirecting] = useState(false);
 	const [usernameAvailable, setUsernameAvailable] = useState(false);
 	const [usernameError, setUsernameError] = useState<string | null>(null);
@@ -304,6 +304,4 @@ const Page = () => {
 			</Card>
 		</main>
 	);
-};
-
-export default Page;
+}

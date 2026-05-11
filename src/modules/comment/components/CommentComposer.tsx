@@ -16,7 +16,10 @@ interface CommentComposerProps {
 	postId: string;
 }
 
-const CommentComposer = ({ viewerUserId, postId }: CommentComposerProps) => {
+export const CommentComposer = ({
+	viewerUserId,
+	postId,
+}: CommentComposerProps) => {
 	const { data: profile } = useProfile({ userId: viewerUserId });
 	const createComment = useCreateComment(postId);
 
@@ -80,5 +83,3 @@ const CommentComposer = ({ viewerUserId, postId }: CommentComposerProps) => {
 		</form>
 	);
 };
-
-export default CommentComposer;

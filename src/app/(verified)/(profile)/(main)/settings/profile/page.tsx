@@ -11,9 +11,9 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import * as z from "zod";
-import ErrorMessage from "@/components/layout/ErrorMessage";
-import PageHeader from "@/components/layout/PageHeader";
-import AnimatedFieldError from "@/components/misc/AnimatedFieldError";
+import { ErrorMessage } from "@/components/layout/ErrorMessage";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,7 @@ const profileSettingsSchema = z.object({
 	pronouns: z.string().max(10, "Pronouns must be at most 10 characters"),
 });
 
-const Page = () => {
+export default function Page() {
 	const { data: sessionData } = authClient.useSession();
 	const {
 		data: profileData,
@@ -476,6 +476,4 @@ const Page = () => {
 			</form>
 		</main>
 	);
-};
-
-export default Page;
+}

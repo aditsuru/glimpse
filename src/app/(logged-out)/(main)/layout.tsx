@@ -1,5 +1,5 @@
 import Link from "next/link";
-import TechStack from "@/components/misc/TechStack";
+import { TechStack } from "@/components/misc/TechStack";
 import { FieldDescription, FieldGroup } from "@/components/ui/field";
 
 async function AuthLayout({

@@ -5,9 +5,13 @@ import {
 } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
-import PostPage from "./PostPage";
+import { PostPage } from "./PostPage";
 
-const Page = async ({ params }: { params: Promise<{ postId: string }> }) => {
+export default async function Page({
+	params,
+}: {
+	params: Promise<{ postId: string }>;
+}) {
 	const { postId } = await params;
 	const { user } = await getRequiredSession();
 
@@ -20,6 +24,4 @@ const Page = async ({ params }: { params: Promise<{ postId: string }> }) => {
 			<PostPage postId={postId} viewerUserId={user.id} />
 		</HydrationBoundary>
 	);
-};
-
-export default Page;
+}

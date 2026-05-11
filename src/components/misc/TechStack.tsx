@@ -76,7 +76,7 @@ const techStack: TechItem[] = [
 	},
 ];
 
-function TechStack() {
+export const TechStack = () => {
 	return (
 		<div>
 			<FieldSeparator>Built with</FieldSeparator>
@@ -127,6 +127,4 @@ function TechStack() {
 			</div>
 		</div>
 	);
-}
-
-export default TechStack;
+};

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/client/utils";
 
-const FeedHeader = () => {
+export const FeedHeader = () => {
 	const pathname = usePathname();
 
 	const tabs = [
@@ -38,5 +38,3 @@ const FeedHeader = () => {
 		</div>
 	);
 };
-
-export default FeedHeader;

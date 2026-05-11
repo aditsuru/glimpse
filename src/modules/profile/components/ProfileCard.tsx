@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/client/utils";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import type { profileSchema } from "../profile.schema";
-import HoverProfileCard from "./HoverProfileCard";
+import { HoverProfileCard } from "./HoverProfileCard";
 
 interface ProfileCardProps {
 	className?: string;
@@ -21,7 +21,7 @@ interface ProfileCardProps {
 	action?: React.ReactNode;
 }
 
-const ProfileCard = ({ data, className, action }: ProfileCardProps) => {
+export const ProfileCard = ({ data, className, action }: ProfileCardProps) => {
 	return (
 		<div className={cn("w-full", className)}>
 			<div className="w-full flex justify-between items-center p-4">
@@ -56,5 +56,3 @@ const ProfileCard = ({ data, className, action }: ProfileCardProps) => {
 		</div>
 	);
 };
-
-export default ProfileCard;

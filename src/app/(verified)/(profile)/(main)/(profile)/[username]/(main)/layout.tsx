@@ -6,7 +6,7 @@ import {
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
 import { ProfileProvider } from "./ProfileContext";
-import ProfileLayout from "./ProfileLayout";
+import { ProfileLayout } from "./ProfileLayout";
 
 const Layout = async ({
 	params,

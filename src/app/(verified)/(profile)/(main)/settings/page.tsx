@@ -7,7 +7,7 @@ import {
 	Snowflake,
 	Sparkles,
 } from "lucide-react";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import {
 	Field,
 	FieldContent,
@@ -23,7 +23,7 @@ import {
 } from "@/modules/profile/profile.queries";
 import { useSettingsStore } from "@/store/use-settings-store";
 
-const Page = () => {
+export default function Page() {
 	const { data: sessionData } = authClient.useSession();
 	const { data: profileData } = useProfile({ userId: sessionData?.user.id });
 	const updateVisibility = useUpdateVisibility({
@@ -161,6 +161,4 @@ const Page = () => {
 			</section>
 		</main>
 	);
-};
-
-export default Page;
+}

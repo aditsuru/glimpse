@@ -1,13 +1,15 @@
 import { AnimatePresence, motion } from "motion/react";
 import { FieldError } from "../ui/field";
 
-const AnimatedFieldError = ({
-	invalid,
-	errors,
-}: {
+interface AnimatedFieldErrorProps {
 	invalid: boolean;
 	errors?: { message?: string } | undefined;
-}) => {
+}
+
+export const AnimatedFieldError = ({
+	invalid,
+	errors,
+}: AnimatedFieldErrorProps) => {
 	return (
 		<AnimatePresence mode="wait">
 			{invalid && (
@@ -28,5 +30,3 @@ const AnimatedFieldError = ({
 		</AnimatePresence>
 	);
 };
-
-export default AnimatedFieldError;

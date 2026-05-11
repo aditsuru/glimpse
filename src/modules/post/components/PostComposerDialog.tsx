@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMediaStore } from "@/store/use-media-store";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
-import PostComposer from "./PostComposer";
+import { PostComposer } from "./PostComposer";
 
 export const PostComposerDialog = () => {
 	const { isOpen, close } = usePostComposerStore();

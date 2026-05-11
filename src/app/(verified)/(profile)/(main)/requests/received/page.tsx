@@ -1,6 +1,6 @@
 "use client";
 
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { Button } from "@/components/ui/button";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -10,10 +10,10 @@ import {
 	usePendingReceived,
 	useRejectRequest,
 } from "@/modules/follow/follow.queries";
-import ProfileCard from "@/modules/profile/components/ProfileCard";
-import RequestsHeader from "../RequestsHeader";
+import { ProfileCard } from "@/modules/profile/components/ProfileCard";
+import { RequestsHeader } from "../RequestsHeader";
 
-const Page = () => {
+export default function Page() {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingReceived();
 	const { data: sessionData } = authClient.useSession();
 	const rejectRequest = useRejectRequest();
@@ -68,6 +68,4 @@ const Page = () => {
 			</ScrollContainer>
 		</main>
 	);
-};
-
-export default Page;
+}

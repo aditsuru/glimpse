@@ -1,13 +1,13 @@
 "use client";
 
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
-import PostCard from "@/modules/post/components/PostCard";
+import { PostCard } from "@/modules/post/components/PostCard";
 import { useGetBookmarkedPosts } from "../bookmark.queries";
 
-const BookmarkFeed = () => {
+export const BookmarkFeed = () => {
 	const { data: sessionData } = authClient.useSession();
 	const { data, fetchNextPage, hasNextPage, isFetching } =
 		useGetBookmarkedPosts();
@@ -32,5 +32,3 @@ const BookmarkFeed = () => {
 		</ScrollContainer>
 	);
 };
-
-export default BookmarkFeed;

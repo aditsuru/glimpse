@@ -21,7 +21,7 @@ const INSET_SIDE = 45;
 const CONTENT_W = FRAME_W - INSET_SIDE * 2; // 1384
 const CONTENT_H = FRAME_H - INSET_TOP - INSET_BOTTOM; // 825
 
-export function Billboard({ frameSrc, children }: BillboardProps) {
+export const Billboard = ({ frameSrc, children }: BillboardProps) => {
 	return (
 		<div className="relative w-full">
 			{/* Outer shell — locked to the billboard frame ratio */}
@@ -63,4 +63,4 @@ export function Billboard({ frameSrc, children }: BillboardProps) {
 			</AspectRatio>
 		</div>
 	);
-}
+};

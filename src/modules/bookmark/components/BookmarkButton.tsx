@@ -16,7 +16,7 @@ interface BookmarkButtonProps {
 	initialState: boolean;
 }
 
-const BookmarkButton = ({
+export const BookmarkButton = ({
 	initialCount,
 	initialState,
 	postId,
@@ -53,5 +53,3 @@ const BookmarkButton = ({
 		</Button>
 	);
 };
-
-export default BookmarkButton;

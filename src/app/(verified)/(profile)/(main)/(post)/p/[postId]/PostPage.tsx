@@ -1,23 +1,22 @@
 "use client";
 
 import { ORPCError } from "@orpc/client";
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
-import ErrorMessage from "@/components/layout/ErrorMessage";
-import PageHeader from "@/components/layout/PageHeader";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { ErrorMessage } from "@/components/layout/ErrorMessage";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Separator } from "@/components/ui/separator";
 import { ScrollContainer } from "@/components/VideoPlayer";
-import CommentComposer from "@/modules/comment/components/CommentComposer";
-import PostComments from "@/modules/comment/components/PostComments";
-import PostCard from "@/modules/post/components/PostCard";
+import { CommentComposer } from "@/modules/comment/components/CommentComposer";
+import { PostComments } from "@/modules/comment/components/PostComments";
+import { PostCard } from "@/modules/post/components/PostCard";
 import { usePost } from "@/modules/post/post.queries";
 
-const PostPage = ({
-	postId,
-	viewerUserId,
-}: {
+interface PostPageProps {
 	postId: string;
 	viewerUserId: string;
-}) => {
+}
+
+export const PostPage = ({ postId, viewerUserId }: PostPageProps) => {
 	const { data, error, isLoading } = usePost(postId);
 
 	if (error) {
@@ -50,5 +49,3 @@ const PostPage = ({
 		</ScrollContainer>
 	);
 };
-
-export default PostPage;

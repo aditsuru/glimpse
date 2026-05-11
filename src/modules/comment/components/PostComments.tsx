@@ -1,18 +1,17 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetPostComments } from "../comment.queries";
-import CommentCard from "./CommentCard";
+import { CommentCard } from "./CommentCard";
 
-const PostComments = ({
-	postId,
-	viewerUserId,
-}: {
+interface PostCommentsProps {
 	postId: string;
 	viewerUserId: string;
-}) => {
+}
+
+export const PostComments = ({ postId, viewerUserId }: PostCommentsProps) => {
 	const searchParams = useSearchParams();
 	const highlight = searchParams.get("highlight");
 
@@ -42,5 +41,3 @@ const PostComments = ({
 		</div>
 	);
 };
-
-export default PostComments;

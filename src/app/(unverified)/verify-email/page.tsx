@@ -28,7 +28,7 @@ import { authClient } from "@/lib/client/auth-client";
 import { config } from "@/lib/shared/config";
 import { LOCAL_STORAGE_KEYS } from "@/lib/shared/constants";
 
-const Page = () => {
+export default function Page() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { data: session, isPending } = authClient.useSession();
@@ -126,6 +126,4 @@ const Page = () => {
 			</Card>
 		</main>
 	);
-};
-
-export default Page;
+}

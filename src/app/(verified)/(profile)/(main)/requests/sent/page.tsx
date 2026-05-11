@@ -1,15 +1,15 @@
 "use client";
 
-import EmptyStateMessage from "@/components/layout/EmptyStateMessage";
+import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { authClient } from "@/lib/client/auth-client";
-import FollowButton from "@/modules/follow/components/FollowButton";
+import { FollowButton } from "@/modules/follow/components/FollowButton";
 import { usePendingSent } from "@/modules/follow/follow.queries";
-import ProfileCard from "@/modules/profile/components/ProfileCard";
-import RequestsHeader from "../RequestsHeader";
+import { ProfileCard } from "@/modules/profile/components/ProfileCard";
+import { RequestsHeader } from "../RequestsHeader";
 
-const Page = () => {
+export default function Page() {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingSent();
 	const { data: sessionData } = authClient.useSession();
 
@@ -47,6 +47,4 @@ const Page = () => {
 			</ScrollContainer>
 		</main>
 	);
-};
-
-export default Page;
+}

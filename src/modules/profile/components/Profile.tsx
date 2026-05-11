@@ -9,7 +9,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_PFP_URL, isGif } from "@/lib/shared/constants";
-import FollowButton from "@/modules/follow/components/FollowButton";
+import { FollowButton } from "@/modules/follow/components/FollowButton";
 import type { profileSchema } from "../profile.schema";
 
 interface ProfileProps {
@@ -17,7 +17,7 @@ interface ProfileProps {
 	viewerUserId: string;
 }
 
-const Profile = ({ data, viewerUserId }: ProfileProps) => {
+export const Profile = ({ data, viewerUserId }: ProfileProps) => {
 	return (
 		<div className="w-full">
 			<div className="relative">
@@ -94,7 +94,7 @@ const Profile = ({ data, viewerUserId }: ProfileProps) => {
 	);
 };
 
-const ProfileSkeleton = () => {
+export const ProfileSkeleton = () => {
 	return (
 		<div className="w-full">
 			<div className="relative">
@@ -118,5 +118,3 @@ const ProfileSkeleton = () => {
 		</div>
 	);
 };
-
-export { Profile, ProfileSkeleton };
