@@ -12,7 +12,7 @@ import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { PostComposer } from "./PostComposer";
 
 export const PostComposerDialog = () => {
-	const { isOpen, close } = usePostComposerStore();
+	const { isOpen, close, isLocked } = usePostComposerStore();
 
 	useEffect(() => {
 		useMediaStore.getState().setPausedGlobally(isOpen);
@@ -20,7 +20,12 @@ export const PostComposerDialog = () => {
 	}, [isOpen]);
 
 	return (
-		<Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
+		<Dialog
+			open={isOpen}
+			onOpenChange={(open) => {
+				if (!open && !isLocked) close();
+			}}
+		>
 			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle className="text-xl font-semibold">

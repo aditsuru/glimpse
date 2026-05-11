@@ -22,6 +22,7 @@ import {
 	MAX_POST_BODY_LENGTH,
 } from "@/lib/shared/constants";
 import { useProfile } from "@/modules/profile/profile.queries";
+import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { useCreatePost, useGetAttachmentPresignedUrl } from "../post.queries";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -106,7 +107,7 @@ interface PostComposerProps {
 export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 	const { data: session } = authClient.useSession();
 	const { data: profile } = useProfile({ userId: session?.user.id ?? "" });
-	const createPost = useCreatePost({ viewerUserId: session?.user.id ?? "" });
+	const createPost = useCreatePost({ username: profile?.username ?? "" });
 	const getAttachmentPresignedUrl = useGetAttachmentPresignedUrl();
 
 	const router = useRouter();
@@ -150,6 +151,15 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		el.style.height = "auto";
 		el.style.height = `${el.scrollHeight}px`;
 	}, []);
+
+	// ── Dialog helper ──────────────────────────────────────────────────────────
+
+	const { setLocked } = usePostComposerStore();
+
+	useEffect(() => {
+		setLocked(isDisabled);
+		return () => setLocked(false); // Cleanup on unmount
+	}, [isDisabled, setLocked]);
 
 	// ── Upload helper ──────────────────────────────────────────────────────────
 
@@ -449,7 +459,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 				)}
 
 				{/* Toolbar */}
-				<div className="flex items-center justify-between mt-4 border-t border-border/40">
+				<div className="flex items-center justify-between mt-4 border-t border-border/40 pt-2">
 					<div className="flex items-center gap-1">
 						{/* Add attachment */}
 						<button

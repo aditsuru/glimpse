@@ -39,6 +39,7 @@ import { BookmarkButton } from "@/modules/bookmark/components/BookmarkButton";
 import { CommentButton } from "@/modules/comment/components/CommentButton";
 import { PostLikeButton } from "@/modules/post-like/components/PostLikeButton";
 import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
+import { useProfile } from "@/modules/profile/profile.queries";
 import { useDeletePost, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";
 
@@ -68,6 +69,8 @@ export const PostCard = ({
 				postId: data.id,
 			}),
 	});
+
+	const { data: profile } = useProfile({ userId: viewerUserId });
 
 	return (
 		<div
@@ -124,6 +127,7 @@ export const PostCard = ({
 						>
 							<DropdownMenuSubmenu
 								postId={data.id}
+								username={profile?.username ?? ""}
 								viewerUserId={viewerUserId}
 								authorId={data.author.id}
 							/>
@@ -239,15 +243,17 @@ export const PostCard = ({
 interface DropdownMenuSubmenu {
 	postId: string;
 	authorId: string;
+	username: string;
 	viewerUserId: string;
 }
 
 const DropdownMenuSubmenu = ({
 	postId,
+	username,
 	viewerUserId,
 	authorId,
 }: DropdownMenuSubmenu) => {
-	const deletePost = useDeletePost({ viewerUserId });
+	const deletePost = useDeletePost({ username });
 
 	const handleDelete = () => {
 		deletePost.mutate({

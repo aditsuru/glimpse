@@ -10,26 +10,19 @@ import { orpc } from "@/lib/client/orpc-client";
  * Side effects:
  * - Invalidate on settle: post.GetAllByUser[username]
  */
-export function useCreatePost({ viewerUserId }: { viewerUserId: string }) {
+export function useCreatePost({ username }: { username: string }) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		...orpc.post.create.mutationOptions(),
 		onSettled: async (_data, _err) => {
-			const username = queryClient.getQueryData<{ username?: string }>(
-				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
-					.queryKey
-			)?.username;
-
-			if (username) {
-				await Promise.all([
-					queryClient.invalidateQueries({
-						queryKey: orpc.post.getAllByUser.queryOptions({
-							input: { username },
-						}).queryKey,
-					}),
-				]);
-			}
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: orpc.post.getAllByUser.queryOptions({
+						input: { username },
+					}).queryKey,
+				}),
+			]);
 		},
 	});
 }
@@ -38,27 +31,16 @@ export function useCreatePost({ viewerUserId }: { viewerUserId: string }) {
  * Side effects:
  * - Invalidate on settle: post.GetAllByUser[username], post.get[postId]
  */
-export function useDeletePost({ viewerUserId }: { viewerUserId: string }) {
+export function useDeletePost({ username }: { username: string }) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		...orpc.post.delete.mutationOptions(),
-		onSettled: async (_data, _err, variables) => {
-			const username = queryClient.getQueryData<{ username?: string }>(
-				orpc.profile.get.queryOptions({ input: { userId: viewerUserId } })
-					.queryKey
-			)?.username;
-
+		onSettled: async (_data, _err) => {
 			await Promise.all([
-				username &&
-					queryClient.invalidateQueries({
-						queryKey: orpc.post.getAllByUser.queryOptions({
-							input: { username },
-						}).queryKey,
-					}),
 				queryClient.invalidateQueries({
-					queryKey: orpc.post.get.queryOptions({
-						input: { postId: variables.postId },
+					queryKey: orpc.post.getAllByUser.queryOptions({
+						input: { username },
 					}).queryKey,
 				}),
 			]);
