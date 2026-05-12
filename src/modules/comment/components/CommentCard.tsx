@@ -116,7 +116,7 @@ const DropdownMenuSubmenu = ({
 	postId,
 	authorId,
 }: DropdownMenuSubmenu) => {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	const deletePost = useDeleteComment({ postId });
 
@@ -142,7 +142,7 @@ const DropdownMenuSubmenu = ({
 			/>
 			<DropdownMenuContent className="w-auto">
 				<DropdownMenuGroup>
-					{authorId === viewerData.userId && (
+					{authorId === userId && (
 						<DropdownMenuItem
 							onClick={handleDelete}
 							className="text-destructive hover:text-destructive!"
@@ -150,7 +150,7 @@ const DropdownMenuSubmenu = ({
 							Delete
 						</DropdownMenuItem>
 					)}
-					{authorId !== viewerData.userId && (
+					{authorId !== userId && (
 						<DropdownMenuItem
 							onClick={handleReport}
 							className="text-destructive hover:text-destructive!"

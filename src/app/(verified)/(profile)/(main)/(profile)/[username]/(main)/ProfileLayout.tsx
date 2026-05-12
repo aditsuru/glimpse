@@ -18,7 +18,7 @@ interface ProfileLayoutProps {
 
 export const ProfileLayout = ({ username, children }: ProfileLayoutProps) => {
 	const { data, isLoading, error } = useProfile({ username });
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {
@@ -46,7 +46,7 @@ export const ProfileLayout = ({ username, children }: ProfileLayoutProps) => {
 			<MobileProfileHeader
 				title={username}
 				className="sm:hidden"
-				showMenu={data.userId === viewerData.userId}
+				showMenu={data.userId === userId}
 			/>
 			<div className="flex-1 flex flex-col">
 				<Profile data={data} />

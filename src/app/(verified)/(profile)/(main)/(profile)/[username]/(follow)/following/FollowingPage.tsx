@@ -13,7 +13,7 @@ interface FollowingPageProps {
 }
 
 export const FollowingPage = ({ username }: FollowingPageProps) => {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	const { data: profileData } = useProfile({ username });
 	const { data, fetchNextPage, hasNextPage, isFetching } = useFollowing(
@@ -33,7 +33,7 @@ export const FollowingPage = ({ username }: FollowingPageProps) => {
 					>
 						<ProfileCard data={profile} />
 
-						{profile.userId !== viewerData.userId && (
+						{profile.userId !== userId && (
 							<FollowButton
 								initialStatus={profile.viewerStatus}
 								targetUserId={profile.userId}

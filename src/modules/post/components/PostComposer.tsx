@@ -105,9 +105,9 @@ interface PostComposerProps {
 }
 
 export const PostComposer = ({ onSuccess }: PostComposerProps) => {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
-	const { data: profile } = useProfile({ userId: viewerData.userId });
+	const { data: profile } = useProfile({ userId: userId });
 	const createPost = useCreatePost();
 	const getAttachmentPresignedUrl = useGetAttachmentPresignedUrl();
 

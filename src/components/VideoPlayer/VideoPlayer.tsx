@@ -302,7 +302,7 @@ export function VideoPlayer({
 	spoiler = false,
 	aspectRatio = 16 / 9,
 	className = "",
-	autoPlayThreshold = 0.5,
+	autoPlayThreshold = 0.6,
 }: VideoPlayerProps) {
 	// ── Refs (never trigger re-renders) ─────────────────────────────────────────
 	const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -641,7 +641,7 @@ export function VideoPlayer({
 		<section
 			ref={containerRef}
 			className={cn(
-				"relative w-full bg-black rounded-lg overflow-hidden select-none",
+				"relative w-full bg-black rounded-lg overflow-hidden select-none border-accent border",
 				className
 			)}
 			style={wrapperStyle}

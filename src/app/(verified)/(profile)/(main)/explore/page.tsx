@@ -18,7 +18,7 @@ export default function Page() {
 	const [inputValue, setInputValue] = useState("");
 	const [searchQuery, setSearchQuery] = useState("");
 
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 	const { data, fetchNextPage, hasNextPage, isFetching } =
 		useSearchProfiles(searchQuery);
 
@@ -61,7 +61,7 @@ export default function Page() {
 					>
 						<ProfileCard data={profile} />
 
-						{profile.userId !== viewerData.userId && (
+						{profile.userId !== userId && (
 							<FollowButton
 								initialStatus={profile.viewerStatus}
 								targetUserId={profile.userId}

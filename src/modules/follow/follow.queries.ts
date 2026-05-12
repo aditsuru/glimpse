@@ -23,7 +23,7 @@ export function useSendFollow({
 	targetVisibility?: "public" | "private";
 }) {
 	const queryClient = useQueryClient();
-	const viewerData = useViewerStore.getState();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.follow.send.mutationOptions(),
@@ -91,7 +91,7 @@ export function useSendFollow({
 				refetches.push(
 					queryClient.invalidateQueries({
 						queryKey: orpc.profile.get.queryOptions({
-							input: { username: viewerData.username },
+							input: { username: username },
 						}).queryKey,
 					})
 				);
@@ -120,7 +120,7 @@ export function useRemoveFollow({
 	targetUsername: string;
 }) {
 	const queryClient = useQueryClient();
-	const viewerData = useViewerStore.getState();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.follow.remove.mutationOptions(),
@@ -188,7 +188,7 @@ export function useRemoveFollow({
 				refetches.push(
 					queryClient.invalidateQueries({
 						queryKey: orpc.profile.get.queryOptions({
-							input: { username: viewerData.username },
+							input: { username: username },
 						}).queryKey,
 					})
 				);
@@ -211,7 +211,7 @@ export function useRemoveFollow({
  */
 export function useRemoveFollower() {
 	const queryClient = useQueryClient();
-	const viewerData = useViewerStore.getState();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.follow.removeFollower.mutationOptions(),
@@ -231,7 +231,7 @@ export function useRemoveFollower() {
 			refetches.push(
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: viewerData.username },
+						input: { username: username },
 					}).queryKey,
 				})
 			);
@@ -247,7 +247,7 @@ export function useRemoveFollower() {
  */
 export function useAcceptRequest() {
 	const queryClient = useQueryClient();
-	const viewerData = useViewerStore.getState();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.follow.accept.mutationOptions(),
@@ -273,7 +273,7 @@ export function useAcceptRequest() {
 			refetches.push(
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: viewerData.username },
+						input: { username: username },
 					}).queryKey,
 				})
 			);

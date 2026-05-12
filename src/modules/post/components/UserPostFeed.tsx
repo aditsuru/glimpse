@@ -12,7 +12,7 @@ interface UserPostFeedProps {
 }
 
 export const UserPostFeed = ({ username, userId }: UserPostFeedProps) => {
-	const viewerData = useViewerStore.getState();
+	const { userId: viewerUserId } = useViewerStore();
 	const { data, fetchNextPage, hasNextPage, isFetching, error } =
 		useGetAllByUser(username);
 
@@ -40,7 +40,7 @@ export const UserPostFeed = ({ username, userId }: UserPostFeedProps) => {
 				<EmptyStateMessage
 					title="No posts yet"
 					description={
-						userId === viewerData.userId
+						userId === viewerUserId
 							? `You haven't posted anything yet`
 							: `${username} hasn't posted anything yet`
 					}

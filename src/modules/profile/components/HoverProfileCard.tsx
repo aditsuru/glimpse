@@ -23,7 +23,7 @@ export const HoverProfileCard = ({
 	username,
 }: HoverProfileCardProps) => {
 	const { data, isLoading, error } = useProfile({ username });
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	if (error) {
 		if (error instanceof ORPCError && error.code === "NOT_FOUND") {
@@ -34,7 +34,12 @@ export const HoverProfileCard = ({
 				/>
 			);
 		}
-		return <ErrorMessage />;
+
+		return (
+			<div className="w-full h-60">
+				<ErrorMessage />
+			</div>
+		);
 	}
 
 	if (isLoading || !data) return <HoverProfileCardSkeleton />;
@@ -46,7 +51,7 @@ export const HoverProfileCard = ({
 					<Avatar className="size-15">
 						<AvatarImage src={data.avatarUrl || DEFAULT_PFP_URL} />
 					</Avatar>
-					{data.userId !== viewerData.userId && (
+					{data.userId !== userId && (
 						<FollowButton
 							targetUserId={data.userId}
 							targetUsername={data.username}

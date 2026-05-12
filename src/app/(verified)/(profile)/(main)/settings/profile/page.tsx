@@ -67,14 +67,14 @@ const profileSettingsSchema = z.object({
 });
 
 export default function Page() {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	const {
 		data: profileData,
 		isLoading: isProfileLoading,
 		error: profileError,
 	} = useProfile({
-		userId: viewerData.userId,
+		userId: userId,
 	});
 
 	const { formState, handleSubmit, control, setError, clearErrors, reset } =

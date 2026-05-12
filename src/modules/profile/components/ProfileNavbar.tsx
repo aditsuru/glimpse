@@ -12,14 +12,14 @@ type ProfileNavbarProps = {
 
 export const ProfileNavbar = ({ username, userId }: ProfileNavbarProps) => {
 	const pathname = usePathname();
-	const viewerData = useViewerStore.getState();
+	const { userId: viewerUserId } = useViewerStore();
 
 	const tabs = [
 		{ label: "Posts", href: `/${username}` },
 		{ label: "Comments", href: `/${username}/comments` },
 	];
 
-	if (viewerData.userId === userId)
+	if (userId === viewerUserId)
 		tabs.push({ label: "Likes", href: `/${username}/likes` });
 
 	return (
