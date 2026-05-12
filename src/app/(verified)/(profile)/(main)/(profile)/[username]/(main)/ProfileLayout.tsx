@@ -32,7 +32,13 @@ export const ProfileLayout = ({ username, children }: ProfileLayoutProps) => {
 		return <ErrorMessage />;
 	}
 
-	if (isLoading || !data) return <ProfileSkeleton />;
+	if (isLoading || !data)
+		return (
+			<div>
+				<PageHeader title={""} />
+				<ProfileSkeleton />
+			</div>
+		);
 
 	return (
 		<ScrollContainer className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
