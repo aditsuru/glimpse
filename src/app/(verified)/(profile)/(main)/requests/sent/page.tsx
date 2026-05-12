@@ -11,7 +11,7 @@ import { RequestsHeader } from "../RequestsHeader";
 
 export default function Page() {
 	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingSent();
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
@@ -28,7 +28,7 @@ export default function Page() {
 						>
 							<ProfileCard data={profile} />
 
-							{profile.userId !== viewerData.userId && (
+							{profile.userId !== userId && (
 								<FollowButton
 									initialStatus={"pending"}
 									targetUserId={profile.userId}

@@ -26,8 +26,9 @@ export default async function Layout({
 	const viewerProfile = await caller.profile.get({ userId: user.id });
 
 	const queryClient = new QueryClient();
-	await queryClient.prefetchQuery(
-		orpc.profile.get.queryOptions({ input: { userId: user.id } })
+	queryClient.setQueryData(
+		orpc.profile.get.queryOptions({ input: { userId: user.id } }).queryKey,
+		viewerProfile
 	);
 
 	return (

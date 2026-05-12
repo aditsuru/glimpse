@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -17,13 +17,21 @@ interface CommentComposerProps {
 }
 
 export const CommentComposer = ({ postId }: CommentComposerProps) => {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
-	const { data: profile } = useProfile({ userId: viewerData.userId });
+	const { data: profile } = useProfile({ userId: userId });
 	const createComment = useCreateComment(postId);
 
 	const [body, setBody] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const growTextarea = useCallback(() => {
+		const el = textareaRef.current;
+		if (!el) return;
+		el.style.height = "auto";
+		el.style.height = `${el.scrollHeight}px`;
+	}, []);
 
 	const handleSubmit = (e: React.SubmitEvent) => {
 		e.preventDefault();
@@ -38,6 +46,9 @@ export const CommentComposer = ({ postId }: CommentComposerProps) => {
 
 		toast.success("Your reply was made successfully.");
 		setBody("");
+		if (textareaRef.current) {
+			textareaRef.current.style.height = "auto";
+		}
 		setIsLoading(false);
 	};
 
@@ -62,12 +73,15 @@ export const CommentComposer = ({ postId }: CommentComposerProps) => {
 			<Textarea
 				id="comment-body"
 				placeholder="Post your reply"
+				ref={textareaRef}
+				rows={1}
 				className={
-					"resize-none min-h-[20px] max-h-40 overflow-y-auto text-lg! border-none shadow-none focus-visible:ring-0 bg-transparent! -mt-1"
+					"resize-none min-h-[20px] max-h-[180px] text-lg! border-none shadow-none focus-visible:ring-0 bg-transparent! -mt-1"
 				}
 				value={body}
 				onChange={(e) => {
 					setBody(e.target.value);
+					growTextarea();
 				}}
 				disabled={isLoading}
 			/>

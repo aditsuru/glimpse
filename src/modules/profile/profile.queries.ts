@@ -29,7 +29,7 @@ export function useIsUsernameAvailable() {
  */
 export function useUpdateAvatar() {
 	const queryClient = useQueryClient();
-	const viewerData = useViewerStore.getState();
+	const { userId, username } = useViewerStore();
 
 	return useMutation({
 		...orpc.profile.updateAvatar.mutationOptions(),
@@ -37,12 +37,12 @@ export function useUpdateAvatar() {
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { userId: viewerData.userId },
+						input: { userId: userId },
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: viewerData.username },
+						input: { username: username },
 					}).queryKey,
 				}),
 			]);
@@ -55,7 +55,7 @@ export function useUpdateAvatar() {
  * - Invalidate on settle: profile.get[userId], profile.get[username:currentUsername]
  */
 export function useUpdateBanner() {
-	const viewerData = useViewerStore.getState();
+	const { userId, username } = useViewerStore();
 	const queryClient = useQueryClient();
 	return useMutation({
 		...orpc.profile.updateBanner.mutationOptions(),
@@ -63,12 +63,12 @@ export function useUpdateBanner() {
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { userId: viewerData.userId },
+						input: { userId: userId },
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: viewerData.username },
+						input: { username: username },
 					}).queryKey,
 				}),
 			]);
@@ -101,28 +101,26 @@ export function useSearchProfiles(query: string) {
  * - Invalidate on settle: profile.get[userId], profile.get[username:currentUsername]
  */
 export function useUpdateProfile() {
-	const viewerData = useViewerStore.getState();
+	const { userId, username } = useViewerStore();
 
 	const queryClient = useQueryClient();
 	return useMutation({
 		...orpc.profile.update.mutationOptions(),
 		onSuccess: (_data, variables) => {
 			if (variables.username) {
-				useViewerStore
-					.getState()
-					.setViewer(viewerData.userId, variables.username);
+				useViewerStore.getState().setViewer(userId, variables.username);
 			}
 		},
 		onSettled: async () => {
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { userId: viewerData.userId },
+						input: { userId: userId },
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: viewerData.username },
+						input: { username: username },
 					}).queryKey,
 				}),
 			]);
@@ -136,7 +134,7 @@ export function useUpdateProfile() {
  *   profile.search (viewerStatus changes for accounts interacting with viewer)
  */
 export function useUpdateVisibility() {
-	const viewerData = useViewerStore.getState();
+	const { userId, username } = useViewerStore();
 
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -145,7 +143,7 @@ export function useUpdateVisibility() {
 			const refetches: Promise<unknown>[] = [
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { userId: viewerData.userId },
+						input: { userId: userId },
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
@@ -154,7 +152,7 @@ export function useUpdateVisibility() {
 			refetches.push(
 				queryClient.invalidateQueries({
 					queryKey: orpc.profile.get.queryOptions({
-						input: { username: viewerData.username },
+						input: { username: username },
 					}).queryKey,
 				})
 			);

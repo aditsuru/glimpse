@@ -18,7 +18,7 @@ interface ProfileProps {
 }
 
 export const Profile = ({ data }: ProfileProps) => {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	return (
 		<div className="w-full">
@@ -40,7 +40,7 @@ export const Profile = ({ data }: ProfileProps) => {
 						<AvatarImage src={data.avatarUrl ?? DEFAULT_PFP_URL} />
 					</Avatar>
 				</div>
-				{viewerData.userId === data.userId && (
+				{userId === data.userId && (
 					<Button
 						variant="outline-ring"
 						nativeButton={false}
@@ -50,7 +50,7 @@ export const Profile = ({ data }: ProfileProps) => {
 						Edit Profile
 					</Button>
 				)}
-				{viewerData.userId !== data.userId && (
+				{userId !== data.userId && (
 					<FollowButton
 						targetUserId={data.userId}
 						targetUsername={data.username}
@@ -101,7 +101,7 @@ export const ProfileSkeleton = () => {
 		<div className="w-full">
 			<div className="relative">
 				<AspectRatio ratio={3 / 1}>
-					<Skeleton className="w-full h-full mt-18" />
+					<Skeleton className="w-full h-full" />
 				</AspectRatio>
 				<div className="px-4">
 					<Skeleton className="absolute -translate-y-1/2 size-30 rounded-full ring-4 ring-background" />

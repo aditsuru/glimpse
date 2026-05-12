@@ -13,7 +13,7 @@ import { useViewerStore } from "@/store/use-viewer-store";
  */
 export function useCreatePost() {
 	const queryClient = useQueryClient();
-	const viewerData = useViewerStore.getState();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.post.create.mutationOptions(),
@@ -21,7 +21,7 @@ export function useCreatePost() {
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: orpc.post.getAllByUser.queryOptions({
-						input: { username: viewerData.username },
+						input: { username: username },
 					}).queryKey,
 				}),
 			]);
@@ -35,7 +35,7 @@ export function useCreatePost() {
  */
 export function useDeletePost() {
 	const queryClient = useQueryClient();
-	const viewerData = useViewerStore.getState();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.post.delete.mutationOptions(),
@@ -43,7 +43,7 @@ export function useDeletePost() {
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: orpc.post.getAllByUser.queryOptions({
-						input: { username: viewerData.username },
+						input: { username: username },
 					}).queryKey,
 				}),
 			]);

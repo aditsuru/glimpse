@@ -240,7 +240,7 @@ interface DropdownMenuSubmenu {
 }
 
 const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	const deletePost = useDeletePost();
 	const router = useRouter();
@@ -273,7 +273,7 @@ const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
 			/>
 			<DropdownMenuContent className="w-auto">
 				<DropdownMenuGroup>
-					{authorId === viewerData.userId && (
+					{authorId === userId && (
 						<DropdownMenuItem
 							onClick={handleDelete}
 							className="text-destructive hover:text-destructive!"
@@ -281,7 +281,7 @@ const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
 							Delete
 						</DropdownMenuItem>
 					)}
-					{authorId !== viewerData.userId && (
+					{authorId !== userId && (
 						<DropdownMenuItem
 							onClick={handleReport}
 							className="text-destructive hover:text-destructive!"

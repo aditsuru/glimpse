@@ -25,7 +25,7 @@ interface FollowersPageProps {
 }
 
 export const FollowersPage = ({ username }: FollowersPageProps) => {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
 	const { data: profileData } = useProfile({ username });
 	const { data, fetchNextPage, hasNextPage, isFetching } = useFollowers(
@@ -45,7 +45,7 @@ export const FollowersPage = ({ username }: FollowersPageProps) => {
 					>
 						<ProfileCard data={profile} />
 
-						{profile.userId !== viewerData.userId && (
+						{profile.userId !== userId && (
 							<FollowButton
 								initialStatus={profile.viewerStatus}
 								targetUserId={profile.userId}
@@ -54,10 +54,9 @@ export const FollowersPage = ({ username }: FollowersPageProps) => {
 								className="mr-4"
 							/>
 						)}
-						{profileData?.userId === viewerData.userId &&
-							profile.userId !== viewerData.userId && (
-								<DropdownMenuSubmenu followerId={profile.userId} />
-							)}
+						{profileData?.userId === userId && profile.userId !== userId && (
+							<DropdownMenuSubmenu followerId={profile.userId} />
+						)}
 					</div>
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}

@@ -24,9 +24,9 @@ import { useSettingsStore } from "@/store/use-settings-store";
 import { useViewerStore } from "@/store/use-viewer-store";
 
 export default function Page() {
-	const viewerData = useViewerStore.getState();
+	const { userId } = useViewerStore();
 
-	const { data: profileData } = useProfile({ userId: viewerData.userId });
+	const { data: profileData } = useProfile({ userId: userId });
 	const updateVisibility = useUpdateVisibility();
 
 	const handleVisibilityChange = async (checked: boolean) => {
