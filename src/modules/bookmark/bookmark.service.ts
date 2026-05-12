@@ -88,6 +88,7 @@ export class BookmarkService {
 					commentsTable,
 					eq(postsTable.id, commentsTable.postId)
 				),
+				bookmarkedAt: bookmarksTable.createdAt,
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
@@ -99,14 +100,14 @@ export class BookmarkService {
 					eq(postsTable.id, bookmarksTable.postId)
 				)
 			)
-			.where(cursor ? lt(postsTable.createdAt, cursor) : undefined)
+			.where(cursor ? lt(bookmarksTable.createdAt, cursor) : undefined)
 			.groupBy(postsTable.id, profilesTable.id, bookmarksTable.createdAt)
 			.orderBy(desc(bookmarksTable.createdAt))
 			.limit(config.POSTS_PAGINATION_LIMIT + 1);
 
 		const hasNext = posts.length > config.POSTS_PAGINATION_LIMIT;
 		const trimmed = hasNext ? posts.slice(0, -1) : posts;
-		const nextCursor = hasNext ? trimmed.at(-1)!.createdAt : null;
+		const nextCursor = hasNext ? trimmed.at(-1)!.bookmarkedAt : null;
 
 		const viewsMap = await getPostViewsBatch(trimmed.map((p) => p.id));
 
