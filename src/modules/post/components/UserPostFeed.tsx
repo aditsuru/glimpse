@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/client";
 import { Lock } from "lucide-react";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { Loader } from "@/components/misc/Loader";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useViewerStore } from "@/store/use-viewer-store";
 import { useGetAllByUser } from "../post.queries";
@@ -13,8 +14,15 @@ interface UserPostFeedProps {
 
 export const UserPostFeed = ({ username, userId }: UserPostFeedProps) => {
 	const { userId: viewerUserId } = useViewerStore();
-	const { data, fetchNextPage, hasNextPage, isFetching, error } =
-		useGetAllByUser(username);
+	const {
+		data,
+		fetchNextPage,
+		hasNextPage,
+		isFetching,
+		error,
+		isLoading,
+		isFetchingNextPage,
+	} = useGetAllByUser(username);
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
@@ -36,6 +44,11 @@ export const UserPostFeed = ({ username, userId }: UserPostFeedProps) => {
 				</div>
 			))}
 			{hasNextPage && <div ref={ref} className="h-1" />}
+			{(isLoading || isFetchingNextPage) && (
+				<div className="py-8 flex justify-center w-full">
+					<Loader />
+				</div>
+			)}
 			{posts.length === 0 && !isFetching && (
 				<EmptyStateMessage
 					title="No posts yet"

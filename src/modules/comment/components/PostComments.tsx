@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { Loader } from "@/components/misc/Loader";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useGetPostComments } from "../comment.queries";
 import { CommentCard } from "./CommentCard";
@@ -14,10 +15,14 @@ export const PostComments = ({ postId }: PostCommentsProps) => {
 	const searchParams = useSearchParams();
 	const highlight = searchParams.get("highlight");
 
-	const { data, fetchNextPage, hasNextPage, isFetching } = useGetPostComments(
-		postId,
-		highlight ? highlight : undefined
-	);
+	const {
+		data,
+		fetchNextPage,
+		hasNextPage,
+		isFetching,
+		isLoading,
+		isFetchingNextPage,
+	} = useGetPostComments(postId, highlight ? highlight : undefined);
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const comments = data?.pages.flatMap((comment) => comment.items) ?? [];
 
@@ -29,6 +34,11 @@ export const PostComments = ({ postId }: PostCommentsProps) => {
 				</div>
 			))}
 			{hasNextPage && <div ref={ref} className="h-1" />}
+			{(isLoading || isFetchingNextPage) && (
+				<div className="py-8 flex justify-center w-full">
+					<Loader />
+				</div>
+			)}
 			{comments.length === 0 && !isFetching && (
 				<div className="flex-1 mt-20 md:mt-10 mb-4">
 					<EmptyStateMessage

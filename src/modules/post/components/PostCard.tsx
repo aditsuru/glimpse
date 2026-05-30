@@ -68,7 +68,7 @@ export const PostCard = ({
 				postId: data.id,
 			}),
 	});
-	data.author.isGlimpseVerified = true;
+
 	return (
 		<div
 			className={cn("p-4 py-2 pt-4 flex flex-col", className)}
@@ -141,7 +141,7 @@ export const PostCard = ({
 						onClick={(e) => e.stopPropagation()}
 						onKeyDown={(e) => e.stopPropagation()}
 					>
-						<p className="whitespace-break-spaces px-1">{data.body}</p>
+						<p className="whitespace-break-spaces">{data.body}</p>
 					</div>
 				)}
 				{data.hasAttachments && isVideo(data.attachments[0].mimeType) && (
@@ -265,7 +265,7 @@ const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
 				render={
 					<Button
 						variant="ghost"
-						className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+						className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent!"
 					>
 						<Ellipsis className="size-4.5" />
 					</Button>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
+import { ProgressBar } from "@/components/layout/ProgressBar";
+import { ProgressBarTrigger } from "@/components/layout/ProgressBarTrigger";
 import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import { cn } from "@/lib/client/utils";
 import { Providers } from "./providers";
@@ -40,6 +43,10 @@ export default function RootLayout({
 					{children}
 					<SmoothCursor />
 				</Providers>
+				<Suspense fallback={null}>
+					<ProgressBar />
+					<ProgressBarTrigger />
+				</Suspense>
 			</body>
 		</html>
 	);
