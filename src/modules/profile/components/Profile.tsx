@@ -56,6 +56,7 @@ export const Profile = ({ data }: ProfileProps) => {
 						targetUsername={data.username}
 						targetVisibility={data.visibility}
 						className="absolute right-4 translate-y-1/2 active:not-aria-[haspopup]:translate-y-5!"
+						showSkeleton={false}
 					/>
 				)}
 			</div>
@@ -64,9 +65,13 @@ export const Profile = ({ data }: ProfileProps) => {
 					{data.displayName}
 					{data.isGlimpseVerified && <VerifiedBadge className="size-6" />}
 				</h2>
-				<div className="flex items-center gap-1 text-muted-foreground">
+				<div className="flex items-center gap-1.5 text-muted-foreground">
 					<h3>@{data.username}</h3>
-					{data.pronouns && <p>~ {data.pronouns}</p>}
+					{data.pronouns && (
+						<p className="flex gap-1.5">
+							<span>~</span> {data.pronouns}
+						</p>
+					)}
 				</div>
 				{data.bio && (
 					<div className="mt-4">

@@ -65,9 +65,13 @@ export const HoverProfileCard = ({
 						{data.isGlimpseVerified && <VerifiedBadge />}
 					</p>
 				</Link>
-				<div className="text-muted-foreground flex gap-1 text-sm">
+				<div className="text-muted-foreground flex gap-1.5 text-sm">
 					@{data.username}
-					{data.pronouns && <p>~ {data.pronouns}</p>}
+					{data.pronouns && (
+						<p className="flex gap-1.5">
+							<span>~</span> {data.pronouns}
+						</p>
+					)}
 				</div>
 			</div>
 			<div>
