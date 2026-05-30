@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Loader } from "@/components/misc/Loader";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -26,24 +27,27 @@ export const BookmarkFeed = () => {
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
 
 	return (
-		<ScrollContainer className="w-full h-full">
-			{posts.map((post) => (
-				<div key={post.id} className="border-b border-accent">
-					<PostCard data={post} />
-				</div>
-			))}
-			{hasNextPage && <div ref={ref} className="h-1" />}
-			{(isLoading || isFetchingNextPage) && (
-				<div className="py-8 flex justify-center w-full">
-					<Loader />
-				</div>
-			)}
-			{posts.length === 0 && !isFetching && (
-				<EmptyStateMessage
-					title="No posts"
-					description="You haven't bookmarked anything yet"
-				/>
-			)}
-		</ScrollContainer>
+		<div className="flex flex-col w-full h-full relative">
+			<ScrollContainer className="flex-1 w-full h-full overflow-y-auto no-scrollbar">
+				<PageHeader title="Bookmarks" />
+				{posts.map((post) => (
+					<div key={post.id} className="border-b border-accent">
+						<PostCard data={post} />
+					</div>
+				))}
+				{hasNextPage && <div ref={ref} className="h-1" />}
+				{(isLoading || isFetchingNextPage) && (
+					<div className="py-8 flex justify-center w-full">
+						<Loader />
+					</div>
+				)}
+				{posts.length === 0 && !isFetching && (
+					<EmptyStateMessage
+						title="No posts"
+						description="You haven't bookmarked anything yet"
+					/>
+				)}
+			</ScrollContainer>
+		</div>
 	);
 };

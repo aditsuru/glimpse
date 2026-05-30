@@ -18,6 +18,7 @@ interface FollowButtonProps {
 	targetUsername: string;
 	initialStatus?: ViewerFollowStatus;
 	targetVisibility: "public" | "private";
+	showSkeleton?: boolean;
 }
 
 export const FollowButton = ({
@@ -26,6 +27,7 @@ export const FollowButton = ({
 	targetUsername,
 	initialStatus,
 	targetVisibility,
+	showSkeleton = true,
 }: FollowButtonProps) => {
 	const openDialog = useUnfollowConfirmStore(
 		(state) => state.openUnfollowDialog
@@ -77,7 +79,9 @@ export const FollowButton = ({
 		return { label: "Follow", variant: "follow" };
 	})();
 
-	if (isInitialLoading) {
+	if (!showSkeleton && isInitialLoading) return null;
+
+	if (isInitialLoading && showSkeleton) {
 		return <Skeleton className="h-9 w-24 rounded-full" />;
 	}
 
