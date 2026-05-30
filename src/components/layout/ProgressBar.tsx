@@ -12,7 +12,6 @@ export const ProgressBar = () => {
 
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
-	const prevRoute = useRef<string | null>(null);
 	const routeRef = useRef(`${pathname}?${searchParams}`);
 
 	const complete = () => {
