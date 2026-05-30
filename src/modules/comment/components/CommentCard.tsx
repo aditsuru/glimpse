@@ -43,7 +43,7 @@ export const CommentCard = ({ data }: CommentCardProps) => {
 			</div>
 			<div className="flex-1 flex flex-col">
 				<div className="text-base font-semibold flex justify-between gap-2 items-center -mt-1 flex-1">
-					<div className="flex justify-between gap-2 items-center">
+					<div className="flex justify-between gap-1 items-center">
 						<HoverCard>
 							<HoverCardTrigger
 								delay={300}

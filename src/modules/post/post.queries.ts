@@ -7,6 +7,14 @@ import {
 import { orpc } from "@/lib/client/orpc-client";
 import { useViewerStore } from "@/store/use-viewer-store";
 
+// Helper function
+const getAllByUserKey = (username: string) =>
+	orpc.post.getAllByUser.infiniteOptions({
+		input: (pageParam) => ({ username, cursor: pageParam }),
+		getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+		initialPageParam: undefined as Date | undefined,
+	}).queryKey;
+
 /**
  * Side effects:
  * - Invalidate on settle: post.GetAllByUser[username]
@@ -17,14 +25,10 @@ export function useCreatePost() {
 
 	return useMutation({
 		...orpc.post.create.mutationOptions(),
-		onSettled: async (_data, _err) => {
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: orpc.post.getAllByUser.queryOptions({
-						input: { username: username },
-					}).queryKey,
-				}),
-			]);
+		onSettled: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: getAllByUserKey(username),
+			});
 		},
 	});
 }
@@ -39,14 +43,10 @@ export function useDeletePost() {
 
 	return useMutation({
 		...orpc.post.delete.mutationOptions(),
-		onSettled: async (_data, _err) => {
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: orpc.post.getAllByUser.queryOptions({
-						input: { username: username },
-					}).queryKey,
-				}),
-			]);
+		onSettled: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: getAllByUserKey(username),
+			});
 		},
 	});
 }

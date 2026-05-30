@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { Loader } from "@/components/misc/Loader";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { PostCard } from "@/modules/post/components/PostCard";
@@ -8,7 +9,14 @@ import { useGetFeed } from "@/modules/post/post.queries";
 import { FeedHeader } from "./FeedHeader";
 
 export const FeedPage = () => {
-	const { data, fetchNextPage, hasNextPage, isFetching } = useGetFeed();
+	const {
+		data,
+		fetchNextPage,
+		hasNextPage,
+		isFetching,
+		isLoading,
+		isFetchingNextPage,
+	} = useGetFeed();
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
@@ -23,6 +31,11 @@ export const FeedPage = () => {
 					</div>
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
+				{(isLoading || isFetchingNextPage) && (
+					<div className="py-8 flex justify-center w-full">
+						<Loader />
+					</div>
+				)}
 				{posts.length === 0 && !isFetching && (
 					<EmptyStateMessage
 						title="No posts yet"

@@ -35,7 +35,7 @@ export const PostLikeButton = ({
 	return (
 		<Button
 			variant="ghost"
-			className="flex gap-1 text-muted-foreground/80 text-xs items-center rounded-2xl hover:bg-transparent! hover:text-pink-500"
+			className="flex gap-1 text-muted-foreground/80 text-xs items-center rounded-2xl hover:bg-transparent! hover:text-[#f91e7f]"
 			title="Like"
 			onClick={() => {
 				if (isLikedByUser) removePostLike.mutate({ postId });
@@ -45,7 +45,7 @@ export const PostLikeButton = ({
 			<Heart
 				className={cn(
 					"size-4.5 transition-transform active:scale-125",
-					isLikedByUser && "fill-pink-500 scale-110"
+					isLikedByUser && "fill-[#f91e7f] scale-110"
 				)}
 				stroke={isLikedByUser ? "none" : "currentColor"}
 			/>
