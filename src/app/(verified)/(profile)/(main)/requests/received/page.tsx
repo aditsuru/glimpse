@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { Loader } from "@/components/misc/Loader";
 import { Button } from "@/components/ui/button";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -13,7 +14,14 @@ import { ProfileCard } from "@/modules/profile/components/ProfileCard";
 import { RequestsHeader } from "../RequestsHeader";
 
 export default function Page() {
-	const { data, fetchNextPage, hasNextPage, isFetching } = usePendingReceived();
+	const {
+		data,
+		fetchNextPage,
+		hasNextPage,
+		isFetching,
+		isLoading,
+		isFetchingNextPage,
+	} = usePendingReceived();
 
 	const rejectRequest = useRejectRequest();
 	const acceptRequest = useAcceptRequest();
@@ -58,6 +66,11 @@ export default function Page() {
 						</div>
 					))}
 					{hasNextPage && <div ref={ref} className="h-1" />}
+					{(isLoading || isFetchingNextPage) && (
+						<div className="py-8 flex justify-center w-full">
+							<Loader />
+						</div>
+					)}
 					{profiles.length === 0 && !isFetching && (
 						<EmptyStateMessage title="There are no pending follow requests" />
 					)}

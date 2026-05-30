@@ -4,9 +4,10 @@ import { ORPCError } from "@orpc/client";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { ErrorMessage } from "@/components/layout/ErrorMessage";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { Loader } from "@/components/misc/Loader";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { MobileProfileHeader } from "@/modules/profile/components/MobileProfileHeader";
-import { Profile, ProfileSkeleton } from "@/modules/profile/components/Profile";
+import { Profile } from "@/modules/profile/components/Profile";
 import { ProfileNavbar } from "@/modules/profile/components/ProfileNavbar";
 import { useProfile } from "@/modules/profile/profile.queries";
 import { useViewerStore } from "@/store/use-viewer-store";
@@ -34,9 +35,8 @@ export const ProfileLayout = ({ username, children }: ProfileLayoutProps) => {
 
 	if (isLoading || !data)
 		return (
-			<div>
-				<PageHeader title={""} />
-				<ProfileSkeleton />
+			<div className="py-8 flex justify-center w-full">
+				<Loader />
 			</div>
 		);
 

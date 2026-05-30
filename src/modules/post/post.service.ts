@@ -129,10 +129,11 @@ export class PostService {
 
 			if (hasAttachments) {
 				await tsx.insert(attachmentsTable).values(
-					attachmentsWithKeys.map((a) => ({
+					attachmentsWithKeys.map((a, index) => ({
 						attachmentKey: a.permanentKey,
 						mimeType: a.mimeType,
 						postId: post.id,
+						position: index,
 					}))
 				);
 
@@ -216,7 +217,7 @@ export class PostService {
 				'mimeType', ${attachmentsTable.mimeType},
 				'url', ${attachmentsTable.attachmentKey}
 				)
-				ORDER BY ${attachmentsTable.createdAt} DESC
+				ORDER BY ${attachmentsTable.position} ASC
 				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
 				, '[]')
 				`,
@@ -352,7 +353,7 @@ export class PostService {
 				'mimeType', ${attachmentsTable.mimeType},
 				'url', ${attachmentsTable.attachmentKey}
 				)
-				ORDER BY ${attachmentsTable.createdAt} DESC
+				ORDER BY ${attachmentsTable.position} ASC
 				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
 				, '[]')
 				`,
@@ -467,7 +468,7 @@ export class PostService {
 				'mimeType', ${attachmentsTable.mimeType},
 				'url', ${attachmentsTable.attachmentKey}
 				)
-				ORDER BY ${attachmentsTable.createdAt} DESC
+				ORDER BY ${attachmentsTable.position} ASC
 				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
 				, '[]')
 				`,

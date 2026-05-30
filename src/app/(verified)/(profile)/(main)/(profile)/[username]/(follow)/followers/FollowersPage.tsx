@@ -2,6 +2,7 @@
 
 import { EllipsisVertical } from "lucide-react";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { Loader } from "@/components/misc/Loader";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -28,9 +29,14 @@ export const FollowersPage = ({ username }: FollowersPageProps) => {
 	const { userId } = useViewerStore();
 
 	const { data: profileData } = useProfile({ username });
-	const { data, fetchNextPage, hasNextPage, isFetching } = useFollowers(
-		profileData?.userId ?? ""
-	);
+	const {
+		data,
+		fetchNextPage,
+		hasNextPage,
+		isFetching,
+		isLoading,
+		isFetchingNextPage,
+	} = useFollowers(profileData?.userId ?? "");
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
@@ -60,6 +66,11 @@ export const FollowersPage = ({ username }: FollowersPageProps) => {
 					</div>
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
+				{(isLoading || isFetchingNextPage) && (
+					<div className="py-8 flex justify-center w-full">
+						<Loader />
+					</div>
+				)}
 				{profiles.length === 0 && !isFetching && (
 					<EmptyStateMessage
 						title="No followers found"

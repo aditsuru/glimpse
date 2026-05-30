@@ -4,6 +4,7 @@ import { ORPCError } from "@orpc/client";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { ErrorMessage } from "@/components/layout/ErrorMessage";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { Loader } from "@/components/misc/Loader";
 import { Separator } from "@/components/ui/separator";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { CommentComposer } from "@/modules/comment/components/CommentComposer";
@@ -25,16 +26,19 @@ export const PostPage = ({ postId }: PostPageProps) => {
 		return <ErrorMessage />;
 	}
 
-	if (!data || isLoading) return;
+	if (isLoading || !data)
+		return (
+			<div className="py-8 flex justify-center w-full">
+				<Loader />
+			</div>
+		);
 
 	return (
 		<ScrollContainer className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
 			<PageHeader title="Post" />
 			<div className="flex-1">
 				<PostCard data={data} leftMargin={false} profileRow separator />
-				<div className="px-8">
-					<Separator />
-				</div>
+				<Separator />
 
 				<CommentComposer postId={postId} />
 				<PostComments postId={postId} />
