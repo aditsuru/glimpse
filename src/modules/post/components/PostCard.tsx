@@ -23,7 +23,6 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Separator } from "@/components/ui/separator";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { useViewCount } from "@/hooks/useViewCount";
 import { formatPostDate } from "@/lib/client/helpers";
@@ -177,11 +176,7 @@ export const PostCard = ({
 				)}
 			</div>
 
-			{separator && (
-				<div className="px-4">
-					<Separator className="mt-4" />
-				</div>
-			)}
+			{separator && <div className="mt-2" />}
 			{/* Toolbar */}
 			<div
 				className={cn("mt-1 flex justify-between", {

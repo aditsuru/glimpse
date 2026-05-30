@@ -8,7 +8,14 @@ export const ProgressBarTrigger = () => {
 			const target = (e.target as HTMLElement).closest("a");
 			if (!target) return;
 			const href = target.getAttribute("href");
-			if (href?.startsWith("/") && !href.startsWith("//")) {
+			if (!href?.startsWith("/") || href.startsWith("//")) return;
+
+			const clickedUrl = new URL(href, window.location.origin);
+			const isSameRoute =
+				clickedUrl.pathname === window.location.pathname &&
+				clickedUrl.search === window.location.search;
+
+			if (!isSameRoute) {
 				window.dispatchEvent(new Event("startProgress"));
 			}
 		};

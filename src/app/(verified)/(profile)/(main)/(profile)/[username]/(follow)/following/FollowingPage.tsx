@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { Loader } from "@/components/misc/Loader";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { FollowButton } from "@/modules/follow/components/FollowButton";
 import { useFollowing } from "@/modules/follow/follow.queries";
@@ -16,9 +17,14 @@ export const FollowingPage = ({ username }: FollowingPageProps) => {
 	const { userId } = useViewerStore();
 
 	const { data: profileData } = useProfile({ username });
-	const { data, fetchNextPage, hasNextPage, isFetching } = useFollowing(
-		profileData?.userId ?? ""
-	);
+	const {
+		data,
+		fetchNextPage,
+		hasNextPage,
+		isFetching,
+		isLoading,
+		isFetchingNextPage,
+	} = useFollowing(profileData?.userId ?? "");
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
@@ -45,6 +51,11 @@ export const FollowingPage = ({ username }: FollowingPageProps) => {
 					</div>
 				))}
 				{hasNextPage && <div ref={ref} className="h-1" />}
+				{(isLoading || isFetchingNextPage) && (
+					<div className="py-8 flex justify-center w-full">
+						<Loader />
+					</div>
+				)}
 				{profiles.length === 0 && !isFetching && (
 					<EmptyStateMessage title="This user doesn't follow any accounts" />
 				)}

@@ -66,7 +66,7 @@ export class PostLikeService {
 						'mimeType', ${attachmentsTable.mimeType},
 						'url', ${attachmentsTable.attachmentKey}
 						)
-						ORDER BY ${attachmentsTable.createdAt} DESC
+						ORDER BY ${attachmentsTable.position} ASC
 						) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
 						, '[]')
 						`,
