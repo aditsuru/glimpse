@@ -7,6 +7,7 @@ import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_PFP_URL, isGif } from "@/lib/shared/constants";
 import { FollowButton } from "@/modules/follow/components/FollowButton";
 import { useViewerStore } from "@/store/use-viewer-store";
@@ -89,6 +90,31 @@ export const Profile = ({ data }: ProfileProps) => {
 							</span>
 						</p>
 					</Link>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const ProfileSkeleton = () => {
+	return (
+		<div className="w-full">
+			<div className="relative">
+				<AspectRatio ratio={3 / 1}>
+					<Skeleton className="w-full h-full" />
+				</AspectRatio>
+				<div className="px-4">
+					<Skeleton className="absolute -translate-y-1/2 size-30 rounded-full ring-4 ring-background" />
+				</div>
+			</div>
+			<div className="mt-[80px] px-4 flex flex-col gap-3">
+				<Skeleton className="h-7 w-40 rounded" />
+				<Skeleton className="h-4 w-28 rounded" />
+				<Skeleton className="h-4 w-full rounded" />
+				<Skeleton className="h-4 w-3/4 rounded" />
+				<div className="flex gap-4 mt-1">
+					<Skeleton className="h-4 w-20 rounded" />
+					<Skeleton className="h-4 w-20 rounded" />
 				</div>
 			</div>
 		</div>
