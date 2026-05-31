@@ -3,6 +3,7 @@ import {
 	HydrationBoundary,
 	QueryClient,
 } from "@tanstack/react-query";
+import { ConfirmDialog } from "@/components/layout/ConfirmDialog";
 import { MobileNavbar } from "@/components/layout/MobileNavbar";
 import { Navbar } from "@/components/layout/Navbar";
 import { SecondarySidebar } from "@/components/layout/SecondarySidebar";
@@ -12,8 +13,6 @@ import { ViewerInitializer } from "@/components/misc/ViewerInitializer";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
 import { getServerCaller } from "@/lib/server/orpc-server";
-import { UnfollowConfirmDialog } from "@/modules/follow/components/UnfollowConfirmDialog";
-import { DeletePostConfirmDialog } from "@/modules/post/components/DeletePostConfirmDialog";
 import { PostComposerDialog } from "@/modules/post/components/PostComposerDialog";
 
 export default async function Layout({
@@ -62,9 +61,8 @@ export default async function Layout({
 				<MeteorsComponent />
 
 				{/* Dialogs */}
-				<UnfollowConfirmDialog />
+				<ConfirmDialog />
 				<PostComposerDialog />
-				<DeletePostConfirmDialog />
 			</div>
 		</HydrationBoundary>
 	);

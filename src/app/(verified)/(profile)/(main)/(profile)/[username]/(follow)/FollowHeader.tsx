@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { startProgress } from "@/lib/client/helpers";
 import { cn } from "@/lib/client/utils";
 
 type FollowHeaderProps = {
@@ -23,7 +24,10 @@ export const FollowHeader = ({ username }: FollowHeaderProps) => {
 		<div className="flex flex-col sticky top-0 bg-background/80 backdrop-blur-sm z-10 border-b border-accent">
 			<div className="flex items-center gap-2 px-4 py-3 h-18">
 				<Button
-					onClick={() => router.back()}
+					onClick={() => {
+						startProgress();
+						router.back();
+					}}
 					className="rounded-full p-2 hover:bg-accent transition-colors"
 					variant="ghost"
 				>

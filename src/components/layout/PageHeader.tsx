@@ -2,6 +2,7 @@
 
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { startProgress } from "@/lib/client/helpers";
 import { cn } from "@/lib/client/utils";
 import { Button } from "../ui/button";
 
@@ -22,7 +23,10 @@ export const PageHeader = ({ title, className }: PageHeaderProps) => {
 			<div className="flex items-center gap-4 h-18">
 				<Button
 					variant="ghost"
-					onClick={() => router.back()}
+					onClick={() => {
+						startProgress();
+						router.back();
+					}}
 					className="rounded-full p-2 hover:bg-accent transition-colors"
 				>
 					<ChevronLeft className="size-5" />

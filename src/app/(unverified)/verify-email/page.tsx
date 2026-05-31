@@ -33,7 +33,7 @@ export default function Page() {
 	const searchParams = useSearchParams();
 	const { data: session, isPending } = authClient.useSession();
 	const [isLoading, setIsLoading] = useState(false);
-	const { secondsLeft, startCooldown } = useCooldown(
+	const { secondsLeft, startCooldown, hasTriggered } = useCooldown(
 		LOCAL_STORAGE_KEYS.VERIFY_EMAIL_COOLDOWN,
 		config.NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT
 	);
@@ -89,11 +89,13 @@ export default function Page() {
 						className="w-full"
 					>
 						{isLoading ? (
-							<Spinner />
+							<Spinner className="mr-2" />
 						) : secondsLeft !== null && secondsLeft > 0 ? (
 							`Wait ${secondsLeft}s to resend`
-						) : (
+						) : hasTriggered ? (
 							"Resend email"
+						) : (
+							"Send email"
 						)}
 					</Button>
 					<AlertDialog>

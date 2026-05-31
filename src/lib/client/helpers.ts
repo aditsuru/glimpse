@@ -12,3 +12,6 @@ export function formatPostDate(date: Date | string): string {
 export const formatNumber = new Intl.NumberFormat("en", {
 	notation: "compact",
 });
+
+export const startProgress = () =>
+	window.dispatchEvent(new Event("startProgress"));

@@ -1,112 +1,112 @@
 {
-  // ─── Regular Components (named export, arrow function) ───────────────────
+	// ─── Regular Components (named export, arrow function) ───────────────────
 
-  "Component": {
-    "prefix": "rfc",
-    "scope": "typescript,typescriptreact,javascript,javascriptreact",
-    "description": "Named export arrow function component",
-    "body": [
-      "export const ${1:${TM_FILENAME_BASE/^(.)/${1:/upcase}/}} = () => {",
-      "  return (",
-      "    <div>",
-      "      $0",
-      "    </div>",
-      "  )",
-      "}"
-    ]
-  },
+	"Component": {
+		"prefix": "rfc",
+		"scope": "typescript,typescriptreact,javascript,javascriptreact",
+		"description": "Named export arrow function component",
+		"body": [
+			"export const ${1:${TM_FILENAME_BASE/^(.)/${1:/upcase}/}} = () => {",
+			"  return (",
+			"    <div>",
+			"      $0",
+			"    </div>",
+			"  )",
+			"}"
+		]
+	},
 
-  "Component with Props": {
-    "prefix": "rfcp",
-    "scope": "typescript,typescriptreact",
-    "description": "Named export arrow function component with Props interface",
-    "body": [
-      "interface ${1:${TM_FILENAME_BASE/^(.)/${1:/upcase}/}}Props {",
-      "  $2",
-      "}",
-      "",
-      "export const ${1:${TM_FILENAME_BASE/^(.)/${1:/upcase}/}} = ({ $3 }: ${1:${TM_FILENAME_BASE/^(.)/${1:/upcase}/}}Props) => {",
-      "  return (",
-      "    <div>",
-      "      $0",
-      "    </div>",
-      "  )",
-      "}"
-    ]
-  },
+	"Component with Props": {
+		"prefix": "rfcp",
+		"scope": "typescript,typescriptreact",
+		"description": "Named export arrow function component with Props interface",
+		"body": [
+			"interface ${1:${TM_FILENAME_BASE/^(.)/${1:/upcase}/}}Props {",
+			"  $2",
+			"}",
+			"",
+			"export const ${1:${TM_FILENAME_BASE/^(.)/${1:/upcase}/}} = ({ $3 }: ${1:${TM_FILENAME_BASE/^(.)/${1:/upcase}/}}Props) => {",
+			"  return (",
+			"    <div>",
+			"      $0",
+			"    </div>",
+			"  )",
+			"}"
+		]
+	},
 
-  // ─── Page (page.tsx) ─────────────────────────────────────────────────────
+	// ─── Page (page.tsx) ─────────────────────────────────────────────────────
 
-  "Next Page": {
-    "prefix": "page",
-    "scope": "typescript,typescriptreact",
-    "description": "Next.js default export page function",
-    "body": [
-      "export default function Page() {",
-      "  return (",
-      "    <div>",
-      "      $0",
-      "    </div>",
-      "  )",
-      "}"
-    ]
-  },
+	"Next Page": {
+		"prefix": "page",
+		"scope": "typescript,typescriptreact",
+		"description": "Next.js default export page function",
+		"body": [
+			"export default function Page() {",
+			"  return (",
+			"    <div>",
+			"      $0",
+			"    </div>",
+			"  )",
+			"}"
+		]
+	},
 
-  "Next Page with Props": {
-    "prefix": "pagep",
-    "scope": "typescript,typescriptreact",
-    "description": "Next.js default export page function with PageProps interface",
-    "body": [
-      "interface PageProps {",
-      "  $1",
-      "}",
-      "",
-      "export default function Page({ $2 }: PageProps) {",
-      "  return (",
-      "    <div>",
-      "      $0",
-      "    </div>",
-      "  )",
-      "}"
-    ]
-  },
+	"Next Page with Props": {
+		"prefix": "pagep",
+		"scope": "typescript,typescriptreact",
+		"description": "Next.js default export page function with PageProps interface",
+		"body": [
+			"interface PageProps {",
+			"  $1",
+			"}",
+			"",
+			"export default function Page({ $2 }: PageProps) {",
+			"  return (",
+			"    <div>",
+			"      $0",
+			"    </div>",
+			"  )",
+			"}"
+		]
+	},
 
-  // ─── Layout (layout.tsx) ──────────────────────────────────────────────────
+	// ─── Layout (layout.tsx) ──────────────────────────────────────────────────
 
-  "Next Layout": {
-    "prefix": "layout",
-    "scope": "typescript,typescriptreact",
-    "description": "Next.js default export layout function",
-    "body": [
-      "export default function Layout({ children }: { children: React.ReactNode }) {",
-      "  return (",
-      "    <div>",
-      "      $0",
-      "      {children}",
-      "    </div>",
-      "  )",
-      "}"
-    ]
-  },
+	"Next Layout": {
+		"prefix": "layout",
+		"scope": "typescript,typescriptreact",
+		"description": "Next.js default export layout function",
+		"body": [
+			"export default function Layout({ children }: { children: React.ReactNode }) {",
+			"  return (",
+			"    <div>",
+			"      $0",
+			"      {children}",
+			"    </div>",
+			"  )",
+			"}"
+		]
+	},
 
-  "Next Layout with Props": {
-    "prefix": "layoutp",
-    "scope": "typescript,typescriptreact",
-    "description": "Next.js default export layout function with LayoutProps interface",
-    "body": [
-      "interface LayoutProps {",
-      "  children: React.ReactNode",
-      "  $1",
-      "}",
-      "",
-      "export default function Layout({ children, $2 }: LayoutProps) {",
-      "  return (",
-      "    <div>",
-      "      $0",
-      "      {children}",
-      "    </div>",
-      "  )",
-      "}"
-    ]
-  }
+	"Next Layout with Props": {
+		"prefix": "layoutp",
+		"scope": "typescript,typescriptreact",
+		"description": "Next.js default export layout function with LayoutProps interface",
+		"body": [
+			"interface LayoutProps {",
+			"  children: React.ReactNode",
+			"  $1",
+			"}",
+			"",
+			"export default function Layout({ children, $2 }: LayoutProps) {",
+			"  return (",
+			"    <div>",
+			"      $0",
+			"      {children}",
+			"    </div>",
+			"  )",
+			"}"
+		]
+	}
 }

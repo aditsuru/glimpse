@@ -32,7 +32,7 @@ export default function Page() {
 	const [email, setEmail] = React.useState("");
 	const [error, setError] = React.useState<string | null>(null);
 	const [isLoading, setIsLoading] = React.useState(false);
-	const { secondsLeft, startCooldown } = useCooldown(
+	const { secondsLeft, startCooldown, hasTriggered } = useCooldown(
 		LOCAL_STORAGE_KEYS.FORGOT_PASSWORD_COOLDOWN,
 		config.NEXT_PUBLIC_EMAIL_RESEND_TIMEOUT
 	);
@@ -131,8 +131,10 @@ export default function Page() {
 								<Spinner className="mr-2" />
 							) : secondsLeft !== null && secondsLeft > 0 ? (
 								`Wait ${secondsLeft}s to resend`
+							) : hasTriggered ? (
+								"Resend link"
 							) : (
-								"Resend email"
+								"Send reset link"
 							)}
 						</Button>
 					</form>

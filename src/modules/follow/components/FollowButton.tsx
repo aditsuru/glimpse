@@ -10,7 +10,7 @@ import {
 	useRemoveFollow,
 	useSendFollow,
 } from "@/modules/follow/follow.queries";
-import { useUnfollowConfirmStore } from "@/store/use-unfollow-confirm-store";
+import { useConfirmDialogStore } from "@/store/use-confirm-dialog-store";
 
 interface FollowButtonProps {
 	className?: string;
@@ -29,9 +29,7 @@ export const FollowButton = ({
 	targetVisibility,
 	showSkeleton = true,
 }: FollowButtonProps) => {
-	const openDialog = useUnfollowConfirmStore(
-		(state) => state.openUnfollowDialog
-	);
+	const openConfirmDialog = useConfirmDialogStore((state) => state.openDialog);
 
 	const { data, isLoading } = useFollowStatus({ targetUserId }, initialStatus);
 
@@ -54,7 +52,15 @@ export const FollowButton = ({
 			removeFollow.mutate({ targetUserId });
 		} else if (status === "accepted" || status === "mutual") {
 			if (targetVisibility === "private") {
-				openDialog(targetUsername, () => removeFollow.mutate({ targetUserId }));
+				openConfirmDialog({
+					title: `Unfollow @${targetUsername}?`,
+					description:
+						"You will stop seeing their posts in your feed. Since this is a private account, you’ll need to send a new request if you want to follow them again.",
+					confirmText: "Unfollow",
+					confirmVariant: "destructive",
+					className: "w-lg",
+					onConfirm: () => removeFollow.mutate({ targetUserId }),
+				});
 			} else {
 				removeFollow.mutate({ targetUserId });
 			}

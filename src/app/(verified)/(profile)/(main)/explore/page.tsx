@@ -3,6 +3,7 @@
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
+import { Loader } from "@/components/misc/Loader";
 import {
 	InputGroup,
 	InputGroupAddon,
@@ -19,10 +20,10 @@ export default function Page() {
 	const [searchQuery, setSearchQuery] = useState("");
 
 	const { userId } = useViewerStore();
-	const { data, fetchNextPage, hasNextPage, isFetching } =
+	const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
 		useSearchProfiles(searchQuery);
 
-	const ref = useInfiniteScroll(fetchNextPage, isFetching);
+	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
 
 	const handleSubmit = (e: React.SubmitEvent) => {
 		e.preventDefault();
@@ -72,8 +73,17 @@ export default function Page() {
 						)}
 					</div>
 				))}
-				{hasNextPage && <div ref={ref} className="h-1" />}
-				{searchQuery && profiles.length === 0 && !isFetching && (
+				{isLoading && (
+					<div className="py-8 flex justify-center w-full">
+						<Loader />
+					</div>
+				)}
+				{hasNextPage && (
+					<div ref={ref} className="py-4 flex justify-center w-full">
+						<Loader />
+					</div>
+				)}
+				{searchQuery && profiles.length === 0 && !isLoading && (
 					<div className="flex-1">
 						<EmptyStateMessage
 							title={`No profiles found for "${searchQuery}"`}

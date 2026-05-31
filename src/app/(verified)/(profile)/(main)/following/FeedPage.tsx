@@ -9,16 +9,10 @@ import { useGetFeed } from "@/modules/post/post.queries";
 import { FeedHeader } from "./FeedHeader";
 
 export const FeedPage = () => {
-	const {
-		data,
-		fetchNextPage,
-		hasNextPage,
-		isFetching,
-		isLoading,
-		isFetchingNextPage,
-	} = useGetFeed();
+	const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
+		useGetFeed();
 
-	const ref = useInfiniteScroll(fetchNextPage, isFetching);
+	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
 
 	return (
@@ -30,20 +24,24 @@ export const FeedPage = () => {
 						<PostCard data={post} />
 					</div>
 				))}
-				{hasNextPage && <div ref={ref} className="h-1" />}
-				{(isLoading || isFetchingNextPage) && (
+				{isLoading && (
 					<div className="py-8 flex justify-center w-full">
 						<Loader />
 					</div>
 				)}
-				{posts.length === 0 && !isFetching && (
+				{hasNextPage && (
+					<div ref={ref} className="py-12 flex justify-center w-full">
+						<Loader />
+					</div>
+				)}
+				{posts.length === 0 && !isLoading && (
 					<EmptyStateMessage
 						title="No posts yet"
 						description={`Start following people to have their latest posts on your feed`}
 					/>
 				)}
-				{!hasNextPage && posts.length > 0 && !isFetching && (
-					<div className="text-center py-8 text-muted-foreground text-base">
+				{!hasNextPage && posts.length > 0 && !isLoading && (
+					<div className="text-center py-12 text-muted-foreground text-base">
 						You're all caught up
 					</div>
 				)}
