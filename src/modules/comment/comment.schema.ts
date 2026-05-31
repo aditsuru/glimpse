@@ -11,9 +11,9 @@ const commentAuthorSchema = z.object({
 
 export const getCommentOutput = commentSelectSchema.extend({
 	author: commentAuthorSchema,
-
 	likesCount: z.number(),
 	isLikedByUser: z.boolean(),
+	repliesCount: z.number(),
 });
 
 export const getCommentListOutput = z.object({
@@ -26,7 +26,6 @@ export const commentSchema = {
 		input: z.object({
 			postId: z.string(),
 		}),
-
 		output: z.object({
 			count: z.number(),
 		}),
@@ -38,7 +37,6 @@ export const commentSchema = {
 			cursor: z.date().optional(),
 			highlight: z.string().optional(),
 		}),
-
 		output: getCommentListOutput,
 	},
 
@@ -47,7 +45,6 @@ export const commentSchema = {
 			username: z.string(),
 			cursor: z.date().optional(),
 		}),
-
 		output: getCommentListOutput,
 	},
 
@@ -55,8 +52,8 @@ export const commentSchema = {
 		input: z.object({
 			postId: z.string(),
 			body: z.string(),
+			parentCommentId: z.string().optional(),
 		}),
-
 		output: z.object({
 			success: z.boolean(),
 		}),
@@ -66,7 +63,6 @@ export const commentSchema = {
 		input: z.object({
 			commentId: z.string(),
 		}),
-
 		output: z.object({
 			success: z.boolean(),
 		}),
@@ -77,7 +73,6 @@ export const commentSchema = {
 			commentId: z.string(),
 			cursor: z.date().optional(),
 		}),
-
 		output: getCommentListOutput,
 	},
 };
