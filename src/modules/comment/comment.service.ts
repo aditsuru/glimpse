@@ -8,7 +8,6 @@ import {
 	getTableColumns,
 	isNull,
 	lt,
-	ne,
 	sql,
 } from "drizzle-orm";
 import type * as z from "zod";
@@ -99,25 +98,6 @@ export class CommentService {
 		`,
 		};
 
-		const viewerComments = !cursor
-			? await this.db
-					.select(selectColumns)
-					.from(commentsTable)
-					.leftJoin(
-						profilesTable,
-						eq(commentsTable.userId, profilesTable.userId)
-					)
-					.where(
-						and(
-							eq(commentsTable.postId, postId),
-							eq(commentsTable.userId, this.userId),
-							isNull(commentsTable.parentCommentId)
-						)
-					)
-					.groupBy(commentsTable.id, profilesTable.id)
-					.orderBy(desc(commentsTable.createdAt))
-			: [];
-
 		const otherComments = await this.db
 			.select(selectColumns)
 			.from(commentsTable)
@@ -126,7 +106,6 @@ export class CommentService {
 				and(
 					eq(commentsTable.postId, postId),
 					isNull(commentsTable.parentCommentId),
-					ne(commentsTable.userId, this.userId),
 					cursor ? lt(commentsTable.createdAt, cursor) : undefined
 				)
 			)
@@ -145,10 +124,7 @@ export class CommentService {
 		const trimmed = hasNext ? otherComments.slice(0, -1) : otherComments;
 		const nextCursor = hasNext ? trimmed.at(-1)!.createdAt : null;
 
-		const comments = [
-			...this.mapComments(viewerComments),
-			...this.mapComments(trimmed),
-		];
+		const comments = [...this.mapComments(trimmed)];
 
 		const items = comments.sort((a, b) =>
 			a.id === highlight ? -1 : b.id === highlight ? 1 : 0

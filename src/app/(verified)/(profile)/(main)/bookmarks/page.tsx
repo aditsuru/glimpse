@@ -1,4 +1,3 @@
-import { PageHeader } from "@/components/layout/PageHeader";
 import { BookmarkFeed } from "@/modules/bookmark/components/BookmarkFeed";
 
 export default function Page() {

@@ -196,7 +196,7 @@ export const PostCard = ({
 
 				<Button
 					variant="ghost"
-					className="flex gap-1 text-muted-foreground/80 text-xs items-center rounded-2xl hover:bg-transparent! hover:text-red-500"
+					className="flex gap-1 text-muted-foreground/80 text-xs items-center rounded-2xl hover:bg-transparent! hover:text-red-500 active:not-aria-[haspopup]:translate-0!"
 					title="Views"
 				>
 					<ChartLine className="size-4.5" />
