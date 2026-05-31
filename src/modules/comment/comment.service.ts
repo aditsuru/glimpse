@@ -109,7 +109,7 @@ export class CommentService {
 			`,
 		};
 
-		const otherComments = await this.db
+		const rawComments = await this.db
 			.select(selectColumns)
 			.from(commentsTable)
 			.leftJoin(profilesTable, eq(commentsTable.userId, profilesTable.userId))
@@ -131,8 +131,8 @@ export class CommentService {
 			.groupBy(commentsTable.id, profilesTable.id)
 			.limit(config.COMMENTS_PAGINATION_LIMIT + 1);
 
-		const hasNext = otherComments.length > config.COMMENTS_PAGINATION_LIMIT;
-		const trimmed = hasNext ? otherComments.slice(0, -1) : otherComments;
+		const hasNext = rawComments.length > config.COMMENTS_PAGINATION_LIMIT;
+		const trimmed = hasNext ? rawComments.slice(0, -1) : rawComments;
 		const nextCursor = hasNext ? trimmed.at(-1)!.createdAt : null;
 
 		const comments = [...this.mapComments(trimmed)];

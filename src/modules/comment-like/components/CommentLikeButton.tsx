@@ -49,7 +49,7 @@ export const CommentLikeButton = ({
 				)}
 				stroke={isLikedByUser ? "none" : "currentColor"}
 			/>
-			<span className="tabular-nums min-w-4 text-left">{formattedCount}</span>
+			<span className="tabular-nums text-left">{formattedCount}</span>
 		</Button>
 	);
 };
