@@ -22,6 +22,7 @@ import {
 import { formatPostDate } from "@/lib/client/helpers";
 import { config } from "@/lib/shared/config";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
+import { CommentLikeButton } from "@/modules/comment-like/components/CommentLikeButton";
 import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
 import { useViewerStore } from "@/store/use-viewer-store";
 import { useDeleteComment } from "../comment.queries";
@@ -78,14 +79,11 @@ export const CommentCard = ({ data }: CommentCardProps) => {
 				</div>
 
 				<div className="flex items-center">
-					<Button
-						variant="ghost"
-						className="flex gap-1 text-muted-foreground/80 text-xs items-center rounded-2xl hover:bg-transparent! hover:text-pink-500 p-0!"
-						title="Likes"
-					>
-						<Heart className="size-4.5" />
-						<span className="tabular-nums text-left"></span>
-					</Button>
+					<CommentLikeButton
+						commentId={data.id}
+						initialCount={data.likesCount}
+						initialState={data.isLikedByUser}
+					/>
 					<Button
 						variant="ghost"
 						className="flex gap-1 text-muted-foreground/80 text-sm items-center rounded-2xl hover:bg-transparent!"

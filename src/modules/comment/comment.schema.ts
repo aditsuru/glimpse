@@ -11,6 +11,9 @@ const commentAuthorSchema = z.object({
 
 export const getCommentOutput = commentSelectSchema.extend({
 	author: commentAuthorSchema,
+
+	likesCount: z.number(),
+	isLikedByUser: z.boolean(),
 });
 
 export const getCommentListOutput = z.object({

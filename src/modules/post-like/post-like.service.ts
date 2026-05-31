@@ -29,7 +29,7 @@ export class PostLikeService {
 			.select({
 				count: count(),
 				isLikedByUser: sql<boolean>`
-				bool_or(${postLikesTable.userId} = ${this.userId})
+					COALESCE(bool_or(${postLikesTable.userId} = ${this.userId}), false)
 			`,
 			})
 			.from(postLikesTable)
