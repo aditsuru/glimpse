@@ -60,6 +60,8 @@ export const PostCard = ({
 }: PostCardProps) => {
 	const router = useRouter();
 	const updateViewCount = useMarkPostSeen();
+	const pathname = usePathname();
+
 	const ref = useViewCount<HTMLDivElement>({
 		postId: data.id,
 		callback: () =>
@@ -74,13 +76,17 @@ export const PostCard = ({
 			role="button"
 			tabIndex={0}
 			onClick={() => {
-				startProgress();
-				router.push(`/p/${data.id}`);
+				if (!pathname.startsWith(`/p/${data.id}`)) {
+					startProgress();
+					router.push(`/p/${data.id}`);
+				}
 			}}
 			onKeyDown={(e) => {
 				if (e.key === "Enter") {
-					startProgress();
-					router.push(`/p/${data.id}`);
+					if (!pathname.startsWith(`/p/${data.id}`)) {
+						startProgress();
+						router.push(`/p/${data.id}`);
+					}
 				}
 			}}
 			ref={ref}
@@ -123,7 +129,11 @@ export const PostCard = ({
 									<VerifiedBadge className="size-4.5" />
 								)}
 							</div>
-							<p className="text-muted-foreground text-sm">
+							<p
+								className={cn("text-muted-foreground text-sm", {
+									"translate-y-[-2px]": profileRow,
+								})}
+							>
 								{`@${data.author.username} · ${formatPostDate(data.createdAt)}`}
 							</p>
 						</div>
