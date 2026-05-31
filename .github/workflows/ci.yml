@@ -1,19 +1,20 @@
 name: CI
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [staging, main]
+  schedule:
+    - cron: '0 2 * * *'
 
 jobs:
   ci:
+    name: Lint & Typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-   
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
@@ -28,3 +29,15 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun typecheck
       - run: bun lint
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun audit --audit-level high

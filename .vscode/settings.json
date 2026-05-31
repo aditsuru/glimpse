@@ -1,14 +1,40 @@
 {
+	// TypeScript
+	"js/ts.tsdk.path": "node_modules/typescript/lib",
+	"js/ts.preferences.importModuleSpecifier": "non-relative",
+
+	// Biome
 	"editor.defaultFormatter": "biomejs.biome",
 	"editor.formatOnSave": true,
 	"editor.codeActionsOnSave": {
-		"source.organizeImports.biome": "explicit"
+		"source.organizeImports.biome": "explicit",
+		"source.fixAll.biome": "explicit"
 	},
-	"[javascript][typescript][json][jsonc]": {
-		"editor.defaultFormatter": "biomejs.biome"
-	},
-	"[github-actions-workflow][markdown][xml][yaml]": {
-		"editor.defaultFormatter": "biomejs.biome"
-	},
-	"js/ts.tsdk.path": "node_modules/typescript/lib"
+	"biome.enabled": true,
+	"biome.requireConfiguration": true,
+
+	// CSpell
+	"cSpell.enabled": true,
+	"cSpell.language": "en,en-US",
+	"cSpell.diagnosticLevel": "Information",
+	"cSpell.words": [
+		"adi",
+		"biomejs",
+		"buildcache",
+		"buildx",
+		"decrby",
+		"ilike",
+		"minioadmin",
+		"partialize",
+		"pkgs",
+		"QSTASH",
+		"sadd",
+		"shadcn",
+		"smembers",
+		"srem",
+		"winget",
+		"zadd",
+		"zrange",
+		"zremrangebyrank"
+	]
 }
