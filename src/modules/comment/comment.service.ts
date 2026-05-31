@@ -13,6 +13,7 @@ import {
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { profilesTable } from "@/db/schema";
+import { commentLikesTable } from "@/db/schema/comment-likes";
 import { commentsTable } from "@/db/schema/comments";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
@@ -88,14 +89,24 @@ export class CommentService {
 			...getTableColumns(commentsTable),
 			authorAvatarUpdatedAt: profilesTable.updatedAt,
 			author: sql<z.infer<typeof postSchema.get.output.shape.author>>`
-		json_build_object(
-		'id', ${profilesTable.userId},
-		'username', ${profilesTable.username},
-		'displayName', ${profilesTable.displayName},
-		'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
-		'avatarUrl', ${profilesTable.avatarKey}
-		)
-		`,
+				json_build_object(
+				'id', ${profilesTable.userId},
+				'username', ${profilesTable.username},
+				'displayName', ${profilesTable.displayName},
+				'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
+				'avatarUrl', ${profilesTable.avatarKey}
+				)
+			`,
+			likesCount: this.db.$count(
+				commentLikesTable,
+				eq(commentsTable.id, commentLikesTable.commentId)
+			),
+			isLikedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${commentLikesTable}
+					WHERE ${commentLikesTable.commentId} = ${commentsTable.id}
+					AND ${commentLikesTable.userId} = ${this.userId}
+				)
+			`,
 		};
 
 		const otherComments = await this.db
@@ -144,7 +155,6 @@ export class CommentService {
 		return data.map((comment) => {
 			return {
 				...comment,
-				parentCommentId: null,
 				author: {
 					...comment.author,
 					avatarUrl:

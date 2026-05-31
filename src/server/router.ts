@@ -1,5 +1,6 @@
 import { bookmarkRouter } from "@/modules/bookmark/bookmark.route";
 import { commentRouter } from "@/modules/comment/comment.route";
+import { commentLikeRouter } from "@/modules/comment-like/comment-like.route";
 import { followRouter } from "@/modules/follow/follow.route";
 import { postRouter } from "@/modules/post/post.route";
 import { postLikeRouter } from "@/modules/post-like/post-like.route";
@@ -11,6 +12,7 @@ export const router = base.router({
 	follow: followRouter,
 	post: postRouter,
 	postLike: postLikeRouter,
+	commentLike: commentLikeRouter,
 	bookmark: bookmarkRouter,
 	comment: commentRouter,
 });

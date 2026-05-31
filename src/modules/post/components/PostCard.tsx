@@ -195,6 +195,7 @@ export const PostCard = ({
 			</div>
 
 			{separator && <div className="mt-2" />}
+
 			{/* Toolbar */}
 			<div
 				className={cn("mt-1 flex justify-between", {
