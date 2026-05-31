@@ -29,6 +29,7 @@ export class CommentService {
 	async create({
 		body,
 		postId,
+		parentCommentId,
 	}: z.infer<typeof commentSchema.create.input>): Promise<
 		z.infer<typeof commentSchema.create.output>
 	> {
@@ -41,6 +42,7 @@ export class CommentService {
 			body,
 			postId,
 			userId: this.userId,
+			parentCommentId: parentCommentId ?? null,
 		});
 
 		return {
@@ -66,16 +68,12 @@ export class CommentService {
 		z.infer<typeof commentSchema.getCount.output>
 	> {
 		const data = await this.db
-			.select({
-				count: count(),
-			})
+			.select({ count: count() })
 			.from(commentsTable)
 			.where(eq(commentsTable.postId, postId))
 			.then((i) => i[0]);
 
-		return {
-			count: data.count,
-		};
+		return { count: data.count };
 	}
 
 	async getPostComments({
@@ -97,16 +95,19 @@ export class CommentService {
 				'avatarUrl', ${profilesTable.avatarKey}
 				)
 			`,
-			likesCount: this.db.$count(
-				commentLikesTable,
-				eq(commentsTable.id, commentLikesTable.commentId)
-			),
-			isLikedByUser: sql<boolean>`EXISTS (
+			likesCount: sql<number>`(
+				SELECT COUNT(*) FROM ${commentLikesTable}
+				WHERE ${commentLikesTable.commentId} = ${commentsTable.id}
+			)::int`,
+			isLikedByUser: sql<boolean>`(EXISTS (
 					SELECT 1 FROM ${commentLikesTable}
 					WHERE ${commentLikesTable.commentId} = ${commentsTable.id}
 					AND ${commentLikesTable.userId} = ${this.userId}
-				)
-			`,
+				))::boolean`,
+			repliesCount: sql<number>`(
+				SELECT COUNT(*) FROM comments r
+				WHERE r.parent_comment_id = ${commentsTable.id}
+			)::int`,
 		};
 
 		const rawComments = await this.db
@@ -141,8 +142,60 @@ export class CommentService {
 			a.id === highlight ? -1 : b.id === highlight ? 1 : 0
 		);
 
+		return { items, nextCursor };
+	}
+
+	async getCommentReplies({
+		commentId,
+		cursor,
+	}: z.infer<typeof commentSchema.getCommentReplies.input>): Promise<
+		z.infer<typeof commentSchema.getCommentReplies.output>
+	> {
+		const selectColumns = {
+			...getTableColumns(commentsTable),
+			authorAvatarUpdatedAt: profilesTable.updatedAt,
+			author: sql<z.infer<typeof postSchema.get.output.shape.author>>`
+				json_build_object(
+				'id', ${profilesTable.userId},
+				'username', ${profilesTable.username},
+				'displayName', ${profilesTable.displayName},
+				'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
+				'avatarUrl', ${profilesTable.avatarKey}
+				)
+			`,
+			likesCount: sql<number>`(
+				SELECT COUNT(*) FROM ${commentLikesTable}
+				WHERE ${commentLikesTable.commentId} = ${commentsTable.id}
+			)::int`,
+			isLikedByUser: sql<boolean>`(EXISTS (
+					SELECT 1 FROM ${commentLikesTable}
+					WHERE ${commentLikesTable.commentId} = ${commentsTable.id}
+					AND ${commentLikesTable.userId} = ${this.userId}
+				))::boolean`,
+			// Replies are leaf nodes — always 0
+			repliesCount: sql<number>`0`,
+		};
+
+		const rawReplies = await this.db
+			.select(selectColumns)
+			.from(commentsTable)
+			.leftJoin(profilesTable, eq(commentsTable.userId, profilesTable.userId))
+			.where(
+				and(
+					eq(commentsTable.parentCommentId, commentId),
+					cursor ? lt(commentsTable.createdAt, cursor) : undefined
+				)
+			)
+			.orderBy(desc(commentsTable.createdAt))
+			.groupBy(commentsTable.id, profilesTable.id)
+			.limit(config.COMMENTS_PAGINATION_LIMIT + 1);
+
+		const hasNext = rawReplies.length > config.COMMENTS_PAGINATION_LIMIT;
+		const trimmed = hasNext ? rawReplies.slice(0, -1) : rawReplies;
+		const nextCursor = hasNext ? trimmed.at(-1)!.createdAt : null;
+
 		return {
-			items,
+			items: this.mapComments(trimmed),
 			nextCursor,
 		};
 	}

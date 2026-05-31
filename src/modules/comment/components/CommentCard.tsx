@@ -1,6 +1,6 @@
 "use client";
 
-import { Ellipsis, Share } from "lucide-react";
+import { Ellipsis, MessageCircle, Share } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,133 +25,183 @@ import { config } from "@/lib/shared/config";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import { CommentLikeButton } from "@/modules/comment-like/components/CommentLikeButton";
 import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
+import { useConfirmDialogStore } from "@/store/use-confirm-dialog-store";
 import { useViewerStore } from "@/store/use-viewer-store";
-import { useDeleteComment } from "../comment.queries";
+import { useDeleteComment, useGetCommentReplies } from "../comment.queries";
 import type { getCommentOutput } from "../comment.schema";
+import { CommentComposer } from "./CommentComposer";
 
 interface CommentCardProps {
 	data: z.infer<typeof getCommentOutput>;
-	showReplies?: boolean;
 	isNested?: boolean;
+	isLast?: boolean;
 }
 
-export const CommentCard = ({
-	data,
-	showReplies = true,
-	isNested = false,
-}: CommentCardProps) => {
+export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 	const [repliesOpen, setRepliesOpen] = useState(false);
+	const [replyComposerOpen, setReplyComposerOpen] = useState(false);
+
+	const {
+		data: repliesData,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useGetCommentReplies(data.id, repliesOpen);
+
+	const replies = repliesData?.pages.flatMap((p) => p.items) ?? [];
+	const remainingCount = Math.max(0, data.repliesCount - replies.length);
 
 	return (
-		<div className="w-full h-full py-2 p-4 flex gap-3 items-start">
-			{/* Avatar column — grows to fill height when replies are open so the vertical line reaches down */}
-			<div className="flex flex-col items-center self-stretch">
-				<Avatar className="shrink-0">
-					<AvatarImage src={data.author.avatarUrl ?? DEFAULT_PFP_URL} />
-				</Avatar>
-				{/* Vertical connector line: only on top-level comments while replies are expanded */}
-				{!isNested && repliesOpen && (
-					<div className="w-[2px] bg-border flex-1 mt-1" />
-				)}
-			</div>
-
-			<div className="flex-1 flex flex-col">
-				{/* Header row */}
-				<div className="text-base font-semibold flex justify-between gap-2 items-center -mt-1 flex-1">
-					<div className="flex justify-between gap-1 items-center">
-						<HoverCard>
-							<HoverCardTrigger
-								delay={300}
-								render={
-									<Link href={`/${data.author.username}`}>
-										<p className="hover:underline hover:underline-offset-4">
-											{data.author.displayName}
-										</p>
-									</Link>
-								}
-							/>
-							<HoverCardContent className="w-xs rounded-xl bg-background">
-								<HoverProfileCard username={data.author.username} />
-							</HoverCardContent>
-						</HoverCard>
-
-						{data.author.isGlimpseVerified && (
-							<VerifiedBadge className="size-4.5" />
-						)}
-						<p className="text-muted-foreground text-sm">
-							{`@${data.author.username} · ${formatPostDate(data.createdAt)}`}
-						</p>
-					</div>
-					<DropdownMenuSubmenu
-						postId={data.id}
-						authorId={data.author.id}
-						commentId={data.id}
-					/>
+		<div className={isNested ? "w-full py-2 pr-4" : "w-full py-2 px-4"}>
+			<div className="flex gap-3 items-start">
+				<div className="flex flex-col items-center self-stretch shrink-0">
+					<Avatar className="shrink-0">
+						<AvatarImage src={data.author.avatarUrl ?? DEFAULT_PFP_URL} />
+					</Avatar>
 				</div>
 
-				{/* Body */}
-				<div>
+				<div className="flex-1 flex flex-col min-w-0">
+					{/* Header */}
+					<div className="text-base font-semibold flex justify-between gap-2 items-center -mt-1">
+						<div className="flex gap-1 items-center">
+							<HoverCard>
+								<HoverCardTrigger
+									delay={300}
+									render={
+										<Link href={`/${data.author.username}`}>
+											<p className="hover:underline hover:underline-offset-4">
+												{data.author.displayName}
+											</p>
+										</Link>
+									}
+								/>
+								<HoverCardContent className="w-xs rounded-xl bg-background">
+									<HoverProfileCard username={data.author.username} />
+								</HoverCardContent>
+							</HoverCard>
+							{data.author.isGlimpseVerified && (
+								<VerifiedBadge className="size-4.5" />
+							)}
+							<p className="text-muted-foreground text-sm">
+								{`@${data.author.username} · ${formatPostDate(data.createdAt)}`}
+							</p>
+						</div>
+						<DropdownMenuSubmenu
+							postId={data.postId}
+							authorId={data.author.id}
+							commentId={data.id}
+						/>
+					</div>
+
+					{/* Body */}
 					<p className="whitespace-break-spaces -mt-1">{data.body}</p>
-				</div>
 
-				{/* Action bar */}
-				<div className="flex items-center gap-4">
-					<CommentLikeButton
-						commentId={data.id}
-						initialCount={data.likesCount}
-						initialState={data.isLikedByUser}
-					/>
-					<Button
-						variant="ghost"
-						className="flex gap-1 text-muted-foreground/80 text-sm items-center rounded-2xl hover:bg-transparent! px-0!"
-						title="Share"
-						onClick={() => {
-							navigator.clipboard.writeText(
-								`${config.NEXT_PUBLIC_APP_URL}/p/${data.postId}?highlight=${data.id}`
-							);
-							toast.success("Link copied to clipboard.");
-						}}
-					>
-						<Share className="size-4.5" />
-					</Button>
-				</div>
+					{/* Action bar */}
+					<div className="flex items-center gap-4 mt-1">
+						<CommentLikeButton
+							commentId={data.id}
+							initialCount={data.likesCount}
+							initialState={data.isLikedByUser}
+						/>
+						{!isNested && (
+							<Button
+								variant="ghost"
+								className="flex gap-1 text-muted-foreground/80 items-center rounded-2xl hover:bg-transparent! hover:text-green-500 px-0!"
+								title="Reply"
+								onClick={() => setReplyComposerOpen((prev) => !prev)}
+							>
+								<MessageCircle className="size-4.5 transition-transform active:scale-125" />
 
-				{/* Nested replies — only mounted after the user clicks "Show Replies" */}
-				{showReplies && repliesOpen && (
-					<div className="flex items-start mt-2">
-						{/* L-shaped Reddit connector: vertical bar sits to the left, horizontal stub leads to the nested avatar */}
-						<div
-							className="shrink-0 self-stretch"
-							style={{ width: 16, marginLeft: -28 }}
-						>
-							<div
-								className="border-l-2 border-b-2 border-border rounded-bl-md"
-								style={{ width: 16, height: 20, marginTop: 4 }}
-							/>
-						</div>
-
-						<div className="flex-1">
-							<CommentCard data={data} showReplies={false} isNested={true} />
-						</div>
+								<span className="tabular-nums min-w-4 text-left">Reply</span>
+							</Button>
+						)}
+						{!isNested && (
+							<Button
+								variant="ghost"
+								className="flex gap-1 text-muted-foreground/80 text-sm items-center rounded-2xl hover:bg-transparent! px-0!"
+								title="Share"
+								onClick={() => {
+									navigator.clipboard.writeText(
+										`${config.NEXT_PUBLIC_APP_URL}/p/${data.postId}?highlight=${data.id}`
+									);
+									toast.success("Link copied to clipboard.");
+								}}
+							>
+								<Share className="size-4.5" />
+							</Button>
+						)}
 					</div>
-				)}
 
-				{/* Show / Hide Replies — always at the bottom, only on top-level comments */}
-				{!isNested && (
-					<Button
-						variant="ghost"
-						className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit mt-1 hover:text-muted-foreground/80"
-						onClick={() => setRepliesOpen((prev) => !prev)}
-					>
-						{repliesOpen ? "Hide Replies" : "Show Replies"}
-					</Button>
-				)}
+					{/* Inline reply composer */}
+					{!isNested && replyComposerOpen && (
+						<CommentComposer
+							postId={data.postId}
+							parentCommentId={data.id}
+							onSuccess={() => {
+								setReplyComposerOpen(false);
+								setRepliesOpen(true);
+							}}
+							className="pb-2"
+						/>
+					)}
+					{/* Replies */}
+					{!isNested && data.repliesCount > 0 && (
+						<div className="mt-1">
+							{!repliesOpen ? (
+								<Button
+									variant="ghost"
+									className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80"
+									onClick={() => setRepliesOpen(true)}
+								>
+									Show {data.repliesCount}{" "}
+									{data.repliesCount === 1 ? "reply" : "replies"}
+								</Button>
+							) : (
+								<>
+									<div>
+										{replies.map((reply, index) => (
+											<CommentCard
+												key={reply.id}
+												data={reply}
+												isNested={true}
+												isLast={!hasNextPage && index === replies.length - 1}
+											/>
+										))}
+									</div>
+
+									<div className="flex gap-4 items-baseline">
+										{hasNextPage && (
+											<Button
+												variant="ghost"
+												className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80"
+												onClick={() => fetchNextPage()}
+												disabled={isFetchingNextPage}
+											>
+												{isFetchingNextPage
+													? "Loading..."
+													: `Show ${remainingCount} more ${remainingCount === 1 ? "reply" : "replies"}`}
+											</Button>
+										)}
+
+										<Button
+											variant="ghost"
+											className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80"
+											onClick={() => setRepliesOpen(false)}
+										>
+											Hide replies
+										</Button>
+									</div>
+								</>
+							)}
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);
 };
 
-interface DropdownMenuSubmenu {
+interface DropdownMenuSubmenuProps {
 	commentId: string;
 	postId: string;
 	authorId: string;
@@ -161,18 +211,26 @@ const DropdownMenuSubmenu = ({
 	commentId,
 	postId,
 	authorId,
-}: DropdownMenuSubmenu) => {
+}: DropdownMenuSubmenuProps) => {
 	const { userId } = useViewerStore();
+	const deleteComment = useDeleteComment({ postId });
 
-	const deletePost = useDeleteComment({ postId });
+	const openConfirmDialog = useConfirmDialogStore((state) => state.openDialog);
 
 	const handleDelete = () => {
-		deletePost.mutate({
-			commentId,
+		openConfirmDialog({
+			title: "Delete Comment?",
+			description: "This can’t be undone.",
+			confirmText: "Delete",
+			confirmVariant: "destructive",
+			className: "sm:max-w-md",
+			onConfirm: () => {
+				deleteComment.mutate({ commentId });
+
+				toast.success("Comment was deleted.");
+			},
 		});
 	};
-
-	const handleReport = () => {};
 
 	return (
 		<DropdownMenu>
@@ -197,10 +255,7 @@ const DropdownMenuSubmenu = ({
 						</DropdownMenuItem>
 					)}
 					{authorId !== userId && (
-						<DropdownMenuItem
-							onClick={handleReport}
-							className="text-destructive hover:text-destructive!"
-						>
+						<DropdownMenuItem className="text-destructive hover:text-destructive!">
 							Report
 						</DropdownMenuItem>
 					)}
