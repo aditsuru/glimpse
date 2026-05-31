@@ -14,20 +14,14 @@ import { ProfileCard } from "@/modules/profile/components/ProfileCard";
 import { RequestsHeader } from "../RequestsHeader";
 
 export default function Page() {
-	const {
-		data,
-		fetchNextPage,
-		hasNextPage,
-		isFetching,
-		isLoading,
-		isFetchingNextPage,
-	} = usePendingReceived();
+	const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
+		usePendingReceived();
 
 	const rejectRequest = useRejectRequest();
 	const acceptRequest = useAcceptRequest();
 	const disabledCondition = rejectRequest.isPending || acceptRequest.isPending;
 
-	const ref = useInfiniteScroll(fetchNextPage, isFetching);
+	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
 	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
 
 	return (
@@ -65,13 +59,17 @@ export default function Page() {
 							</div>
 						</div>
 					))}
-					{hasNextPage && <div ref={ref} className="h-1" />}
-					{(isLoading || isFetchingNextPage) && (
+					{isLoading && (
 						<div className="py-8 flex justify-center w-full">
 							<Loader />
 						</div>
 					)}
-					{profiles.length === 0 && !isFetching && (
+					{hasNextPage && (
+						<div ref={ref} className="py-12 flex justify-center w-full">
+							<Loader />
+						</div>
+					)}
+					{profiles.length === 0 && !isLoading && (
 						<EmptyStateMessage title="There are no pending follow requests" />
 					)}
 				</div>

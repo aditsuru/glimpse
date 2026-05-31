@@ -15,15 +15,9 @@ export const PostComments = ({ postId }: PostCommentsProps) => {
 	const searchParams = useSearchParams();
 	const highlight = searchParams.get("highlight");
 
-	const {
-		data,
-		fetchNextPage,
-		hasNextPage,
-		isFetching,
-		isLoading,
-		isFetchingNextPage,
-	} = useGetPostComments(postId, highlight ? highlight : undefined);
-	const ref = useInfiniteScroll(fetchNextPage, isFetching);
+	const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
+		useGetPostComments(postId, highlight ? highlight : undefined);
+	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
 	const comments = data?.pages.flatMap((comment) => comment.items) ?? [];
 
 	return (
@@ -33,13 +27,17 @@ export const PostComments = ({ postId }: PostCommentsProps) => {
 					<CommentCard data={comment} />
 				</div>
 			))}
-			{hasNextPage && <div ref={ref} className="h-1" />}
-			{(isLoading || isFetchingNextPage) && (
+			{isLoading && (
 				<div className="py-8 flex justify-center w-full">
 					<Loader />
 				</div>
 			)}
-			{comments.length === 0 && !isFetching && (
+			{hasNextPage && (
+				<div ref={ref} className="py-12 flex justify-center w-full">
+					<Loader />
+				</div>
+			)}
+			{comments.length === 0 && !isLoading && (
 				<div className="flex-1 mt-20 md:mt-10 mb-4">
 					<EmptyStateMessage
 						title="No comments yet"

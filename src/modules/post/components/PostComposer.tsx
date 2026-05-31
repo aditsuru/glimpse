@@ -9,6 +9,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { VideoPlayer } from "@/components/VideoPlayer";
+import { startProgress } from "@/lib/client/helpers";
 import { uploadToS3 } from "@/lib/client/upload-utils";
 import { cn } from "@/lib/client/utils";
 import {
@@ -155,12 +156,17 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 
 	// ── Dialog helper ──────────────────────────────────────────────────────────
 
-	const { setLocked } = usePostComposerStore();
+	const { setLocked, setDirty } = usePostComposerStore();
 
 	useEffect(() => {
 		setLocked(isDisabled);
 		return () => setLocked(false); // Cleanup on unmount
 	}, [isDisabled, setLocked]);
+
+	useEffect(() => {
+		const dirty = body.trim().length > 0 || attachments.length > 0;
+		setDirty(dirty);
+	}, [body, attachments, setDirty]);
 
 	// ── Upload helper ──────────────────────────────────────────────────────────
 
@@ -353,6 +359,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 			setSpoiler(false);
 			onSuccess?.();
 			toast.success("Post created successfully.");
+			startProgress();
 			router.push(`/p/${postId}`);
 		} catch {
 			setError("Failed to post. Please try again.");

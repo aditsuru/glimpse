@@ -134,7 +134,7 @@ const DropdownMenuSubmenu = ({
 				render={
 					<Button
 						variant="ghost"
-						className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl"
+						className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! aria-expanded:bg-transparent! px-0!"
 					>
 						<Ellipsis className="size-4.5" />
 					</Button>

@@ -2,14 +2,17 @@ import { useEffect, useState } from "react";
 
 export function useCooldown(storageKey: string, cooldownMs: number) {
 	const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+	const [hasTriggered, setHasTriggered] = useState(false);
 
 	useEffect(() => {
 		const stored = localStorage.getItem(storageKey);
 		if (!stored) {
 			setSecondsLeft(0);
+			setHasTriggered(false);
 			return;
 		}
 
+		setHasTriggered(true);
 		const parsed = parseInt(stored, 10);
 		if (Number.isNaN(parsed)) {
 			localStorage.removeItem(storageKey);
@@ -38,7 +41,8 @@ export function useCooldown(storageKey: string, cooldownMs: number) {
 	const startCooldown = () => {
 		localStorage.setItem(storageKey, (Date.now() + cooldownMs).toString());
 		setSecondsLeft(cooldownMs / 1000);
+		setHasTriggered(true);
 	};
 
-	return { secondsLeft, startCooldown };
+	return { secondsLeft, hasTriggered, startCooldown };
 }

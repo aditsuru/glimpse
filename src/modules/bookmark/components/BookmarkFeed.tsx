@@ -9,21 +9,10 @@ import { PostCard } from "@/modules/post/components/PostCard";
 import { useGetBookmarkedPosts } from "../bookmark.queries";
 
 export const BookmarkFeed = () => {
-	const {
-		data,
-		fetchNextPage,
-		hasNextPage,
-		isFetching,
-		isFetchingNextPage,
-		isLoading,
-	} = useGetBookmarkedPosts();
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+		useGetBookmarkedPosts();
 
-	const timeout = async () => {
-		await new Promise((resolve) => setTimeout(resolve, 4000));
-		fetchNextPage();
-	};
-
-	const ref = useInfiniteScroll(timeout, isFetching);
+	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
 
 	return (
@@ -35,13 +24,17 @@ export const BookmarkFeed = () => {
 						<PostCard data={post} />
 					</div>
 				))}
-				{hasNextPage && <div ref={ref} className="h-1" />}
-				{(isLoading || isFetchingNextPage) && (
+				{isLoading && (
 					<div className="py-8 flex justify-center w-full">
 						<Loader />
 					</div>
 				)}
-				{posts.length === 0 && !isFetching && (
+				{hasNextPage && (
+					<div ref={ref} className="py-12 flex justify-center w-full">
+						<Loader />
+					</div>
+				)}
+				{posts.length === 0 && !isLoading && (
 					<EmptyStateMessage
 						title="No posts"
 						description="You haven't bookmarked anything yet"

@@ -4,7 +4,7 @@
 
 import { ChartLine, Ellipsis, Share } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type * as z from "zod";
 import { ImageCarousel } from "@/components/ImageCarousel";
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/hover-card";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { useViewCount } from "@/hooks/useViewCount";
-import { formatPostDate } from "@/lib/client/helpers";
+import { formatPostDate, startProgress } from "@/lib/client/helpers";
 import { cn } from "@/lib/client/utils";
 import { config } from "@/lib/shared/config";
 import {
@@ -38,7 +38,7 @@ import { BookmarkButton } from "@/modules/bookmark/components/BookmarkButton";
 import { CommentButton } from "@/modules/comment/components/CommentButton";
 import { PostLikeButton } from "@/modules/post-like/components/PostLikeButton";
 import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
-import { useDeletePostConfirmStore } from "@/store/use-delete-post-confirm-store";
+import { useConfirmDialogStore } from "@/store/use-confirm-dialog-store";
 import { useViewerStore } from "@/store/use-viewer-store";
 import { useDeletePost, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";
@@ -60,6 +60,8 @@ export const PostCard = ({
 }: PostCardProps) => {
 	const router = useRouter();
 	const updateViewCount = useMarkPostSeen();
+	const pathname = usePathname();
+
 	const ref = useViewCount<HTMLDivElement>({
 		postId: data.id,
 		callback: () =>
@@ -73,8 +75,20 @@ export const PostCard = ({
 			className={cn("p-4 py-2 pt-4 flex flex-col", className)}
 			role="button"
 			tabIndex={0}
-			onClick={() => router.push(`/p/${data.id}`)}
-			onKeyDown={(e) => e.key === "Enter" && router.push(`/p/${data.id}`)}
+			onClick={() => {
+				if (!pathname.startsWith(`/p/${data.id}`)) {
+					startProgress();
+					router.push(`/p/${data.id}`);
+				}
+			}}
+			onKeyDown={(e) => {
+				if (e.key === "Enter") {
+					if (!pathname.startsWith(`/p/${data.id}`)) {
+						startProgress();
+						router.push(`/p/${data.id}`);
+					}
+				}
+			}}
 			ref={ref}
 		>
 			<div className="flex gap-4 items-start">
@@ -115,7 +129,11 @@ export const PostCard = ({
 									<VerifiedBadge className="size-4.5" />
 								)}
 							</div>
-							<p className="text-muted-foreground text-sm">
+							<p
+								className={cn("text-muted-foreground text-sm", {
+									"translate-y-[-2px]": profileRow,
+								})}
+							>
 								{`@${data.author.username} · ${formatPostDate(data.createdAt)}`}
 							</p>
 						</div>
@@ -239,16 +257,26 @@ const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
 
 	const deletePost = useDeletePost();
 	const router = useRouter();
+	const pathname = usePathname();
 
-	const openDeleteDialog = useDeletePostConfirmStore(
-		(state) => state.openDialog
-	);
+	const openConfirmDialog = useConfirmDialogStore((state) => state.openDialog);
 
 	const handleDelete = () => {
-		openDeleteDialog(() => {
-			deletePost.mutate({ postId });
-			router.push("/");
-			toast.success("Post was deleted.");
+		openConfirmDialog({
+			title: "Delete Post?",
+			description:
+				"This can’t be undone and it will be removed from your profile, the timeline of any accounts that follow you, and from the trending feed.",
+			confirmText: "Delete",
+			confirmVariant: "destructive",
+			className: "sm:max-w-md",
+			onConfirm: () => {
+				deletePost.mutate({ postId });
+				if (pathname.startsWith("/p/")) {
+					startProgress();
+					router.push("/");
+				}
+				toast.success("Post was deleted.");
+			},
 		});
 	};
 
@@ -260,7 +288,7 @@ const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
 				render={
 					<Button
 						variant="ghost"
-						className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent!"
+						className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! aria-expanded:bg-transparent! px-0!"
 					>
 						<Ellipsis className="size-4.5" />
 					</Button>

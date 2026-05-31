@@ -144,6 +144,13 @@ export default function Page() {
 
 	const checkUsername = useDebouncedCallback(async (value: string) => {
 		if (value.length < 3) return;
+
+		if (value === profileData?.username) {
+			setUsernameError(null);
+			setUsernameAvailable(false);
+			return;
+		}
+
 		try {
 			const { available } = await isUsernameAvailable.mutateAsync({
 				username: value,
@@ -370,10 +377,17 @@ export default function Page() {
 										type="text"
 										autoComplete="username"
 										onChange={(e) => {
+											const val = e.target.value;
 											setUsernameAvailable(false);
 											setUsernameError(null);
 											field.onChange(e);
-											checkUsername(e.target.value);
+
+											if (val === profileData?.username) {
+												checkUsername.cancel();
+												return;
+											}
+
+											checkUsername(val);
 										}}
 										className={cn({
 											"focus-visible:ring-success/40 ring-success/40 ring-3":
