@@ -23,7 +23,7 @@ export const PostComments = ({ postId }: PostCommentsProps) => {
 	return (
 		<div>
 			{comments.map((comment) => (
-				<div key={comment.id} className="border-b border-accent">
+				<div key={comment.id} className="border-b border-accent pt-2">
 					<CommentCard data={comment} />
 				</div>
 			))}

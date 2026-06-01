@@ -20,7 +20,10 @@ export const BookmarkFeed = () => {
 			<ScrollContainer className="flex-1 w-full h-full overflow-y-auto no-scrollbar">
 				<PageHeader title="Bookmarks" />
 				{posts.map((post) => (
-					<div key={post.id} className="border-b border-accent">
+					<div
+						key={post.id}
+						className="border-b border-accent hover:bg-accent/15"
+					>
 						<PostCard data={post} />
 					</div>
 				))}

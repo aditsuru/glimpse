@@ -6,18 +6,21 @@ import {
 	desc,
 	eq,
 	getTableColumns,
+	inArray,
 	isNull,
 	lt,
 	sql,
 } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
-import { profilesTable } from "@/db/schema";
+import { attachmentsTable, postsTable, profilesTable } from "@/db/schema";
+import { bookmarksTable } from "@/db/schema/bookmarks";
 import { commentLikesTable } from "@/db/schema/comment-likes";
 import { commentsTable } from "@/db/schema/comments";
+import { postLikesTable } from "@/db/schema/post-likes";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
-import type { postSchema } from "../post/post.schema";
+import type { getPostOutput, postSchema } from "../post/post.schema";
 import type {
 	commentSchema,
 	getCommentOutput,
@@ -180,21 +183,6 @@ export class CommentService {
 				SELECT COUNT(*) FROM comments r
 				WHERE r.parent_comment_id = ${commentsTable.id}
 			)::int`,
-			// Walk up the parent chain to find the root comment id; null if this is already top-level
-			topLevelCommentId: sql<string | null>`(
-				WITH RECURSIVE ancestors AS (
-					SELECT id, parent_comment_id
-					FROM comments
-					WHERE id = ${commentsTable.parentCommentId}
-					UNION ALL
-					SELECT c.id, c.parent_comment_id
-					FROM comments c
-					INNER JOIN ancestors a ON c.id = a.parent_comment_id
-				)
-				SELECT id FROM ancestors
-				WHERE parent_comment_id IS NULL
-				LIMIT 1
-			)`,
 		};
 
 		const rawComments = await this.db
@@ -215,8 +203,101 @@ export class CommentService {
 		const trimmed = hasNext ? rawComments.slice(0, -1) : rawComments;
 		const nextCursor = hasNext ? trimmed.at(-1)!.createdAt : null;
 
+		const mapped = this.mapComments(trimmed);
+
+		// Split into replies (have parentCommentId) and top-level (don't)
+		const replyComments = mapped.filter((c) => c.parentCommentId !== null);
+		const topLevelComments = mapped.filter((c) => c.parentCommentId === null);
+
+		const parentCommentIds = [
+			...new Set(replyComments.map((c) => c.parentCommentId!)),
+		];
+		const postIds = [...new Set(topLevelComments.map((c) => c.postId))];
+
+		// Fetch parent comments and posts in parallel
+		const [rawParentComments, rawPosts] = await Promise.all([
+			parentCommentIds.length > 0
+				? this.db
+						.select(selectColumns)
+						.from(commentsTable)
+						.leftJoin(
+							profilesTable,
+							eq(commentsTable.userId, profilesTable.userId)
+						)
+						.where(inArray(commentsTable.id, parentCommentIds))
+						.groupBy(commentsTable.id, profilesTable.id)
+				: Promise.resolve([]),
+			postIds.length > 0
+				? this.db
+						.select({
+							...getTableColumns(postsTable),
+							authorAvatarUpdatedAt: profilesTable.updatedAt,
+							author: sql<z.infer<typeof postSchema.get.output.shape.author>>`
+								json_build_object(
+								'id', ${profilesTable.userId},
+								'username', ${profilesTable.username},
+								'displayName', ${profilesTable.displayName},
+								'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
+								'avatarUrl', ${profilesTable.avatarKey}
+								)
+							`,
+							attachments: sql<
+								z.infer<typeof postSchema.get.output.shape.attachments>
+							>`
+								COALESCE(
+								json_agg(
+								json_build_object(
+								'mimeType', ${attachmentsTable.mimeType},
+								'url', ${attachmentsTable.attachmentKey}
+								)
+								ORDER BY ${attachmentsTable.position} ASC
+								) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
+								, '[]')
+							`,
+							likesCount: sql<number>`(
+								SELECT COUNT(*) FROM ${postLikesTable}
+								WHERE ${postLikesTable.postId} = ${postsTable.id}
+							)::int`,
+							isLikedByUser: sql<boolean>`(EXISTS (
+								SELECT 1 FROM ${postLikesTable}
+								WHERE ${postLikesTable.postId} = ${postsTable.id}
+								AND ${postLikesTable.userId} = ${this.userId}
+							))::boolean`,
+							bookmarksCount: sql<number>`(
+								SELECT COUNT(*) FROM ${bookmarksTable}
+								WHERE ${bookmarksTable.postId} = ${postsTable.id}
+							)::int`,
+							isBookmarkedByUser: sql<boolean>`(EXISTS (
+								SELECT 1 FROM ${bookmarksTable}
+								WHERE ${bookmarksTable.postId} = ${postsTable.id}
+								AND ${bookmarksTable.userId} = ${this.userId}
+							))::boolean`,
+							commentsCount: sql<number>`(
+								SELECT COUNT(*) FROM ${commentsTable} c
+								WHERE c.post_id = ${postsTable.id}
+							)::int`,
+						})
+						.from(postsTable)
+						.innerJoin(
+							profilesTable,
+							eq(postsTable.userId, profilesTable.userId)
+						)
+						.leftJoin(
+							attachmentsTable,
+							eq(attachmentsTable.postId, postsTable.id)
+						)
+						.where(inArray(postsTable.id, postIds))
+						.groupBy(postsTable.id, profilesTable.id)
+				: Promise.resolve([]),
+		]);
+
+		const parentCommentMap = new Map(
+			this.mapComments(rawParentComments).map((c) => [c.id, c])
+		);
+		const postMap = new Map(rawPosts.map((p) => [p.id, p]));
+
 		return {
-			items: this.mapUserComments(trimmed),
+			items: this.mapUserComments(mapped, parentCommentMap, postMap),
 			nextCursor,
 		};
 	}
@@ -299,23 +380,44 @@ export class CommentService {
 	}
 
 	private mapUserComments(
-		data: (z.infer<typeof getUserCommentOutput> & {
-			authorAvatarUpdatedAt: Date | null;
-		})[]
-	) {
+		data: z.infer<typeof getCommentOutput>[],
+		parentCommentMap: Map<string, z.infer<typeof getCommentOutput>>,
+		postMap: Map<
+			string,
+			z.infer<typeof getPostOutput> & { authorAvatarUpdatedAt: Date | null }
+		>
+	): z.infer<typeof getUserCommentOutput>[] {
 		return data.map((comment) => {
-			return {
-				...comment,
+			if (comment.parentCommentId !== null) {
+				return {
+					...comment,
+					context: {
+						parentComment: parentCommentMap.get(comment.parentCommentId)!,
+					},
+				};
+			}
+			const rawPost = postMap.get(comment.postId)!;
+			const post: z.infer<typeof getPostOutput> = {
+				...rawPost,
 				author: {
-					...comment.author,
+					...rawPost.author,
 					avatarUrl:
-						comment.author.avatarUrl && comment.authorAvatarUpdatedAt
+						rawPost.author.avatarUrl && rawPost.authorAvatarUpdatedAt
 							? constructPublicUrl({
-									key: comment.author.avatarUrl,
-									updatedAt: comment.authorAvatarUpdatedAt,
+									key: rawPost.author.avatarUrl,
+									updatedAt: rawPost.authorAvatarUpdatedAt,
 								}).publicUrl
 							: null,
 				},
+				attachments: rawPost.attachments.map((a) => ({
+					...a,
+					url: constructPublicUrl({ key: a.url, updatedAt: rawPost.updatedAt })
+						.publicUrl,
+				})),
+			};
+			return {
+				...comment,
+				context: { post },
 			};
 		});
 	}
