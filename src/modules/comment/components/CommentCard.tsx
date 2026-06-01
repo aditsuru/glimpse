@@ -21,6 +21,7 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { formatPostDate } from "@/lib/client/helpers";
+import { cn } from "@/lib/client/utils";
 import { config } from "@/lib/shared/config";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import { CommentLikeButton } from "@/modules/comment-like/components/CommentLikeButton";
@@ -46,6 +47,7 @@ export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
+		isLoading,
 	} = useGetCommentReplies(data.id, repliesOpen);
 
 	const replies = repliesData?.pages.flatMap((p) => p.items) ?? [];
@@ -185,10 +187,15 @@ export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 
 										<Button
 											variant="ghost"
-											className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80"
+											className={cn(
+												"flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80",
+												{
+													"pointer-events-none": isLoading,
+												}
+											)}
 											onClick={() => setRepliesOpen(false)}
 										>
-											Hide replies
+											{isLoading ? "Loading..." : "Hide replies"}
 										</Button>
 									</div>
 								</>
