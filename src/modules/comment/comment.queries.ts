@@ -5,6 +5,22 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { orpc } from "@/lib/client/orpc-client";
+import { useViewerStore } from "@/store/use-viewer-store";
+
+// Key helpers
+const getAllCommentsByUserKey = (username: string) =>
+	orpc.comment.getAllCommentsByUser.infiniteOptions({
+		input: (pageParam) => ({ username, cursor: pageParam }),
+		getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+		initialPageParam: undefined as Date | undefined,
+	}).queryKey;
+
+const getCommentRepliesKey = (commentId: string) =>
+	orpc.comment.getCommentReplies.infiniteOptions({
+		input: (pageParam) => ({ commentId, cursor: pageParam }),
+		getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+		initialPageParam: undefined as Date | undefined,
+	}).queryKey;
 
 export function useGetCommentsCount(postId: string, initialCount: number) {
 	return useQuery({
@@ -47,12 +63,26 @@ export function useGetCommentReplies(commentId: string, enabled: boolean) {
 	});
 }
 
+export function useGetAllCommentsByUser(username: string) {
+	return useInfiniteQuery(
+		orpc.comment.getAllCommentsByUser.infiniteOptions({
+			input: (pageParam) => ({
+				username,
+				cursor: pageParam,
+			}),
+			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+			initialPageParam: undefined as Date | undefined,
+		})
+	);
+}
+
 /**
  * Side effects:
- * - Invalidate on settle: comment.getCount[postId], comment.getPostComments[postId]
+ * - Invalidate on settle: comment.getCount[postId], comment.getPostComments[postId], comment.getAllCommentsByUser[username]
  */
 export function useCreateComment(postId: string) {
 	const queryClient = useQueryClient();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.comment.create.mutationOptions(),
@@ -66,6 +96,9 @@ export function useCreateComment(postId: string) {
 				queryClient.invalidateQueries({
 					queryKey: orpc.comment.getPostComments.key(),
 				}),
+				queryClient.invalidateQueries({
+					queryKey: getAllCommentsByUserKey(username),
+				}),
 			]);
 		},
 	});
@@ -73,7 +106,7 @@ export function useCreateComment(postId: string) {
 
 /**
  * Side effects:
- * - Invalidate on settle: comment.getCommentReplies[commentId], comment.getCount[postId], comment.getPostComments (for repliesCount)
+ * - Invalidate on settle: comment.getCommentReplies[commentId], comment.getCount[postId], comment.getPostComments (for repliesCount), comment.getAllCommentsByUser[username]
  */
 export function useCreateReply({
 	postId,
@@ -83,6 +116,7 @@ export function useCreateReply({
 	commentId: string;
 }) {
 	const queryClient = useQueryClient();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.comment.create.mutationOptions(),
@@ -94,14 +128,13 @@ export function useCreateReply({
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
-					queryKey: orpc.comment.getCommentReplies.infiniteOptions({
-						input: (pageParam) => ({ commentId, cursor: pageParam }),
-						getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-						initialPageParam: undefined as Date | undefined,
-					}).queryKey,
+					queryKey: getCommentRepliesKey(commentId),
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.comment.getPostComments.key(),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: getAllCommentsByUserKey(username),
 				}),
 			]);
 		},
@@ -110,10 +143,11 @@ export function useCreateReply({
 
 /**
  * Side effects:
- * - Invalidate on settle: comment.getCount[postId], comment.getPostComments[postId]
+ * - Invalidate on settle: comment.getCount[postId], comment.getPostComments[postId], comment.getAllCommentsByUser[username]
  */
 export function useDeleteComment({ postId }: { postId: string }) {
 	const queryClient = useQueryClient();
+	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.comment.delete.mutationOptions(),
@@ -126,6 +160,9 @@ export function useDeleteComment({ postId }: { postId: string }) {
 				}),
 				queryClient.invalidateQueries({
 					queryKey: orpc.comment.getPostComments.key(),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: getAllCommentsByUserKey(username),
 				}),
 			]);
 		},

@@ -18,7 +18,11 @@ import { commentsTable } from "@/db/schema/comments";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
 import type { postSchema } from "../post/post.schema";
-import type { commentSchema, getCommentOutput } from "./comment.schema";
+import type {
+	commentSchema,
+	getCommentOutput,
+	getUserCommentOutput,
+} from "./comment.schema";
 
 export class CommentService {
 	constructor(
@@ -145,6 +149,78 @@ export class CommentService {
 		return { items, nextCursor };
 	}
 
+	async getAllCommentsByUser({
+		username,
+		cursor,
+	}: z.infer<typeof commentSchema.getAllCommentsByUser.input>): Promise<
+		z.infer<typeof commentSchema.getAllCommentsByUser.output>
+	> {
+		const selectColumns = {
+			...getTableColumns(commentsTable),
+			authorAvatarUpdatedAt: profilesTable.updatedAt,
+			author: sql<z.infer<typeof postSchema.get.output.shape.author>>`
+				json_build_object(
+				'id', ${profilesTable.userId},
+				'username', ${profilesTable.username},
+				'displayName', ${profilesTable.displayName},
+				'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
+				'avatarUrl', ${profilesTable.avatarKey}
+				)
+			`,
+			likesCount: sql<number>`(
+				SELECT COUNT(*) FROM ${commentLikesTable}
+				WHERE ${commentLikesTable.commentId} = ${commentsTable.id}
+			)::int`,
+			isLikedByUser: sql<boolean>`(EXISTS (
+					SELECT 1 FROM ${commentLikesTable}
+					WHERE ${commentLikesTable.commentId} = ${commentsTable.id}
+					AND ${commentLikesTable.userId} = ${this.userId}
+				))::boolean`,
+			repliesCount: sql<number>`(
+				SELECT COUNT(*) FROM comments r
+				WHERE r.parent_comment_id = ${commentsTable.id}
+			)::int`,
+			// Walk up the parent chain to find the root comment id; null if this is already top-level
+			topLevelCommentId: sql<string | null>`(
+				WITH RECURSIVE ancestors AS (
+					SELECT id, parent_comment_id
+					FROM comments
+					WHERE id = ${commentsTable.parentCommentId}
+					UNION ALL
+					SELECT c.id, c.parent_comment_id
+					FROM comments c
+					INNER JOIN ancestors a ON c.id = a.parent_comment_id
+				)
+				SELECT id FROM ancestors
+				WHERE parent_comment_id IS NULL
+				LIMIT 1
+			)`,
+		};
+
+		const rawComments = await this.db
+			.select(selectColumns)
+			.from(commentsTable)
+			.leftJoin(profilesTable, eq(commentsTable.userId, profilesTable.userId))
+			.where(
+				and(
+					eq(profilesTable.username, username),
+					cursor ? lt(commentsTable.createdAt, cursor) : undefined
+				)
+			)
+			.orderBy(desc(commentsTable.createdAt))
+			.groupBy(commentsTable.id, profilesTable.id)
+			.limit(config.COMMENTS_PAGINATION_LIMIT + 1);
+
+		const hasNext = rawComments.length > config.COMMENTS_PAGINATION_LIMIT;
+		const trimmed = hasNext ? rawComments.slice(0, -1) : rawComments;
+		const nextCursor = hasNext ? trimmed.at(-1)!.createdAt : null;
+
+		return {
+			items: this.mapUserComments(trimmed),
+			nextCursor,
+		};
+	}
+
 	async getCommentReplies({
 		commentId,
 		cursor,
@@ -202,6 +278,28 @@ export class CommentService {
 
 	private mapComments(
 		data: (z.infer<typeof getCommentOutput> & {
+			authorAvatarUpdatedAt: Date | null;
+		})[]
+	) {
+		return data.map((comment) => {
+			return {
+				...comment,
+				author: {
+					...comment.author,
+					avatarUrl:
+						comment.author.avatarUrl && comment.authorAvatarUpdatedAt
+							? constructPublicUrl({
+									key: comment.author.avatarUrl,
+									updatedAt: comment.authorAvatarUpdatedAt,
+								}).publicUrl
+							: null,
+				},
+			};
+		});
+	}
+
+	private mapUserComments(
+		data: (z.infer<typeof getUserCommentOutput> & {
 			authorAvatarUpdatedAt: Date | null;
 		})[]
 	) {

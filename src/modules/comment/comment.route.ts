@@ -49,4 +49,11 @@ export const commentRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.commentService.getCommentReplies({ ...input });
 		}),
+
+	getAllCommentsByUser: commentProcedure
+		.input(commentSchema.getAllCommentsByUser.input)
+		.output(commentSchema.getAllCommentsByUser.output)
+		.handler(async ({ input, context }) => {
+			return await context.commentService.getAllCommentsByUser({ ...input });
+		}),
 });
