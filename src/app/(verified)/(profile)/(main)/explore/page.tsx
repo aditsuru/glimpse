@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { Loader } from "@/components/misc/Loader";
@@ -9,10 +9,14 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
+import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { FollowButton } from "@/modules/follow/components/FollowButton";
 import { ProfileCard } from "@/modules/profile/components/ProfileCard";
-import { useSearchProfiles } from "@/modules/profile/profile.queries";
+import {
+	useGetSuggestions,
+	useSearchProfiles,
+} from "@/modules/profile/profile.queries";
 import { useViewerStore } from "@/store/use-viewer-store";
 
 export default function Page() {
@@ -20,28 +24,45 @@ export default function Page() {
 	const [searchQuery, setSearchQuery] = useState("");
 
 	const { userId } = useViewerStore();
-	const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
-		useSearchProfiles(searchQuery);
 
-	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
+	// Search Query
+	const {
+		data: searchData,
+		fetchNextPage,
+		hasNextPage,
+		isLoading: isSearchLoading,
+		isFetching,
+	} = useSearchProfiles(searchQuery);
+
+	// Suggestions Query (Only runs when NOT searching)
+	const { data: suggestionsData, isLoading: isSuggestionsLoading } =
+		useGetSuggestions(searchQuery.length === 0);
+
+	const ref = useInfiniteScroll(fetchNextPage, isFetching);
 
 	const handleSubmit = (e: React.SubmitEvent) => {
 		e.preventDefault();
 		setSearchQuery(inputValue);
 	};
 
-	const profiles = data?.pages.flatMap((page) => page.items) ?? [];
+	const searchProfiles = searchData?.pages.flatMap((page) => page.items) ?? [];
+	const suggestionProfiles = suggestionsData?.items ?? [];
+
+	const isSearching = searchQuery.length > 0;
 
 	return (
-		<div className="w-full h-full overflow-y-auto no-scrollbar flex flex-col">
+		<main className="flex flex-col w-full h-full overflow-hidden">
 			<form
 				onSubmit={handleSubmit}
-				className="sticky top-0 w-full flex justify-center px-4 py-4 border-b border-accent bg-background/80 backdrop-blur-sm z-10 h-18 items-center"
+				className="shrink-0 w-full flex justify-center px-4 py-4 border-b border-accent bg-background/80 backdrop-blur-sm z-10 h-18 items-center"
 			>
 				<InputGroup className="w-sm bg-background! rounded-full! p-4! py-5! has-[[data-slot=input-group-control]:focus-visible]:ring-0!">
 					<InputGroupInput
 						value={inputValue}
-						onChange={(e) => setInputValue(e.target.value)}
+						onChange={(e) => {
+							setInputValue(e.target.value);
+							if (e.target.value === "") setSearchQuery(""); // Clear search if input is emptied
+						}}
 						placeholder="Search profiles..."
 						autoComplete="off"
 						className="text-base!"
@@ -54,43 +75,94 @@ export default function Page() {
 				</InputGroup>
 			</form>
 
-			<div className="flex flex-col flex-1">
-				{profiles.map((profile) => (
-					<div
-						key={profile.id}
-						className="hover:bg-accent/20 px-4 flex items-center"
-					>
-						<ProfileCard data={profile} />
+			<ScrollContainer className="flex-1 overflow-y-auto no-scrollbar relative w-full">
+				<div className="flex flex-col w-full pb-8">
+					{/* --- SEARCH RESULTS VIEW --- */}
+					{isSearching ? (
+						<>
+							{searchProfiles.map((profile) => (
+								<div
+									key={profile.id}
+									className="hover:bg-accent/20 px-4 flex items-center"
+								>
+									<ProfileCard data={profile} />
+									{profile.userId !== userId && (
+										<FollowButton
+											initialStatus={profile.viewerStatus}
+											targetUserId={profile.userId}
+											targetUsername={profile.username}
+											targetVisibility={profile.visibility}
+											className="mr-4"
+										/>
+									)}
+								</div>
+							))}
 
-						{profile.userId !== userId && (
-							<FollowButton
-								initialStatus={profile.viewerStatus}
-								targetUserId={profile.userId}
-								targetUsername={profile.username}
-								targetVisibility={profile.visibility}
-								className="mr-4"
-							/>
-						)}
-					</div>
-				))}
-				{isLoading && (
-					<div className="py-8 flex justify-center w-full">
-						<Loader />
-					</div>
-				)}
-				{hasNextPage && (
-					<div ref={ref} className="py-4 flex justify-center w-full">
-						<Loader />
-					</div>
-				)}
-				{searchQuery && profiles.length === 0 && !isLoading && (
-					<div className="flex-1">
-						<EmptyStateMessage
-							title={`No profiles found for "${searchQuery}"`}
-						/>
-					</div>
-				)}
-			</div>
-		</div>
+							{isSearchLoading && (
+								<div className="py-8 flex justify-center w-full">
+									<Loader />
+								</div>
+							)}
+
+							{hasNextPage && (
+								<div ref={ref} className="py-8 flex justify-center w-full">
+									{isFetching && <Loader />}
+								</div>
+							)}
+
+							{searchProfiles.length === 0 && !isSearchLoading && (
+								<div className="mt-16">
+									<EmptyStateMessage
+										title={`No profiles found for "${searchQuery}"`}
+									/>
+								</div>
+							)}
+						</>
+					) : (
+						<>
+							{suggestionProfiles.length > 0 && (
+								<div className="px-6 py-4 text-xl font-semibold">
+									Suggested Accounts
+								</div>
+							)}
+
+							{suggestionProfiles.map((profile) => (
+								<div
+									key={profile.id}
+									className="hover:bg-accent/20 px-4 flex items-center"
+								>
+									<ProfileCard data={profile} />
+									{profile.userId !== userId && (
+										<FollowButton
+											initialStatus={profile.viewerStatus}
+											targetUserId={profile.userId}
+											targetUsername={profile.username}
+											targetVisibility={profile.visibility}
+											className="mr-4"
+										/>
+									)}
+								</div>
+							))}
+
+							{isSuggestionsLoading && (
+								<div className="py-8 flex justify-center w-full">
+									<Loader />
+								</div>
+							)}
+
+							{!isSuggestionsLoading && suggestionProfiles.length === 0 && (
+								<div className="mt-24">
+									<EmptyStateMessage
+										Icon={Sparkles}
+										title="You're popular!"
+										description="You somehow follow literally everyone on the platform. Go touch some grass."
+									/>
+								</div>
+							)}
+						</>
+					)}
+				</div>
+			</ScrollContainer>
+		</main>
 	);
 }

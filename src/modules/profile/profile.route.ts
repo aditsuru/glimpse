@@ -84,4 +84,10 @@ export const profileRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.profileService.updateVisibility({ ...input });
 		}),
+
+	getSuggestions: profileProcedure
+		.output(profileSchema.getSuggestions.output)
+		.handler(async ({ context }) => {
+			return await context.profileService.getSuggestions();
+		}),
 });

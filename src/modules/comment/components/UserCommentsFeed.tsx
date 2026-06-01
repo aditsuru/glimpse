@@ -43,7 +43,7 @@ export const UserCommentsFeed = ({ username }: UserCommentsFeedProps) => {
 						) : (
 							<div className="px-4">
 								<PostCard data={comment.context.post} />
-								<div className="pt-2 pb-6 px-4">
+								<div className="pt-2 pb-6 px-6">
 									<Separator />
 								</div>
 							</div>

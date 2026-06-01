@@ -161,3 +161,10 @@ export function useUpdateVisibility() {
 		},
 	});
 }
+
+export function useGetSuggestions(enabled: boolean) {
+	return useQuery({
+		...orpc.profile.getSuggestions.queryOptions(),
+		enabled,
+	});
+}
