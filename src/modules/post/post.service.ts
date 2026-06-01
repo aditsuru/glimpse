@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: none */
 import { ORPCError } from "@orpc/server";
-import { and, desc, eq, getTableColumns, lt, sql } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, like, lt, sql } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import {
@@ -695,5 +695,99 @@ export class PostService {
 			items: mappedPosts,
 			nextCursor,
 		};
+	}
+
+	async getBillboard(): Promise<
+		z.infer<typeof postSchema.getBillboard.output>
+	> {
+		const scoreSql = sql<number>`(
+			${postsTable.views} + 
+			((SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2) + 
+			((SELECT count(*) FROM ${commentsTable} WHERE ${commentsTable.postId} = ${postsTable.id}) * 3)
+		) / POWER(GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 0) + 2, 1.8)`;
+
+		const posts = await this.db
+			.select({
+				...getTableColumns(postsTable),
+				authorAvatarUpdatedAt: profilesTable.updatedAt,
+				author: sql<z.infer<typeof postSchema.get.output.shape.author>>`
+				json_build_object(
+				'id', ${profilesTable.userId},
+				'username', ${profilesTable.username},
+				'displayName', ${profilesTable.displayName},
+				'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
+				'avatarUrl', ${profilesTable.avatarKey}
+				)
+				`,
+				attachments: sql<
+					z.infer<typeof postSchema.get.output.shape.attachments>
+				>`
+				COALESCE(
+				json_agg(
+				json_build_object(
+				'mimeType', ${attachmentsTable.mimeType},
+				'url', ${attachmentsTable.attachmentKey}
+				)
+				ORDER BY ${attachmentsTable.position} ASC
+				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
+				, '[]')
+				`,
+				likesCount: this.db.$count(
+					postLikesTable,
+					eq(postsTable.id, postLikesTable.postId)
+				),
+				isLikedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${postLikesTable}
+					WHERE ${postLikesTable.postId} = ${postsTable.id}
+					AND ${postLikesTable.userId} = ${this.userId}
+				)`,
+				bookmarksCount: this.db.$count(
+					bookmarksTable,
+					eq(postsTable.id, bookmarksTable.postId)
+				),
+				isBookmarkedByUser: sql<boolean>`EXISTS (
+					SELECT 1 FROM ${bookmarksTable}
+					WHERE ${bookmarksTable.postId} = ${postsTable.id}
+					AND ${bookmarksTable.userId} = ${this.userId}
+				)`,
+				commentsCount: this.db.$count(
+					commentsTable,
+					eq(postsTable.id, commentsTable.postId)
+				),
+			})
+			.from(postsTable)
+			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
+			.leftJoin(attachmentsTable, eq(postsTable.id, attachmentsTable.postId))
+			.where(
+				and(
+					eq(profilesTable.visibility, "public"),
+					eq(postsTable.hasAttachments, true),
+					like(attachmentsTable.mimeType, "video/%")
+				)
+			)
+			.groupBy(postsTable.id, profilesTable.id)
+			.orderBy(desc(scoreSql), desc(postsTable.createdAt))
+			.limit(10);
+
+		const viewsMap = await getPostViewsBatch(posts.map((p) => p.id));
+
+		return posts.map((post) => ({
+			...post,
+			views: post.views + (viewsMap.get(post.id) ?? 0),
+			author: {
+				...post.author,
+				avatarUrl: post.author.avatarUrl
+					? constructPublicUrl({
+							key: post.author.avatarUrl,
+							updatedAt: post.authorAvatarUpdatedAt,
+						}).publicUrl
+					: null,
+			},
+			attachments: post.attachments.map((a) => ({
+				...a,
+				url: constructPublicUrl({ key: a.url, updatedAt: post.updatedAt })
+					.publicUrl,
+			})),
+		}));
 	}
 }

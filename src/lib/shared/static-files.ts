@@ -10,9 +10,6 @@ export const SIDEBAR_GIFS = [
 	`${config.NEXT_PUBLIC_R2_PUBLIC_URL}/static/banner/07.gif`,
 ] as const;
 
-export const TIME_BREAK_MEDIA = [
-	`${config.NEXT_PUBLIC_R2_PUBLIC_URL}/static/billboard/time-break-01.mp4`,
-	`${config.NEXT_PUBLIC_R2_PUBLIC_URL}/static/billboard/time-break-02.mp4`,
-];
+export const TRANSITION_MEDIA = `${config.NEXT_PUBLIC_R2_PUBLIC_URL}/static/billboard/transition-media.mp4`;
 
 export const BILLBOARD_FRAME = `${config.NEXT_PUBLIC_R2_PUBLIC_URL}/static/billboard/frame.png`;

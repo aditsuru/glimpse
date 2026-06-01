@@ -113,4 +113,8 @@ export const postSchema = {
 		}),
 		output: getTrendingFeedOutput,
 	},
+
+	getBillboard: {
+		output: z.array(getPostOutput),
+	},
 };

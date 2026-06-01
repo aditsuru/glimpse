@@ -1,72 +1,48 @@
 "use client";
 
-import { useState } from "react";
-
-// ─── Playlist config ──────────────────────────────────────────────────────────
-const TRENDING_REPEATS = 1;
-const TRENDING_PER_CYCLE = 1;
+import { useEffect, useState } from "react";
+import type * as z from "zod";
+import type { postSchema } from "@/modules/post/post.schema";
 
 interface BillboardVideoProps {
-	trendingVideos: string[];
-	timeBreakVideos: string[];
+	posts: z.infer<typeof postSchema.getBillboard.output>;
+	transitionVideo: string;
 }
 
 export const BillboardVideo = ({
-	trendingVideos,
-	timeBreakVideos,
+	posts,
+	transitionVideo,
 }: BillboardVideoProps) => {
-	const [trendingIdx, setTrendingIdx] = useState(0);
-	const [timeBreakIdx, setTimeBreakIdx] = useState(0);
-	const [repeat, setRepeat] = useState(0);
-	const [cyclePos, setCyclePos] = useState(0);
-	const [phase, setPhase] = useState<"trending" | "timebreak">("trending");
+	const [phase, setPhase] = useState<"transition" | "post">("transition");
+	const [postIdx, setPostIdx] = useState(0);
 
-	const [videoKey, setVideoKey] = useState(0);
-	const bump = () => setVideoKey((k) => k + 1);
+	const noPosts = posts.length === 0;
 
-	const currentSrc =
-		phase === "trending"
-			? trendingVideos[trendingIdx % trendingVideos.length]
-			: timeBreakVideos[timeBreakIdx % timeBreakVideos.length];
+	useEffect(() => {
+		if (noPosts || phase === "transition") return;
 
-	const handleEnded = () => {
-		if (phase === "trending") {
-			const nextRepeat = repeat + 1;
+		const timer = setTimeout(() => {
+			setPhase("transition");
+			setPostIdx((prev) => (prev + 1) % posts.length);
+		}, 15000);
 
-			if (nextRepeat < TRENDING_REPEATS) {
-				setRepeat(nextRepeat);
-				bump();
-				return;
-			}
+		return () => clearTimeout(timer);
+	}, [phase, noPosts, posts.length]);
 
-			setRepeat(0);
-			setTrendingIdx((i) => i + 1);
-
-			const nextCyclePos = cyclePos + 1;
-			if (nextCyclePos >= TRENDING_PER_CYCLE) {
-				setCyclePos(0);
-				setPhase("timebreak");
-			} else {
-				setCyclePos(nextCyclePos);
-			}
-			bump();
-		} else {
-			// One break video per cycle — advance index for next cycle, return to trending
-			setTimeBreakIdx((i) => (i + 1) % timeBreakVideos.length);
-			setPhase("trending");
-			bump();
-		}
+	const handleTransitionEnded = () => {
+		if (noPosts) return;
+		setPhase("post");
 	};
 
-	return (
-		<figure aria-label="Billboard video">
+	if (noPosts || phase === "transition") {
+		return (
 			<video
-				key={videoKey}
-				src={currentSrc}
+				src={transitionVideo}
 				autoPlay
 				muted
 				playsInline
-				onEnded={handleEnded}
+				loop={noPosts}
+				onEnded={noPosts ? undefined : handleTransitionEnded}
 				style={{
 					width: "100%",
 					height: "100%",
@@ -75,6 +51,27 @@ export const BillboardVideo = ({
 					display: "block",
 				}}
 			/>
-		</figure>
+		);
+	}
+
+	const currentPost = posts[postIdx];
+	const media = currentPost.attachments[0];
+
+	return (
+		<video
+			key={`post-${currentPost.id}`}
+			src={media.url}
+			autoPlay
+			muted
+			loop
+			playsInline
+			style={{
+				width: "100%",
+				height: "100%",
+				objectFit: "cover",
+				objectPosition: "center",
+				display: "block",
+			}}
+		/>
 	);
 };

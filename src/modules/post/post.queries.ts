@@ -103,3 +103,10 @@ export function useGetTrendingFeed() {
 		})
 	);
 }
+
+export function useGetBillboard() {
+	return useQuery({
+		...orpc.post.getBillboard.queryOptions(),
+		refetchInterval: 60000 * 15,
+	});
+}
