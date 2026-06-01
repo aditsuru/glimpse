@@ -7,6 +7,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { cn } from "@/lib/client/utils";
 import { CommentCard } from "@/modules/comment/components/CommentCard";
 import { PostCard } from "@/modules/post/components/PostCard";
+import { useViewerStore } from "@/store/use-viewer-store";
 import { useGetAllCommentsByUser } from "../comment.queries";
 
 interface UserCommentsFeedProps {
@@ -17,6 +18,7 @@ export const UserCommentsFeed = ({ username }: UserCommentsFeedProps) => {
 	const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
 		useGetAllCommentsByUser(username);
 
+	const { username: viewerUsername } = useViewerStore();
 	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
 	const comments = data?.pages.flatMap((comment) => comment.items) ?? [];
 
@@ -41,7 +43,7 @@ export const UserCommentsFeed = ({ username }: UserCommentsFeedProps) => {
 						) : (
 							<div className="px-4">
 								<PostCard data={comment.context.post} />
-								<div className="pt-2 pb-6">
+								<div className="pt-2 pb-6 px-4">
 									<Separator />
 								</div>
 							</div>
@@ -77,7 +79,11 @@ export const UserCommentsFeed = ({ username }: UserCommentsFeedProps) => {
 			{comments.length === 0 && !isLoading && (
 				<EmptyStateMessage
 					title="No comments yet"
-					description="You haven't commented on anything yet"
+					description={
+						username === viewerUsername
+							? `You haven't commented on anything yet`
+							: `${username} hasn't commented on anything yet`
+					}
 				/>
 			)}
 		</div>
