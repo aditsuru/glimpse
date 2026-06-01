@@ -101,7 +101,7 @@ export const CommentCard = ({
 						<AvatarImage src={data.author.avatarUrl ?? DEFAULT_PFP_URL} />
 					</Avatar>
 
-					{showConnector && <div className="flex-1 w-[2px] bg-ring" />}
+					{showConnector && <div className="flex-1 w-px bg-ring" />}
 				</div>
 
 				<div className="flex-1 flex flex-col min-w-0">
