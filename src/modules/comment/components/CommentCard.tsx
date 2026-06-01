@@ -1,7 +1,10 @@
+/** biome-ignore-all lint/a11y/useSemanticElements: div is needed to be interactive */
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: these divs are not interactive */
 "use client";
 
 import { Ellipsis, MessageCircle, Share } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import type * as z from "zod";
@@ -20,7 +23,7 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { formatPostDate } from "@/lib/client/helpers";
+import { formatPostDate, startProgress } from "@/lib/client/helpers";
 import { cn } from "@/lib/client/utils";
 import { config } from "@/lib/shared/config";
 import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
@@ -36,11 +39,19 @@ interface CommentCardProps {
 	data: z.infer<typeof getCommentOutput>;
 	isNested?: boolean;
 	isLast?: boolean;
+	redirect?: string;
+	hideToolbar?: boolean;
 }
 
-export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
+export const CommentCard = ({
+	data,
+	isNested = false,
+	redirect,
+	hideToolbar = false,
+}: CommentCardProps) => {
 	const [repliesOpen, setRepliesOpen] = useState(false);
 	const [replyComposerOpen, setReplyComposerOpen] = useState(false);
+	const router = useRouter();
 
 	const {
 		data: repliesData,
@@ -54,7 +65,21 @@ export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 	const remainingCount = Math.max(0, data.repliesCount - replies.length);
 
 	return (
-		<div className={isNested ? "w-full py-2 pr-4" : "w-full py-2 px-4"}>
+		<div
+			className={isNested ? "w-full py-2 pr-4" : "w-full py-2 px-4"}
+			onClick={() => {
+				if (!redirect) return;
+				startProgress();
+				router.push(`/p/${data.postId}?highlight=${redirect}`);
+			}}
+			onKeyDown={(e) => {
+				if (e.key === "Enter") {
+					if (!redirect) return;
+					startProgress();
+					router.push(`/p/${data.postId}?highlight=${redirect}`);
+				}
+			}}
+		>
 			<div className="flex gap-3 items-start">
 				<div className="flex flex-col items-center self-stretch shrink-0">
 					<Avatar className="shrink-0">
@@ -64,8 +89,12 @@ export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 
 				<div className="flex-1 flex flex-col min-w-0">
 					{/* Header */}
-					<div className="text-base font-semibold flex justify-between gap-2 items-center -mt-1">
-						<div className="flex gap-1 items-center">
+					<div className="text-base font-semibold flex justify-between gap-2 items-center -mt-1 translate-y-[-2px]">
+						<div
+							className="flex gap-1 items-center"
+							onClick={(e) => e.stopPropagation()}
+							onKeyDown={(e) => e.stopPropagation()}
+						>
 							<HoverCard>
 								<HoverCardTrigger
 									delay={300}
@@ -99,13 +128,17 @@ export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 					<p className="whitespace-break-spaces -mt-1">{data.body}</p>
 
 					{/* Action bar */}
-					<div className="flex items-center gap-4 mt-1">
+					<div
+						className="flex items-center gap-4 mt-1"
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => e.stopPropagation()}
+					>
 						<CommentLikeButton
 							commentId={data.id}
 							initialCount={data.likesCount}
 							initialState={data.isLikedByUser}
 						/>
-						{!isNested && (
+						{!isNested && !hideToolbar && (
 							<Button
 								variant="ghost"
 								className="flex gap-1 text-muted-foreground/80 items-center rounded-2xl hover:bg-transparent! hover:text-green-500 px-0!"
@@ -117,7 +150,7 @@ export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 								<span className="tabular-nums min-w-4 text-left">Reply</span>
 							</Button>
 						)}
-						{!isNested && (
+						{!isNested && !hideToolbar && (
 							<Button
 								variant="ghost"
 								className="flex gap-1 text-muted-foreground/80 text-sm items-center rounded-2xl hover:bg-transparent! px-0!"
@@ -135,7 +168,7 @@ export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 					</div>
 
 					{/* Inline reply composer */}
-					{!isNested && replyComposerOpen && (
+					{!isNested && !hideToolbar && replyComposerOpen && (
 						<CommentComposer
 							postId={data.postId}
 							parentCommentId={data.id}
@@ -147,7 +180,7 @@ export const CommentCard = ({ data, isNested = false }: CommentCardProps) => {
 						/>
 					)}
 					{/* Replies */}
-					{!isNested && data.repliesCount > 0 && (
+					{!isNested && !hideToolbar && data.repliesCount > 0 && (
 						<div className="mt-1">
 							{!repliesOpen ? (
 								<Button
@@ -246,6 +279,8 @@ const DropdownMenuSubmenu = ({
 					<Button
 						variant="ghost"
 						className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! aria-expanded:bg-transparent! px-0!"
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => e.stopPropagation()}
 					>
 						<Ellipsis className="size-4.5" />
 					</Button>
@@ -255,7 +290,10 @@ const DropdownMenuSubmenu = ({
 				<DropdownMenuGroup>
 					{authorId === userId && (
 						<DropdownMenuItem
-							onClick={handleDelete}
+							onClick={(e) => {
+								handleDelete();
+								e.stopPropagation();
+							}}
 							className="text-destructive hover:text-destructive!"
 						>
 							Delete

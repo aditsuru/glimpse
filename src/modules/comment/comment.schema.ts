@@ -16,8 +16,17 @@ export const getCommentOutput = commentSelectSchema.extend({
 	repliesCount: z.number(),
 });
 
+export const getUserCommentOutput = getCommentOutput.extend({
+	parentCommentId: z.string().nullable(),
+});
+
 export const getCommentListOutput = z.object({
 	items: z.array(getCommentOutput),
+	nextCursor: z.date().nullable(),
+});
+
+export const getUserCommentListOutput = z.object({
+	items: z.array(getUserCommentOutput),
 	nextCursor: z.date().nullable(),
 });
 
@@ -45,7 +54,7 @@ export const commentSchema = {
 			username: z.string(),
 			cursor: z.date().optional(),
 		}),
-		output: getCommentListOutput,
+		output: getUserCommentListOutput,
 	},
 
 	create: {
