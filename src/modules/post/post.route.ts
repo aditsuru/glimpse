@@ -60,4 +60,11 @@ export const postRouter = base.router({
 		.handler(async ({ input, context }) => {
 			return await context.postService.getFeed({ ...input });
 		}),
+
+	getTrendingFeed: postProcedure
+		.input(postSchema.getTrendingFeed.input)
+		.output(postSchema.getTrendingFeed.output)
+		.handler(async ({ input, context }) => {
+			return await context.postService.getTrendingFeed({ ...input });
+		}),
 });

@@ -57,10 +57,11 @@ export const UserCommentsFeed = ({ username }: UserCommentsFeedProps) => {
 							<CommentCard
 								data={comment}
 								redirect={comment.parentCommentId ?? comment.id}
-								hideToolbar
-								isNested={"parentComment" in comment.context}
+								hideToolbar={isReply}
+								isNested={isReply}
 								hideConnectors
 								pfpSize="lg"
+								hideNestedReplies
 							/>
 						</div>
 					</div>

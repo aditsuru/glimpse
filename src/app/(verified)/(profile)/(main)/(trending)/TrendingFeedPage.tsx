@@ -6,11 +6,11 @@ import { Loader } from "@/components/misc/Loader";
 import { ScrollContainer } from "@/components/VideoPlayer";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { PostCard } from "@/modules/post/components/PostCard";
-import { useGetFeed } from "@/modules/post/post.queries";
+import { useGetTrendingFeed } from "@/modules/post/post.queries";
 
-export const FeedPage = () => {
+export const TrendingFeedPage = () => {
 	const { data, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
-		useGetFeed();
+		useGetTrendingFeed();
 
 	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
@@ -45,7 +45,7 @@ export const FeedPage = () => {
 				)}
 				{!hasNextPage && posts.length > 0 && !isLoading && (
 					<div className="text-center py-12 text-muted-foreground text-base">
-						You're all caught up
+						You've reached the end
 					</div>
 				)}
 			</ScrollContainer>

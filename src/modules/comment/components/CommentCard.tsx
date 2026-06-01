@@ -155,7 +155,7 @@ export const CommentCard = ({
 							initialCount={data.likesCount}
 							initialState={data.isLikedByUser}
 						/>
-						{!isNested && !hideToolbar && (
+						{!isNested && !hideToolbar && !hideNestedReplies && (
 							<Button
 								variant="ghost"
 								className="flex gap-1 text-muted-foreground/80 items-center rounded-2xl hover:bg-transparent! hover:text-green-500 px-0!"
@@ -202,7 +202,7 @@ export const CommentCard = ({
 				!hideToolbar &&
 				!hideNestedReplies &&
 				data.repliesCount > 0 && (
-					<div className="">
+					<div className="ml-1">
 						{!repliesOpen ? (
 							<Button
 								variant="ghost"

@@ -40,6 +40,11 @@ export const getPostListOutput = z.object({
 	nextCursor: z.date().nullable(),
 });
 
+export const getTrendingFeedOutput = z.object({
+	items: z.array(getPostOutput),
+	nextCursor: z.number().nullable(),
+});
+
 export const postSchema = {
 	markPostSeen: {
 		input: z.object({
@@ -100,5 +105,12 @@ export const postSchema = {
 			cursor: z.date().optional(),
 		}),
 		output: getPostListOutput,
+	},
+
+	getTrendingFeed: {
+		input: z.object({
+			cursor: z.number().optional(),
+		}),
+		output: getTrendingFeedOutput,
 	},
 };

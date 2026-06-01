@@ -1,9 +1,5 @@
-import { FeedHeader } from "../following/FeedHeader";
+import { TrendingFeedPage } from "@/app/(verified)/(profile)/(main)/(trending)/TrendingFeedPage";
 
 export default function Page() {
-	return (
-		<div className="flex flex-col w-full h-full relative">
-			<FeedHeader />
-		</div>
-	);
+	return <TrendingFeedPage />;
 }
