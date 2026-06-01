@@ -4,9 +4,11 @@ import {
 	and,
 	desc,
 	eq,
+	exists,
 	getTableColumns,
 	ilike,
 	lt,
+	not,
 	or,
 	sql,
 } from "drizzle-orm";
@@ -402,5 +404,94 @@ export class ProfileService {
 			throw new ORPCError("NOT_FOUND", { message: "Profile not found" });
 
 		return { success: true };
+	}
+
+	async getSuggestions(): Promise<
+		z.infer<typeof profileSchema.getSuggestions.output>
+	> {
+		const items = await this.db
+			.select({
+				...getTableColumns(profilesTable),
+				followersCount: this.db.$count(
+					followsTable,
+					and(
+						eq(followsTable.followingId, profilesTable.userId),
+						eq(followsTable.status, "accepted")
+					)
+				),
+				followingCount: this.db.$count(
+					followsTable,
+					and(
+						eq(followsTable.followerId, profilesTable.userId),
+						eq(followsTable.status, "accepted")
+					)
+				),
+
+				viewerFollowsStatus: sql<null>`null`.as("viewer_follows_status"),
+				profileFollowsViewerStatus: this.db
+					.select({ status: followsTable.status })
+					.from(followsTable)
+					.where(
+						and(
+							eq(followsTable.followerId, profilesTable.userId),
+							eq(followsTable.followingId, sql`${this.userId}`)
+						)
+					)
+					.limit(1)
+					.as("profile_follows_status"),
+			})
+			.from(profilesTable)
+			.where(
+				and(
+					not(eq(profilesTable.userId, this.userId)),
+					not(
+						exists(
+							this.db
+								.select()
+								.from(followsTable)
+								.where(
+									and(
+										eq(followsTable.followerId, this.userId),
+										eq(followsTable.followingId, profilesTable.userId)
+									)
+								)
+						)
+					)
+				)
+			)
+			.orderBy(sql`RANDOM()`)
+			.limit(10);
+
+		const mappedItems = items.map(
+			({
+				avatarKey,
+				bannerKey,
+				viewerFollowsStatus,
+				profileFollowsViewerStatus,
+				...profile
+			}) => ({
+				...profile,
+				avatarUrl: avatarKey
+					? constructPublicUrl({
+							key: avatarKey,
+							updatedAt: profile.updatedAt,
+						}).publicUrl
+					: null,
+				bannerUrl: bannerKey
+					? constructPublicUrl({
+							key: bannerKey,
+							updatedAt: profile.updatedAt,
+						}).publicUrl
+					: null,
+				viewerStatus: computeViewerStatus(
+					viewerFollowsStatus ?? undefined,
+					profileFollowsViewerStatus
+				),
+			})
+		);
+
+		return {
+			items: mappedItems,
+		};
 	}
 }

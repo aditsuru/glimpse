@@ -112,4 +112,10 @@ export const profileSchema = {
 			success: z.boolean(),
 		}),
 	},
+
+	getSuggestions: {
+		output: z.object({
+			items: z.array(getProfileListOutput),
+		}),
+	},
 };

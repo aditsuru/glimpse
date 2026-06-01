@@ -91,3 +91,22 @@ export function useGetFeed() {
 		})
 	);
 }
+
+export function useGetTrendingFeed() {
+	return useInfiniteQuery(
+		orpc.post.getTrendingFeed.infiniteOptions({
+			input: (pageParam) => ({
+				cursor: pageParam,
+			}),
+			getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+			initialPageParam: undefined as number | undefined,
+		})
+	);
+}
+
+export function useGetBillboard() {
+	return useQuery({
+		...orpc.post.getBillboard.queryOptions(),
+		refetchInterval: 60000 * 15,
+	});
+}

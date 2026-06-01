@@ -199,7 +199,7 @@ export const PostCard = ({
 
 			{/* Toolbar */}
 			<div
-				className={cn("mt-1 flex justify-between", {
+				className={cn("mt-1 flex justify-evenly sm:justify-between", {
 					"md:pl-14": leftMargin,
 					"px-4": separator,
 				})}
