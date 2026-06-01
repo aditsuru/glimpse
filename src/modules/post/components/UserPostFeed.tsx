@@ -38,7 +38,10 @@ export const UserPostFeed = ({ username, userId }: UserPostFeedProps) => {
 	return (
 		<div className="w-full h-full">
 			{posts.map((post) => (
-				<div key={post.id} className="border-b border-accent">
+				<div
+					key={post.id}
+					className="border-b border-accent hover:bg-accent/15"
+				>
 					<PostCard data={post} />
 				</div>
 			))}

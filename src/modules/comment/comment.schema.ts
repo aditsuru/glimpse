@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { commentSelectSchema } from "@/db/schema/comments";
+import { getPostOutput } from "../post/post.schema";
 
 const commentAuthorSchema = z.object({
 	id: z.string(),
@@ -16,13 +17,16 @@ export const getCommentOutput = commentSelectSchema.extend({
 	repliesCount: z.number(),
 });
 
-export const getUserCommentOutput = getCommentOutput.extend({
-	parentCommentId: z.string().nullable(),
-});
-
 export const getCommentListOutput = z.object({
 	items: z.array(getCommentOutput),
 	nextCursor: z.date().nullable(),
+});
+
+export const getUserCommentOutput = getCommentOutput.extend({
+	context: z.union([
+		z.object({ parentComment: getCommentOutput }),
+		z.object({ post: getPostOutput }),
+	]),
 });
 
 export const getUserCommentListOutput = z.object({

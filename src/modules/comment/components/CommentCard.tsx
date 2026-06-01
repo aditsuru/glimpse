@@ -41,6 +41,10 @@ interface CommentCardProps {
 	isLast?: boolean;
 	redirect?: string;
 	hideToolbar?: boolean;
+	hideNestedReplies?: boolean;
+	hideConnectors?: boolean;
+	forceConnector?: boolean;
+	pfpSize?: "lg" | "sm" | "default";
 }
 
 export const CommentCard = ({
@@ -49,6 +53,10 @@ export const CommentCard = ({
 	redirect,
 	hideToolbar = false,
 	isLast = false,
+	hideNestedReplies = false,
+	hideConnectors = false,
+	forceConnector = false,
+	pfpSize,
 }: CommentCardProps) => {
 	const [repliesOpen, setRepliesOpen] = useState(false);
 	const [replyComposerOpen, setReplyComposerOpen] = useState(false);
@@ -64,6 +72,12 @@ export const CommentCard = ({
 
 	const replies = repliesData?.pages.flatMap((p) => p.items) ?? [];
 	const remainingCount = Math.max(0, data.repliesCount - replies.length);
+
+	const showConnector =
+		forceConnector ||
+		(!hideConnectors &&
+			!isLast &&
+			(isNested || (repliesOpen && replies.length > 0 && !replyComposerOpen)));
 
 	return (
 		<div
@@ -83,14 +97,11 @@ export const CommentCard = ({
 		>
 			<div className="flex gap-3 items-start">
 				<div className="flex flex-col items-center self-stretch shrink-0">
-					<Avatar className="shrink-0">
+					<Avatar className="shrink-0" size={pfpSize}>
 						<AvatarImage src={data.author.avatarUrl ?? DEFAULT_PFP_URL} />
 					</Avatar>
 
-					{!isLast &&
-						(isNested || (repliesOpen && !isNested && !replyComposerOpen)) && (
-							<div className="flex-1 w-[2px] bg-border" />
-						)}
+					{showConnector && <div className="flex-1 w-[2px] bg-ring" />}
 				</div>
 
 				<div className="flex-1 flex flex-col min-w-0">
@@ -175,7 +186,7 @@ export const CommentCard = ({
 				</div>
 			</div>
 			{/* Inline reply composer */}
-			{!isNested && !hideToolbar && replyComposerOpen && (
+			{!isNested && !hideToolbar && !hideNestedReplies && replyComposerOpen && (
 				<CommentComposer
 					postId={data.postId}
 					parentCommentId={data.id}
@@ -187,61 +198,64 @@ export const CommentCard = ({
 				/>
 			)}
 			{/* Replies */}
-			{!isNested && !hideToolbar && data.repliesCount > 0 && (
-				<div className="">
-					{!repliesOpen ? (
-						<Button
-							variant="ghost"
-							className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80"
-							onClick={() => setRepliesOpen(true)}
-						>
-							Show {data.repliesCount}{" "}
-							{data.repliesCount === 1 ? "reply" : "replies"}
-						</Button>
-					) : (
-						<>
-							<div>
-								{replies.map((reply, index) => (
-									<CommentCard
-										key={reply.id}
-										data={reply}
-										isNested={true}
-										isLast={!hasNextPage && index === replies.length - 1}
-									/>
-								))}
-							</div>
+			{!isNested &&
+				!hideToolbar &&
+				!hideNestedReplies &&
+				data.repliesCount > 0 && (
+					<div className="">
+						{!repliesOpen ? (
+							<Button
+								variant="ghost"
+								className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80"
+								onClick={() => setRepliesOpen(true)}
+							>
+								Show {data.repliesCount}{" "}
+								{data.repliesCount === 1 ? "reply" : "replies"}
+							</Button>
+						) : (
+							<>
+								<div>
+									{replies.map((reply, index) => (
+										<CommentCard
+											key={reply.id}
+											data={reply}
+											isNested={true}
+											isLast={index === replies.length - 1}
+										/>
+									))}
+								</div>
 
-							<div className="flex gap-4 items-baseline">
-								{hasNextPage && (
+								<div className="flex gap-4 items-baseline">
+									{hasNextPage && (
+										<Button
+											variant="ghost"
+											className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80"
+											onClick={() => fetchNextPage()}
+											disabled={isFetchingNextPage}
+										>
+											{isFetchingNextPage
+												? "Loading..."
+												: `Show ${remainingCount} more ${remainingCount === 1 ? "reply" : "replies"}`}
+										</Button>
+									)}
+
 									<Button
 										variant="ghost"
-										className="flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80"
-										onClick={() => fetchNextPage()}
-										disabled={isFetchingNextPage}
+										className={cn(
+											"flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80",
+											{
+												"pointer-events-none": isLoading,
+											}
+										)}
+										onClick={() => setRepliesOpen(false)}
 									>
-										{isFetchingNextPage
-											? "Loading..."
-											: `Show ${remainingCount} more ${remainingCount === 1 ? "reply" : "replies"}`}
+										{isLoading ? "Loading..." : "Hide replies"}
 									</Button>
-								)}
-
-								<Button
-									variant="ghost"
-									className={cn(
-										"flex gap-1 text-muted-foreground text-sm items-center rounded-2xl hover:bg-transparent! px-0! w-fit hover:text-muted-foreground/80",
-										{
-											"pointer-events-none": isLoading,
-										}
-									)}
-									onClick={() => setRepliesOpen(false)}
-								>
-									{isLoading ? "Loading..." : "Hide replies"}
-								</Button>
-							</div>
-						</>
-					)}
-				</div>
-			)}
+								</div>
+							</>
+						)}
+					</div>
+				)}
 		</div>
 	);
 };
@@ -265,7 +279,7 @@ const DropdownMenuSubmenu = ({
 	const handleDelete = () => {
 		openConfirmDialog({
 			title: "Delete Comment?",
-			description: "This can’t be undone.",
+			description: "This can't be undone.",
 			confirmText: "Delete",
 			confirmVariant: "destructive",
 			className: "sm:max-w-md",

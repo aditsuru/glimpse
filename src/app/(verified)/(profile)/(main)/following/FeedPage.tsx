@@ -17,10 +17,13 @@ export const FeedPage = () => {
 
 	return (
 		<div className="flex flex-col w-full h-full relative">
-			<FeedHeader />
 			<ScrollContainer className="flex-1 overflow-y-auto no-scrollbar w-full h-full">
+				<FeedHeader />
 				{posts.map((post) => (
-					<div key={post.id} className="border-b border-accent">
+					<div
+						key={post.id}
+						className="border-b border-accent hover:bg-accent/15"
+					>
 						<PostCard data={post} />
 					</div>
 				))}
