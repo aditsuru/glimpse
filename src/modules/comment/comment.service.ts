@@ -2,10 +2,12 @@
 import { ORPCError } from "@orpc/server";
 import {
 	and,
+	asc,
 	count,
 	desc,
 	eq,
 	getTableColumns,
+	gt,
 	inArray,
 	isNull,
 	lt,
@@ -340,10 +342,10 @@ export class CommentService {
 			.where(
 				and(
 					eq(commentsTable.parentCommentId, commentId),
-					cursor ? lt(commentsTable.createdAt, cursor) : undefined
+					cursor ? gt(commentsTable.createdAt, cursor) : undefined
 				)
 			)
-			.orderBy(desc(commentsTable.createdAt))
+			.orderBy(asc(commentsTable.createdAt))
 			.groupBy(commentsTable.id, profilesTable.id)
 			.limit(config.COMMENTS_PAGINATION_LIMIT + 1);
 

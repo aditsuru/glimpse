@@ -315,6 +315,21 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[validateAndUpload]
 	);
 
+	// ── Paste Support ──────────────────────────────────────────────────────────
+
+	const handlePaste = useCallback(
+		async (e: React.ClipboardEvent) => {
+			if (isDisabled) return;
+
+			const files = e.clipboardData.files;
+			if (files && files.length > 0) {
+				e.preventDefault();
+				await validateAndUpload(files);
+			}
+		},
+		[isDisabled, validateAndUpload]
+	);
+
 	// ── Attachment actions ─────────────────────────────────────────────────────
 
 	const removeAttachment = (index: number) => {
@@ -326,7 +341,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 
 	// ── Submit ─────────────────────────────────────────────────────────────────
 
-	const handleSubmit = async (e: React.SubmitEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!canSubmit) return;
 
@@ -395,6 +410,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 				onDragLeave={handleDragLeave}
 				onDragOver={handleDragOver}
 				onDrop={handleDrop}
+				onPaste={handlePaste}
 			>
 				{/* Drag overlay — only for images */}
 				{isDragging && (
