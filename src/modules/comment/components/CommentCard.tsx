@@ -194,7 +194,9 @@ export const CommentCard = ({
 						setReplyComposerOpen(false);
 						setRepliesOpen(true);
 					}}
-					className="pb-8"
+					className={cn("pb-4", {
+						"pb-8": repliesOpen,
+					})}
 				/>
 			)}
 			{/* Replies */}
