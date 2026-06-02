@@ -22,6 +22,13 @@ const getCommentRepliesKey = (commentId: string) =>
 		initialPageParam: undefined as Date | undefined,
 	}).queryKey;
 
+const getPostCommentsKey = (postId: string) =>
+	orpc.comment.getPostComments.infiniteOptions({
+		input: (pageParam) => ({ postId, cursor: pageParam }),
+		getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+		initialPageParam: undefined as Date | undefined,
+	}).queryKey;
+
 export function useGetCommentsCount(postId: string, initialCount: number) {
 	return useQuery({
 		...orpc.comment.getCount.queryOptions({
@@ -94,7 +101,7 @@ export function useCreateComment(postId: string) {
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({
-					queryKey: orpc.comment.getPostComments.key(),
+					queryKey: getPostCommentsKey(postId),
 				}),
 				queryClient.invalidateQueries({
 					queryKey: getAllCommentsByUserKey(username),
@@ -131,7 +138,7 @@ export function useCreateReply({
 					queryKey: getCommentRepliesKey(commentId),
 				}),
 				queryClient.invalidateQueries({
-					queryKey: orpc.comment.getPostComments.key(),
+					queryKey: getPostCommentsKey(postId),
 				}),
 				queryClient.invalidateQueries({
 					queryKey: getAllCommentsByUserKey(username),
@@ -143,28 +150,51 @@ export function useCreateReply({
 
 /**
  * Side effects:
- * - Invalidate on settle: comment.getCount[postId], comment.getPostComments[postId], comment.getAllCommentsByUser[username]
+ * - Invalidate on settle: comment.getCount[postId], comment.getPostComments, comment.getAllCommentsByUser[username], comment.getCommentReplies[parentCommentId]
  */
-export function useDeleteComment({ postId }: { postId: string }) {
+export function useDeleteComment({
+	postId,
+	parentCommentId,
+}: {
+	postId: string;
+	parentCommentId?: string | null;
+}) {
 	const queryClient = useQueryClient();
 	const { username } = useViewerStore();
 
 	return useMutation({
 		...orpc.comment.delete.mutationOptions(),
 		onSettled: async () => {
-			await Promise.all([
+			const promises: Promise<unknown>[] = [
 				queryClient.invalidateQueries({
 					queryKey: orpc.comment.getCount.queryOptions({
 						input: { postId },
 					}).queryKey,
 				}),
+
 				queryClient.invalidateQueries({
-					queryKey: orpc.comment.getPostComments.key(),
+					queryKey: getPostCommentsKey(postId),
 				}),
 				queryClient.invalidateQueries({
 					queryKey: getAllCommentsByUserKey(username),
 				}),
-			]);
+			];
+
+			if (parentCommentId) {
+				promises.push(
+					queryClient.invalidateQueries({
+						queryKey: getCommentRepliesKey(parentCommentId),
+					})
+				);
+			} else {
+				promises.push(
+					queryClient.invalidateQueries({
+						queryKey: orpc.comment.getCommentReplies.key(),
+					})
+				);
+			}
+
+			await Promise.all(promises);
 		},
 	});
 }
