@@ -17,7 +17,10 @@ export const FeedPage = () => {
 
 	return (
 		<div className="flex flex-col w-full h-full relative">
-			<ScrollContainer className="flex-1 overflow-y-auto no-scrollbar w-full h-full">
+			<ScrollContainer
+				scrollKey="following-feed"
+				className="flex-1 overflow-y-auto no-scrollbar w-full h-full"
+			>
 				<FeedHeader />
 				{posts.map((post) => (
 					<div

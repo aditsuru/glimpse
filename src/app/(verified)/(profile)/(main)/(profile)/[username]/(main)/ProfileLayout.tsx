@@ -41,7 +41,10 @@ export const ProfileLayout = ({ username, children }: ProfileLayoutProps) => {
 		);
 
 	return (
-		<ScrollContainer className="flex flex-col w-full h-full overflow-y-auto no-scrollbar">
+		<ScrollContainer
+			scrollKey={`profile-feed-${username}`}
+			className="flex flex-col w-full h-full overflow-y-auto no-scrollbar"
+		>
 			<PageHeader title={username} className="max-sm:hidden" />
 			<MobileProfileHeader
 				title={username}

@@ -17,7 +17,10 @@ export const TrendingFeedPage = () => {
 
 	return (
 		<div className="flex flex-col w-full h-full relative">
-			<ScrollContainer className="flex-1 overflow-y-auto no-scrollbar w-full h-full">
+			<ScrollContainer
+				scrollKey="trending-feed"
+				className="flex-1 overflow-y-auto no-scrollbar w-full h-full"
+			>
 				<FeedHeader />
 				{posts.map((post) => (
 					<div
@@ -38,10 +41,7 @@ export const TrendingFeedPage = () => {
 					</div>
 				)}
 				{posts.length === 0 && !isLoading && (
-					<EmptyStateMessage
-						title="No posts yet"
-						description={`Start following people to have their latest posts on your feed`}
-					/>
+					<EmptyStateMessage title="No posts yet" />
 				)}
 				{!hasNextPage && posts.length > 0 && !isLoading && (
 					<div className="text-center py-12 text-muted-foreground text-base">
