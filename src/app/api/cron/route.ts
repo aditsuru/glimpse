@@ -54,17 +54,20 @@ export const { POST } = serve(async (context) => {
 
 	const allPostIds = [...new Set(flushData.flatMap((d) => d.postIds))];
 
-	await context.run("write-view-history", async () => {
-		const validPosts = await db
+	const validPostIds = await context.run("resolve-valid-posts", async () => {
+		const rows = await db
 			.select({ id: postsTable.id })
 			.from(postsTable)
 			.where(inArray(postsTable.id, allPostIds));
+		return rows.map((r) => r.id);
+	});
 
-		const validPostIds = new Set(validPosts.map((p) => p.id));
+	const validPostIdSet = new Set(validPostIds);
 
+	await context.run("write-view-history", async () => {
 		const insertions = flushData.flatMap(({ userId, postIds }) =>
 			postIds
-				.filter((postId) => validPostIds.has(postId))
+				.filter((postId) => validPostIdSet.has(postId))
 				.map((postId) => ({ userId, postId }))
 		);
 
@@ -79,14 +82,17 @@ export const { POST } = serve(async (context) => {
 	});
 
 	await context.run("write-view-counts", async () => {
+		const idsToFlush = allPostIds.filter((id) => validPostIdSet.has(id));
+		if (idsToFlush.length === 0) return;
+
 		const pipeline = redis.pipeline();
-		allPostIds.forEach((id) => {
+		idsToFlush.forEach((id) => {
 			pipeline.getdel(REDIS_KEYS.POST_VIEWS(id));
 		});
 		const raw = await pipeline.exec<(number | null)[]>();
 
-		const deltas = allPostIds
-			.map((id, i) => ({ id, delta: raw[i] ?? 0 }))
+		const deltas = idsToFlush
+			.map((id, i) => ({ id, delta: Number(raw[i] ?? 0) }))
 			.filter((e) => e.delta > 0);
 
 		if (deltas.length === 0) return;
@@ -114,5 +120,7 @@ export const { POST } = serve(async (context) => {
 		);
 	});
 
-	logger.info(`Cron synced ${allPostIds.length} views and updated histories.`);
+	logger.info(
+		`Cron synced views for ${validPostIds.length}/${allPostIds.length} posts (${allPostIds.length - validPostIds.length} deleted/skipped).`
+	);
 });
