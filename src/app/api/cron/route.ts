@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: none */
 
 import { serve } from "@upstash/workflow/nextjs";
-import { inArray, type SQL, sql } from "drizzle-orm";
+import { inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { postsTable, viewHistoryTable } from "@/db/schema";
 import { logger } from "@/lib/server/logger";
@@ -85,11 +85,11 @@ export const { POST } = serve(async (context) => {
 		const idsToFlush = allPostIds.filter((id) => validPostIdSet.has(id));
 		if (idsToFlush.length === 0) return;
 
-		const pipeline = redis.pipeline();
+		const getPipeline = redis.pipeline();
 		idsToFlush.forEach((id) => {
-			pipeline.getdel(REDIS_KEYS.POST_VIEWS(id));
+			getPipeline.get(REDIS_KEYS.POST_VIEWS(id));
 		});
-		const raw = await pipeline.exec<(number | null)[]>();
+		const raw = await getPipeline.exec<(number | null)[]>();
 
 		const deltas = idsToFlush
 			.map((id, i) => ({ id, delta: Number(raw[i] ?? 0) }))
@@ -97,19 +97,25 @@ export const { POST } = serve(async (context) => {
 
 		if (deltas.length === 0) return;
 
-		const chunks: SQL[] = [sql`(case`];
-		const ids: string[] = [];
-		for (const { id, delta } of deltas) {
-			chunks.push(sql`when ${postsTable.id} = ${id} then ${delta}`);
-			ids.push(id);
-		}
-		chunks.push(sql`end)`);
-		const caseExpr = sql.join(chunks, sql.raw(" "));
+		const ids = deltas.map((e) => e.id);
+
+		const caseExpr = sql`cast(case ${sql.join(
+			deltas.map(
+				({ id, delta }) => sql`when ${postsTable.id} = ${id} then ${delta}`
+			),
+			sql` `
+		)} end as integer)`;
 
 		await db
 			.update(postsTable)
 			.set({ views: sql`${postsTable.views} + ${caseExpr}` })
 			.where(inArray(postsTable.id, ids));
+
+		const delPipeline = redis.pipeline();
+		ids.forEach((id) => {
+			delPipeline.del(REDIS_KEYS.POST_VIEWS(id));
+		});
+		await delPipeline.exec();
 	});
 
 	await context.run("release-flushes", async () => {
