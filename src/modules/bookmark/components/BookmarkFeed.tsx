@@ -17,7 +17,10 @@ export const BookmarkFeed = () => {
 
 	return (
 		<div className="flex flex-col w-full h-full relative">
-			<ScrollContainer className="flex-1 w-full h-full overflow-y-auto no-scrollbar">
+			<ScrollContainer
+				scrollKey="bookmarks-feed"
+				className="flex-1 w-full h-full overflow-y-auto no-scrollbar"
+			>
 				<PageHeader title="Bookmarks" />
 				{posts.map((post) => (
 					<div
