@@ -55,13 +55,24 @@ export const { POST } = serve(async (context) => {
 	const allPostIds = [...new Set(flushData.flatMap((d) => d.postIds))];
 
 	await context.run("write-view-history", async () => {
+		const validPosts = await db
+			.select({ id: postsTable.id })
+			.from(postsTable)
+			.where(inArray(postsTable.id, allPostIds));
+
+		const validPostIds = new Set(validPosts.map((p) => p.id));
+
+		const insertions = flushData.flatMap(({ userId, postIds }) =>
+			postIds
+				.filter((postId) => validPostIds.has(postId))
+				.map((postId) => ({ userId, postId }))
+		);
+
+		if (insertions.length === 0) return;
+
 		await db
 			.insert(viewHistoryTable)
-			.values(
-				flushData.flatMap(({ userId, postIds }) =>
-					postIds.map((postId) => ({ userId, postId }))
-				)
-			)
+			.values(insertions)
 			.onConflictDoNothing({
 				target: [viewHistoryTable.userId, viewHistoryTable.postId],
 			});
