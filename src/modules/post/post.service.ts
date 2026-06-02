@@ -584,13 +584,25 @@ export class PostService {
 
 		const seenPostIds = [...new Set([...seenPostIdsRedis, ...seenPostIdsDB])];
 
-		// Hacker News Decay Formula
-		// Score = (Views + Likes*2 + Comments*3) / (Time_In_Hours + 2)^1.8
 		const scoreSql = sql<number>`(
-			${postsTable.views} + 
-			((SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2) + 
-			((SELECT count(*) FROM ${commentsTable} WHERE ${commentsTable.postId} = ${postsTable.id}) * 3)
-		) / POWER(GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 0) + 2, 1.8)`;
+			(
+				1.0
+				+ ${postsTable.views} * 0.5
+				+ (SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2
+				+ (SELECT count(*) FROM ${commentsTable}   WHERE ${commentsTable.postId}  = ${postsTable.id}) * 4
+			) / POWER(
+				GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 0) + 2,
+				1.2   -- reduced from 1.8; punishes age less aggressively
+			)
+			+
+			-- Engagement velocity: interactions per hour of life
+			-- rewards posts that earned engagement efficiently
+			(
+				(SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2
+				+ (SELECT count(*) FROM ${commentsTable} WHERE ${commentsTable.postId}  = ${postsTable.id}) * 4
+			) / GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 1)
+			* 0.4   -- weight of the velocity bonus; tune between 0.2–0.8
+		)`;
 
 		const posts = await this.db
 			.select({
@@ -657,7 +669,7 @@ export class PostService {
 						]
 					: []),
 				desc(scoreSql),
-				desc(postsTable.createdAt)
+				sql`md5(${postsTable.id})`
 			)
 			.limit(limit + 1)
 			.offset(offset);
@@ -701,10 +713,24 @@ export class PostService {
 		z.infer<typeof postSchema.getBillboard.output>
 	> {
 		const scoreSql = sql<number>`(
-			${postsTable.views} + 
-			((SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2) + 
-			((SELECT count(*) FROM ${commentsTable} WHERE ${commentsTable.postId} = ${postsTable.id}) * 3)
-		) / POWER(GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 0) + 2, 1.8)`;
+			(
+				1.0
+				+ ${postsTable.views} * 0.5
+				+ (SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2
+				+ (SELECT count(*) FROM ${commentsTable}   WHERE ${commentsTable.postId}  = ${postsTable.id}) * 4
+			) / POWER(
+				GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 0) + 2,
+				1.2   -- reduced from 1.8; punishes age less aggressively
+			)
+			+
+			-- Engagement velocity: interactions per hour of life
+			-- rewards posts that earned engagement efficiently
+			(
+				(SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2
+				+ (SELECT count(*) FROM ${commentsTable} WHERE ${commentsTable.postId}  = ${postsTable.id}) * 4
+			) / GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 1)
+			* 0.4   -- weight of the velocity bonus; tune between 0.2–0.8
+		)`;
 
 		const posts = await this.db
 			.select({
@@ -766,7 +792,7 @@ export class PostService {
 				)
 			)
 			.groupBy(postsTable.id, profilesTable.id)
-			.orderBy(desc(scoreSql), desc(postsTable.createdAt))
+			.orderBy(desc(scoreSql), sql`md5(${postsTable.id})`)
 			.limit(10);
 
 		const viewsMap = await getPostViewsBatch(posts.map((p) => p.id));
