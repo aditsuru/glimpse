@@ -3,11 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "motion/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { Loader } from "@/components/misc/Loader";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -43,7 +44,7 @@ const resetPasswordSchema = z
 		path: ["confirmPassword"],
 	});
 
-export default function Page() {
+function ResetPasswordForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
@@ -201,5 +202,19 @@ export default function Page() {
 				</CardContent>
 			</Card>
 		</main>
+	);
+}
+
+export default function Page() {
+	return (
+		<Suspense
+			fallback={
+				<main className="w-screen h-dvh flex justify-center items-center py-12">
+					<Loader />
+				</main>
+			}
+		>
+			<ResetPasswordForm />
+		</Suspense>
 	);
 }
