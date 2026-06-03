@@ -204,7 +204,7 @@ export const CommentCard = ({
 				!hideToolbar &&
 				!hideNestedReplies &&
 				data.repliesCount > 0 && (
-					<div className="ml-1">
+					<div>
 						{!repliesOpen ? (
 							<Button
 								variant="ghost"

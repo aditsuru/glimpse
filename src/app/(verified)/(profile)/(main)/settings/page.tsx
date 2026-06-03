@@ -1,13 +1,17 @@
 "use client";
 
 import {
+	ExternalLink,
 	HatGlasses,
 	MoonStar,
 	Presentation,
 	Snowflake,
 	Sparkles,
+	User,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { Button } from "@/components/ui/button";
 import {
 	Field,
 	FieldContent,
@@ -35,6 +39,8 @@ export default function Page() {
 		});
 	};
 
+	const router = useRouter();
+
 	const {
 		isSidebarGifGalleryEnabled,
 		setSidebarGifGalleryEnabled,
@@ -50,9 +56,10 @@ export default function Page() {
 		<main className="w-full h-full overflow-y-auto no-scrollbar">
 			<PageHeader title="Settings" />
 			<section className="flex flex-col gap-6 py-8 px-12">
+				{/* Profile */}
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-4">
-						<h2 className="text-xl font-semibold">Profile </h2>
+						<h2 className="text-xl font-semibold">Profile</h2>
 
 						<Field orientation="horizontal" className="w-full">
 							<FieldContent>
@@ -77,6 +84,8 @@ export default function Page() {
 						</Field>
 					</div>
 				</div>
+
+				{/* Personalization */}
 				<Separator />
 				<div className="flex flex-col gap-4">
 					<div>
@@ -158,6 +167,35 @@ export default function Page() {
 								checked={isMeteorsEnabled}
 								onCheckedChange={setIsMeteorsEnabled}
 							/>
+						</Field>
+					</div>
+				</div>
+
+				{/* Account */}
+				<Separator />
+				<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-4">
+						<h2 className="text-xl font-semibold">Account</h2>
+
+						<Field orientation="horizontal" className="w-full">
+							<FieldContent>
+								<FieldLabel className="flex items-center gap-2 text-lg">
+									<User className="size-5" />
+									Account Information
+								</FieldLabel>
+								<FieldDescription>
+									Update your email, change your password, and manage linked
+									accounts.
+								</FieldDescription>
+							</FieldContent>
+							<Button
+								variant="outline"
+								className="px-2"
+								onClick={() => router.push("/settings/account")}
+							>
+								Manage Account
+								<ExternalLink />
+							</Button>
 						</Field>
 					</div>
 				</div>

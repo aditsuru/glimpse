@@ -26,9 +26,14 @@ export function useCreatePost() {
 	return useMutation({
 		...orpc.post.create.mutationOptions(),
 		onSettled: async () => {
-			await queryClient.invalidateQueries({
-				queryKey: getAllByUserKey(username),
-			});
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: getAllByUserKey(username),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: orpc.post.getFeed.key(),
+				}),
+			]);
 		},
 	});
 }
@@ -44,9 +49,14 @@ export function useDeletePost() {
 	return useMutation({
 		...orpc.post.delete.mutationOptions(),
 		onSettled: async () => {
-			await queryClient.invalidateQueries({
-				queryKey: getAllByUserKey(username),
-			});
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: getAllByUserKey(username),
+				}),
+				queryClient.invalidateQueries({
+					queryKey: orpc.post.getFeed.key(),
+				}),
+			]);
 		},
 	});
 }

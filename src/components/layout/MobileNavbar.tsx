@@ -2,8 +2,6 @@
 
 import { Bell, Home, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/client/utils";
 import { useProfile } from "@/modules/profile/profile.queries";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { Avatar, AvatarImage } from "../ui/avatar";
@@ -20,7 +18,6 @@ type MobileNavbarProps = {
 };
 
 export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
-	const pathname = usePathname();
 	const { open: openPostComposer } = usePostComposerStore();
 
 	const { data } = useProfile({
@@ -33,21 +30,13 @@ export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 				if (href === "/create-post")
 					return (
 						<button key={href} type="button" onClick={openPostComposer}>
-							<Icon
-								className={cn("size-7", {
-									"stroke-[2.5px]": pathname === href,
-								})}
-							/>
+							<Icon className="stroke-[2.5px]" />
 						</button>
 					);
 
 				return (
 					<Link key={href} href={href}>
-						<Icon
-							className={cn("size-7", {
-								"stroke-[2.5px] fill-current": pathname === href,
-							})}
-						/>
+						<Icon className="stroke-[2.5px]" />
 					</Link>
 				);
 			})}

@@ -49,7 +49,7 @@ export const BookmarkButton = ({
 				)}
 				stroke={isBookmarkedByUser ? "none" : "currentColor"}
 			/>
-			<span className="tabular-nums min-w-8 text-left">{formattedCount}</span>
+			<span className="tabular-nums min-w-6 text-left">{formattedCount}</span>
 		</Button>
 	);
 };
