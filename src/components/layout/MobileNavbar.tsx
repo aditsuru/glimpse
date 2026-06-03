@@ -33,21 +33,13 @@ export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 				if (href === "/create-post")
 					return (
 						<button key={href} type="button" onClick={openPostComposer}>
-							<Icon
-								className={cn("size-7", {
-									"stroke-[2.5px]": pathname === href,
-								})}
-							/>
+							<Icon className="stroke-[2.5px]" />
 						</button>
 					);
 
 				return (
 					<Link key={href} href={href}>
-						<Icon
-							className={cn("size-7", {
-								"stroke-[2.5px] fill-current": pathname === href,
-							})}
-						/>
+						<Icon className="stroke-[2.5px]" />
 					</Link>
 				);
 			})}

@@ -27,7 +27,7 @@ export const CommentButton = ({ initialCount, postId }: CommentButtonProps) => {
 				<MessageCircle
 					className={"size-4.5 transition-transform active:scale-125"}
 				/>
-				<span className="tabular-nums min-w-8 text-left">{formattedCount}</span>
+				<span className="tabular-nums min-w-6 text-left">{formattedCount}</span>
 			</Button>
 		</Link>
 	);

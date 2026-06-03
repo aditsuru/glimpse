@@ -201,18 +201,18 @@ export const PostCard = ({
 			<div
 				className={cn("mt-1 flex justify-evenly sm:justify-between", {
 					"md:pl-14": leftMargin,
-					"px-4": separator,
+					"px-2": separator,
 				})}
 				onClick={(e) => e.stopPropagation()}
 				onKeyDown={(e) => e.stopPropagation()}
 			>
+				<CommentButton postId={data.id} initialCount={data.commentsCount} />
+
 				<PostLikeButton
 					postId={data.id}
 					initialCount={data.likesCount}
 					initialState={data.isLikedByUser}
 				/>
-
-				<CommentButton postId={data.id} initialCount={data.commentsCount} />
 
 				<Button
 					variant="ghost"
@@ -220,7 +220,7 @@ export const PostCard = ({
 					title="Views"
 				>
 					<ChartLine className="size-4.5" />
-					<span className="tabular-nums min-w-8 text-left">
+					<span className="tabular-nums min-w-6 text-left">
 						{data.views === 0 ? "1" : data.views}
 					</span>
 				</Button>

@@ -157,10 +157,7 @@ export const Navbar = ({ userId }: NavbarProps) => {
 										</Link>
 									}
 								/>
-								<TooltipContent
-									className="text-base px-4 font-semibold"
-									side="left"
-								>
+								<TooltipContent className="text-base px-4" side="left">
 									Customize your experience
 								</TooltipContent>
 							</Tooltip>
