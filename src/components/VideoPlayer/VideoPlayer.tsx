@@ -433,8 +433,7 @@ export function VideoPlayer({
 		v.muted = muted;
 		v.volume = vol;
 
-		v.play().catch((err) => {
-			console.warn("[VideoPlayer] Autoplay blocked by browser:", err);
+		v.play().catch((_err) => {
 			autoplayFailed.current = true;
 			// Release the slot so other videos aren't permanently blocked
 			if (useMediaStore.getState().activeVideoId === videoId) {

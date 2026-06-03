@@ -2,8 +2,6 @@
 
 import { Bell, Home, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/client/utils";
 import { useProfile } from "@/modules/profile/profile.queries";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { Avatar, AvatarImage } from "../ui/avatar";
@@ -20,7 +18,6 @@ type MobileNavbarProps = {
 };
 
 export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
-	const pathname = usePathname();
 	const { open: openPostComposer } = usePostComposerStore();
 
 	const { data } = useProfile({

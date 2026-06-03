@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { GlimpseChangeEmailConfirmation } from "@/emails/ChangeEmailVerification";
 import { GlimpseVerifyEmail } from "@/emails/VerifyEmail";
 import { config } from "@/lib/shared/config";
 import GlimpseResetPasswordEmail from "./ResetPassword";
@@ -37,6 +38,27 @@ export async function sendResetPasswordEmail({
 			resetPasswordUrl,
 			username,
 			userEmail: to,
+		}),
+	});
+}
+
+export async function sendChangeEmailConfirmation({
+	to,
+	newEmail,
+	verificationUrl,
+}: {
+	to: string;
+	newEmail: string;
+	verificationUrl: string;
+}) {
+	await resend.emails.send({
+		from: "Glimpse <noreply@aditsuru.com>",
+		to,
+		subject: "Approve your email change on Glimpse",
+		react: GlimpseChangeEmailConfirmation({
+			verificationUrl,
+			userEmail: to,
+			newEmail,
 		}),
 	});
 }

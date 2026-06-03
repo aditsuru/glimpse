@@ -1,3 +1,4 @@
+import { accountRouter } from "@/modules/account/account.route";
 import { bookmarkRouter } from "@/modules/bookmark/bookmark.route";
 import { commentRouter } from "@/modules/comment/comment.route";
 import { commentLikeRouter } from "@/modules/comment-like/comment-like.route";
@@ -15,6 +16,7 @@ export const router = base.router({
 	commentLike: commentLikeRouter,
 	bookmark: bookmarkRouter,
 	comment: commentRouter,
+	account: accountRouter,
 });
 
 export type Router = typeof router;
