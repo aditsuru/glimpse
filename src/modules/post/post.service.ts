@@ -1,6 +1,15 @@
 /** biome-ignore-all lint/style/noNonNullAssertion: none */
 import { ORPCError } from "@orpc/server";
-import { and, desc, eq, getTableColumns, like, lt, sql } from "drizzle-orm";
+import {
+	and,
+	desc,
+	eq,
+	getTableColumns,
+	inArray,
+	like,
+	lt,
+	sql,
+} from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import {
@@ -17,6 +26,7 @@ import { customNanoid } from "@/lib/server/helpers";
 import {
 	getPostViews,
 	getPostViewsBatch,
+	getTrendingPage,
 	getViewHistory,
 	isPostSeen,
 	markPostSeen as markPostSeenHelper,
@@ -567,146 +577,106 @@ export class PostService {
 	}: z.infer<typeof postSchema.getTrendingFeed.input>): Promise<
 		z.infer<typeof postSchema.getTrendingFeed.output>
 	> {
-		const offset = cursor || 0;
 		const limit = config.POSTS_PAGINATION_LIMIT;
 
 		const [seenPostIdsRedis, seenPostIdsDB] = await Promise.all([
 			getViewHistory(this.userId),
 			this.db
-				.select({
-					postId: viewHistoryTable.postId,
-				})
+				.select({ postId: viewHistoryTable.postId })
 				.from(viewHistoryTable)
 				.where(eq(viewHistoryTable.userId, this.userId))
-				.orderBy(desc(viewHistoryTable.createdAt))
-				.then((posts) => posts.map((i) => i.postId)),
+				.then((rows) => rows.map((r) => r.postId)),
 		]);
 
-		const seenPostIds = [...new Set([...seenPostIdsRedis, ...seenPostIdsDB])];
+		const seenPostIds = new Set<string>([
+			...(seenPostIdsRedis as string[]),
+			...seenPostIdsDB,
+		]);
 
-		const scoreSql = sql<number>`(
-			(
-				1.0
-				+ ${postsTable.views} * 0.5
-				+ (SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2
-				+ (SELECT count(*) FROM ${commentsTable}   WHERE ${commentsTable.postId}  = ${postsTable.id}) * 4
-			) / POWER(
-				GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 0) + 2,
-				1.2   -- reduced from 1.8; punishes age less aggressively
-			)
-			+
-			-- Engagement velocity: interactions per hour of life
-			-- rewards posts that earned engagement efficiently
-			(
-				(SELECT count(*) FROM ${postLikesTable} WHERE ${postLikesTable.postId} = ${postsTable.id}) * 2
-				+ (SELECT count(*) FROM ${commentsTable} WHERE ${commentsTable.postId}  = ${postsTable.id}) * 4
-			) / GREATEST(EXTRACT(EPOCH FROM (NOW() - ${postsTable.createdAt})) / 3600, 1)
-			* 0.4   -- weight of the velocity bonus; tune between 0.2–0.8
-		)`;
+		const { postIds, nextCursor } = await getTrendingPage(
+			cursor ?? null,
+			limit,
+			seenPostIds
+		);
+
+		if (postIds.length === 0) return { items: [], nextCursor: null };
 
 		const posts = await this.db
 			.select({
 				...getTableColumns(postsTable),
 				authorAvatarUpdatedAt: profilesTable.updatedAt,
 				author: sql<z.infer<typeof postSchema.get.output.shape.author>>`
-				json_build_object(
+			  json_build_object(
 				'id', ${profilesTable.userId},
 				'username', ${profilesTable.username},
 				'displayName', ${profilesTable.displayName},
 				'isGlimpseVerified', ${profilesTable.isGlimpseVerified},
 				'avatarUrl', ${profilesTable.avatarKey}
-				)
-				`,
+			  )`,
 				attachments: sql<
 					z.infer<typeof postSchema.get.output.shape.attachments>
 				>`
-				COALESCE(
+			  COALESCE(
 				json_agg(
-				json_build_object(
-				'mimeType', ${attachmentsTable.mimeType},
-				'url', ${attachmentsTable.attachmentKey}
-				)
-				ORDER BY ${attachmentsTable.position} ASC
-				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL)
-				, '[]')
-				`,
+				  json_build_object('mimeType', ${attachmentsTable.mimeType}, 'url', ${attachmentsTable.attachmentKey})
+				  ORDER BY ${attachmentsTable.position} ASC
+				) FILTER (WHERE ${attachmentsTable.id} IS NOT NULL),
+			  '[]')`,
 				likesCount: this.db.$count(
 					postLikesTable,
 					eq(postsTable.id, postLikesTable.postId)
 				),
 				isLikedByUser: sql<boolean>`EXISTS (
-					SELECT 1 FROM ${postLikesTable}
-					WHERE ${postLikesTable.postId} = ${postsTable.id}
-					AND ${postLikesTable.userId} = ${this.userId}
-				)`,
+			  SELECT 1 FROM ${postLikesTable}
+			  WHERE ${postLikesTable.postId} = ${postsTable.id}
+			  AND ${postLikesTable.userId} = ${this.userId}
+			)`,
 				bookmarksCount: this.db.$count(
 					bookmarksTable,
 					eq(postsTable.id, bookmarksTable.postId)
 				),
 				isBookmarkedByUser: sql<boolean>`EXISTS (
-					SELECT 1 FROM ${bookmarksTable}
-					WHERE ${bookmarksTable.postId} = ${postsTable.id}
-					AND ${bookmarksTable.userId} = ${this.userId}
-				)`,
+			  SELECT 1 FROM ${bookmarksTable}
+			  WHERE ${bookmarksTable.postId} = ${postsTable.id}
+			  AND ${bookmarksTable.userId} = ${this.userId}
+			)`,
 				commentsCount: this.db.$count(
 					commentsTable,
 					eq(postsTable.id, commentsTable.postId)
 				),
-				score: scoreSql,
 			})
 			.from(postsTable)
 			.innerJoin(profilesTable, eq(postsTable.userId, profilesTable.userId))
 			.leftJoin(attachmentsTable, eq(postsTable.id, attachmentsTable.postId))
-			.where(eq(profilesTable.visibility, "public")) // Exclude private accounts
-			.groupBy(postsTable.id, profilesTable.id)
-			.orderBy(
-				...(seenPostIds.length > 0
-					? [
-							sql`CASE WHEN ${postsTable.id} = ANY(ARRAY[${sql.join(
-								seenPostIds.map((id) => sql`${id}`),
-								sql`, `
-							)}]) THEN 1 ELSE 0 END`,
-						]
-					: []),
-				desc(scoreSql),
-				sql`md5(${postsTable.id})`
-			)
-			.limit(limit + 1)
-			.offset(offset);
+			.where(inArray(postsTable.id, postIds))
+			.groupBy(postsTable.id, profilesTable.id);
 
-		const hasNext = posts.length > limit;
-		const trimmed = hasNext ? posts.slice(0, -1) : posts;
-		const nextCursor = hasNext ? offset + limit : null;
+		const postMap = new Map(posts.map((p) => [p.id, p]));
+		const viewsMap = await getPostViewsBatch(postIds);
 
-		const viewsMap = await getPostViewsBatch(trimmed.map((p) => p.id));
-
-		const mappedPosts = trimmed.map((post) => {
-			return {
-				...post,
-				views: post.views + (viewsMap.get(post.id) ?? 0),
+		const mappedPosts = postIds
+			.map((id) => postMap.get(id))
+			.filter(Boolean)
+			.map((post) => ({
+				...post!,
+				views: post!.views + (viewsMap.get(post!.id) ?? 0),
 				author: {
-					...post.author,
-					avatarUrl: post.author.avatarUrl
+					...post!.author,
+					avatarUrl: post!.author.avatarUrl
 						? constructPublicUrl({
-								key: post.author.avatarUrl,
-								updatedAt: post.authorAvatarUpdatedAt,
+								key: post!.author.avatarUrl,
+								updatedAt: post!.authorAvatarUpdatedAt,
 							}).publicUrl
 						: null,
 				},
-				attachments: post.attachments.map((a) => {
-					return {
-						...a,
-						url: constructPublicUrl({ key: a.url, updatedAt: post.updatedAt })
-							.publicUrl,
-					};
-				}),
-			};
-		});
+				attachments: post!.attachments.map((a) => ({
+					...a,
+					url: constructPublicUrl({ key: a.url, updatedAt: post!.updatedAt })
+						.publicUrl,
+				})),
+			}));
 
-		return {
-			items: mappedPosts,
-			nextCursor,
-		};
+		return { items: mappedPosts, nextCursor };
 	}
 
 	async getBillboard(): Promise<

@@ -44,3 +44,62 @@ export async function getPostViewsBatch(
 
 	return new Map(postIds.map((id, i) => [id, results[i] ?? 0]));
 }
+
+const WEIGHTS = {
+	view: 0.5,
+	like: 2.0,
+	comment: 4.0,
+} as const;
+
+export async function incrementTrendingScore(
+	postId: string,
+	event: keyof typeof WEIGHTS
+) {
+	await redis.zincrby(REDIS_KEYS.TRENDING_FEED(), WEIGHTS[event], postId);
+}
+
+export async function removeTrendingPost(postId: string) {
+	await redis.zrem(REDIS_KEYS.TRENDING_FEED(), postId);
+}
+
+export async function getTrendingPage(
+	cursor: number | null,
+	limit: number,
+	seenPostIds: Set<string>
+): Promise<{ postIds: string[]; nextCursor: number | null }> {
+	const maxScore: number | "+inf" = cursor !== null ? cursor : "+inf";
+
+	const results = (await redis.zrange(
+		REDIS_KEYS.TRENDING_FEED(),
+		maxScore,
+		"-inf",
+		{
+			byScore: true,
+			rev: true,
+			withScores: true,
+			offset: 0,
+			count: limit * 3,
+		}
+	)) as string[];
+
+	if (results.length === 0) return { postIds: [], nextCursor: null };
+
+	const pairs: { id: string; score: number }[] = [];
+	for (let i = 0; i < results.length; i += 2) {
+		pairs.push({ id: results[i], score: Number(results[i + 1]) });
+	}
+
+	const unseen = pairs.filter((p) => !seenPostIds.has(p.id));
+	const seen = pairs.filter((p) => seenPostIds.has(p.id));
+	const ordered = [...unseen, ...seen].slice(0, limit + 1);
+
+	const hasNext = ordered.length > limit;
+	const trimmed = hasNext ? ordered.slice(0, limit) : ordered;
+	// biome-ignore lint/style/noNonNullAssertion: none
+	const nextCursor = hasNext ? trimmed.at(-1)!.score : null;
+
+	return {
+		postIds: trimmed.map((p) => p.id),
+		nextCursor,
+	};
+}
