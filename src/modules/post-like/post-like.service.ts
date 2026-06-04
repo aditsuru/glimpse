@@ -8,7 +8,12 @@ import { attachmentsTable, postsTable, profilesTable } from "@/db/schema";
 import { bookmarksTable } from "@/db/schema/bookmarks";
 import { commentsTable } from "@/db/schema/comments";
 import { postLikesTable } from "@/db/schema/post-likes";
-import { getPostViewsBatch } from "@/lib/server/redis-utils";
+import { upsertNotification } from "@/lib/server/helpers";
+import { logger } from "@/lib/server/logger";
+import {
+	getPostViewsBatch,
+	incrementTrendingScore,
+} from "@/lib/server/redis-utils";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
 import type { postSchema } from "../post/post.schema";
@@ -152,6 +157,27 @@ export class PostLikeService {
 					postId,
 				})
 				.onConflictDoNothing();
+
+			const post = await this.db
+				.select({ userId: postsTable.userId })
+				.from(postsTable)
+				.where(eq(postsTable.id, postId))
+				.limit(1)
+				.then((i) => i[0]);
+
+			if (post) {
+				void Promise.all([
+					upsertNotification({
+						type: "like",
+						recipientId: post.userId,
+						actorId: this.userId,
+						postId,
+					}).catch((e) => logger.error({ err: e }, "notification failed")),
+					incrementTrendingScore(postId, "like").catch((e) =>
+						logger.error("trending increment failed", e)
+					),
+				]);
+			}
 
 			return {
 				success: true,

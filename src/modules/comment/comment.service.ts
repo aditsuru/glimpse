@@ -20,6 +20,9 @@ import { bookmarksTable } from "@/db/schema/bookmarks";
 import { commentLikesTable } from "@/db/schema/comment-likes";
 import { commentsTable } from "@/db/schema/comments";
 import { postLikesTable } from "@/db/schema/post-likes";
+import { upsertNotification } from "@/lib/server/helpers";
+import { logger } from "@/lib/server/logger";
+import { incrementTrendingScore } from "@/lib/server/redis-utils";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
 import type { getPostOutput, postSchema } from "../post/post.schema";
@@ -47,16 +50,75 @@ export class CommentService {
 				message: "Comment cannot be empty.",
 			});
 
-		await this.db.insert(commentsTable).values({
-			body,
-			postId,
-			userId: this.userId,
-			parentCommentId: parentCommentId ?? null,
-		});
+		const [inserted] = await this.db
+			.insert(commentsTable)
+			.values({
+				body,
+				postId,
+				userId: this.userId,
+				parentCommentId: parentCommentId ?? null,
+			})
+			.returning({ id: commentsTable.id });
 
-		return {
-			success: true,
-		};
+		const [post, parentComment] = await Promise.all([
+			this.db
+				.select({ userId: postsTable.userId })
+				.from(postsTable)
+				.where(eq(postsTable.id, postId))
+				.limit(1)
+				.then((i) => i[0]),
+			parentCommentId
+				? this.db
+						.select({ userId: commentsTable.userId })
+						.from(commentsTable)
+						.where(eq(commentsTable.id, parentCommentId))
+						.limit(1)
+						.then((i) => i[0])
+				: Promise.resolve(null),
+		]);
+
+		const notifications: Promise<void>[] = [];
+
+		if (post) {
+			notifications.push(
+				upsertNotification({
+					type: "comment",
+					recipientId: post.userId,
+					actorId: this.userId,
+					postId,
+					commentId: inserted.id,
+					body,
+				}).catch((e) => logger.error({ err: e }, "notification failed"))
+			);
+		}
+
+		if (
+			parentComment &&
+			parentComment.userId !== post?.userId &&
+			parentComment.userId !== this.userId
+		) {
+			notifications.push(
+				upsertNotification({
+					type: "reply",
+					recipientId: parentComment.userId,
+					actorId: this.userId,
+					postId,
+					commentId: inserted.id,
+					parentCommentId: parentCommentId as string,
+					body,
+				}).catch((e) => logger.error({ err: e }, "notification failed"))
+			);
+		}
+
+		notifications.push(
+			incrementTrendingScore(postId, "comment").catch((e) =>
+				logger.error({ err: e }, "trending increment failed")
+			)
+		);
+
+		void Promise.all(notifications);
+
+		return { success: true };
 	}
 
 	async delete({
@@ -207,7 +269,6 @@ export class CommentService {
 
 		const mapped = this.mapComments(trimmed);
 
-		// Split into replies (have parentCommentId) and top-level (don't)
 		const replyComments = mapped.filter((c) => c.parentCommentId !== null);
 		const topLevelComments = mapped.filter((c) => c.parentCommentId === null);
 
@@ -216,7 +277,6 @@ export class CommentService {
 		];
 		const postIds = [...new Set(topLevelComments.map((c) => c.postId))];
 
-		// Fetch parent comments and posts in parallel
 		const [rawParentComments, rawPosts] = await Promise.all([
 			parentCommentIds.length > 0
 				? this.db
@@ -331,7 +391,7 @@ export class CommentService {
 					WHERE ${commentLikesTable.commentId} = ${commentsTable.id}
 					AND ${commentLikesTable.userId} = ${this.userId}
 				))::boolean`,
-			// Replies are leaf nodes — always 0
+
 			repliesCount: sql<number>`0`,
 		};
 

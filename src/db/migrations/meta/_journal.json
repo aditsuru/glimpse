@@ -43,6 +43,27 @@
 			"when": 1780241995791,
 			"tag": "0005_crazy_thor_girl",
 			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1780569047070,
+			"tag": "0006_misty_alex_wilder",
+			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "7",
+			"when": 1780569507659,
+			"tag": "0007_keen_supernaut",
+			"breakpoints": true
+		},
+		{
+			"idx": 8,
+			"version": "7",
+			"when": 1780584381135,
+			"tag": "0008_ordinary_stardust",
+			"breakpoints": true
 		}
 	]
 }

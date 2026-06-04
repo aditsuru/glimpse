@@ -3,7 +3,10 @@ import { and, count, eq, sql } from "drizzle-orm";
 import { DatabaseError } from "pg";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
+import { commentsTable } from "@/db/schema";
 import { commentLikesTable } from "@/db/schema/comment-likes";
+import { upsertNotification } from "@/lib/server/helpers";
+import { logger } from "@/lib/server/logger";
 import type { commentLikeSchema } from "@/modules/comment-like/comment-like.schema";
 
 export class CommentLikeService {
@@ -44,6 +47,22 @@ export class CommentLikeService {
 					commentId,
 				})
 				.onConflictDoNothing();
+
+			const comment = await this.db
+				.select({ userId: commentsTable.userId })
+				.from(commentsTable)
+				.where(eq(commentsTable.id, commentId))
+				.limit(1)
+				.then((i) => i[0]);
+
+			if (comment) {
+				void upsertNotification({
+					type: "comment_like",
+					recipientId: comment.userId,
+					actorId: this.userId,
+					commentId,
+				}).catch((e) => logger.error("notification failed", e));
+			}
 
 			return {
 				success: true,

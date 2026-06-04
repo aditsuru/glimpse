@@ -5,7 +5,8 @@ import { and, count, desc, eq, getTableColumns, lt, sql } from "drizzle-orm";
 import type * as z from "zod";
 import type { db as DBType } from "@/db";
 import { followsTable, profilesTable } from "@/db/schema";
-import { computeViewerStatus } from "@/lib/server/helpers";
+import { computeViewerStatus, upsertNotification } from "@/lib/server/helpers";
+import { logger } from "@/lib/server/logger";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
 import type { followSchema } from "./follow.schema";
@@ -45,6 +46,14 @@ export class FollowService {
 					targetUserProfile.visibility === "public" ? "accepted" : "pending",
 			})
 			.onConflictDoNothing();
+
+		if (targetUserProfile.visibility === "public") {
+			void upsertNotification({
+				type: "follow",
+				recipientId: targetUserId,
+				actorId: this.userId,
+			}).catch((e) => logger.error("notification failed", e));
+		}
 
 		return {
 			success: true,
@@ -132,6 +141,12 @@ export class FollowService {
 				status: "accepted",
 			})
 			.where(matchCondition);
+
+		void upsertNotification({
+			type: "follow_accept",
+			recipientId: followerId,
+			actorId: this.userId,
+		}).catch((e) => logger.error("notification failed", e));
 
 		return {
 			success: true,

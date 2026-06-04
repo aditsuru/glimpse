@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { EmptyStateMessage } from "@/components/layout/EmptyStateMessage";
 import { Loader } from "@/components/misc/Loader";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { cn } from "@/lib/client/utils";
 import { useGetPostComments } from "../comment.queries";
 import { CommentCard } from "./CommentCard";
 
@@ -22,8 +23,13 @@ export const PostComments = ({ postId }: PostCommentsProps) => {
 
 	return (
 		<div>
-			{comments.map((comment) => (
-				<div key={comment.id} className="border-b border-accent pt-2">
+			{comments.map((comment, index) => (
+				<div
+					key={comment.id}
+					className={cn("border-b border-accent pt-2", {
+						"bg-primary/15": highlight && index === 0,
+					})}
+				>
 					<CommentCard data={comment} />
 				</div>
 			))}

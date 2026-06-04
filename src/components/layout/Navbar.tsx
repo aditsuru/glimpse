@@ -21,6 +21,7 @@ import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
 import { SIDEBAR_GIFS } from "@/lib/shared/static-files";
 import { usePendingReceivedCount } from "@/modules/follow/follow.queries";
+import { useGetUnreadNotificationCount } from "@/modules/notification/notification.queries";
 import { useProfile } from "@/modules/profile/profile.queries";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { useSettingsStore } from "@/store/use-settings-store";
@@ -66,6 +67,7 @@ export const Navbar = ({ userId }: NavbarProps) => {
 	});
 
 	const { data: followCountData } = usePendingReceivedCount();
+	const { data: unreadNotificationCount } = useGetUnreadNotificationCount();
 
 	const { open, onHoverStart, onHoverEnd, isOnboardingDone } =
 		useOnboardingTooltip();
@@ -181,6 +183,30 @@ export const Navbar = ({ userId }: NavbarProps) => {
 											{followCountData.count}
 										</span>
 									)}
+								</div>
+								<span>{label}</span>
+							</Link>
+						);
+					}
+
+					if (resolvedHref === "/notifications") {
+						return (
+							<Link
+								key={label}
+								href={resolvedHref}
+								className={cn(
+									"flex items-center gap-4 px-[14px] py-3 rounded-full text-xl transition-colors hover:bg-accent w-full",
+									{ "font-bold": isActive }
+								)}
+							>
+								<div className="relative inline-flex">
+									<Icon className="size-7 shrink-0" />
+									{unreadNotificationCount &&
+										unreadNotificationCount.count !== 0 && (
+											<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
+												{unreadNotificationCount.count}
+											</span>
+										)}
 								</div>
 								<span>{label}</span>
 							</Link>
