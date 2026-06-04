@@ -15,4 +15,5 @@ export const REDIS_KEYS = {
 	VIEW_HISTORY: (userId: string) => `${config.NODE_ENV}:post:history:${userId}`,
 	VIEW_HISTORY_FLUSHING: (userId: string) =>
 		`${config.NODE_ENV}:post:history:${userId}:flushing`,
+	TRENDING_FEED: () => `${config.NODE_ENV}:trending:feed`,
 };
