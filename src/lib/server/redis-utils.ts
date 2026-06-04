@@ -63,11 +63,14 @@ export async function removeTrendingPost(postId: string) {
 }
 
 export async function getTrendingPage(
-	cursor: number | null,
+	cursor: { score: number; id: string } | null,
 	limit: number,
 	seenPostIds: Set<string>
-): Promise<{ postIds: string[]; nextCursor: number | null }> {
-	const maxScore: number | "+inf" = cursor !== null ? cursor : "+inf";
+): Promise<{
+	postIds: string[];
+	nextCursor: { score: number; id: string } | null;
+}> {
+	const maxScore: number | "+inf" = cursor !== null ? cursor.score : "+inf";
 
 	const results = (await redis.zrange(
 		REDIS_KEYS.TRENDING_FEED(),
@@ -89,17 +92,20 @@ export async function getTrendingPage(
 		pairs.push({ id: results[i], score: Number(results[i + 1]) });
 	}
 
-	const unseen = pairs.filter((p) => !seenPostIds.has(p.id));
-	const seen = pairs.filter((p) => seenPostIds.has(p.id));
+	const filtered = cursor
+		? pairs.filter((p) => !(p.score === cursor.score && p.id === cursor.id))
+		: pairs;
+
+	const unseen = filtered.filter((p) => !seenPostIds.has(p.id));
+	const seen = filtered.filter((p) => seenPostIds.has(p.id));
 	const ordered = [...unseen, ...seen].slice(0, limit + 1);
 
 	const hasNext = ordered.length > limit;
 	const trimmed = hasNext ? ordered.slice(0, limit) : ordered;
-	// biome-ignore lint/style/noNonNullAssertion: none
-	const nextCursor = hasNext ? trimmed.at(-1)!.score : null;
+	const last = trimmed.at(-1);
 
 	return {
 		postIds: trimmed.map((p) => p.id),
-		nextCursor,
+		nextCursor: hasNext && last ? { score: last.score, id: last.id } : null,
 	};
 }
