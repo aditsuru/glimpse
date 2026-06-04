@@ -2,6 +2,8 @@
 
 import { Bell, Home, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
+import { usePendingReceivedCount } from "@/modules/follow/follow.queries";
+import { useGetUnreadNotificationCount } from "@/modules/notification/notification.queries";
 import { useProfile } from "@/modules/profile/profile.queries";
 import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { Avatar, AvatarImage } from "../ui/avatar";
@@ -24,6 +26,9 @@ export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 		userId,
 	});
 
+	const { data: followCountData } = usePendingReceivedCount();
+	const { data: unreadNotificationCount } = useGetUnreadNotificationCount();
+
 	return (
 		<nav className="shrink-0 md:hidden border-t border-accent flex justify-around items-center py-3 bg-background">
 			{mobileNavItems.map(({ href, icon: Icon }) => {
@@ -34,16 +39,39 @@ export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 						</button>
 					);
 
+				if (href === "/notifications")
+					return (
+						<Link key={href} href={href}>
+							<div className="relative inline-flex">
+								<Icon className="stroke-[2.5px]" />
+								{unreadNotificationCount &&
+									unreadNotificationCount.count !== 0 && (
+										<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
+											{unreadNotificationCount.count}
+										</span>
+									)}
+							</div>
+						</Link>
+					);
+
 				return (
 					<Link key={href} href={href}>
 						<Icon className="stroke-[2.5px]" />
 					</Link>
 				);
 			})}
+
 			<Link href={`/${data?.username}`}>
-				<Avatar className="size-7 shrink-0">
-					<AvatarImage src={data?.avatarUrl ?? "/static/default-pfp.png"} />
-				</Avatar>
+				<div className="relative inline-flex">
+					<Avatar className="size-7 shrink-0">
+						<AvatarImage src={data?.avatarUrl ?? "/static/default-pfp.png"} />
+					</Avatar>
+					{followCountData && followCountData.count !== 0 && (
+						<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
+							{followCountData.count}
+						</span>
+					)}
+				</div>
 			</Link>
 		</nav>
 	);

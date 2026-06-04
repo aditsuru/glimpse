@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/drawer";
 import { startProgress } from "@/lib/client/helpers";
 import { cn } from "@/lib/client/utils";
+import { usePendingReceivedCount } from "@/modules/follow/follow.queries";
 
 const navItems = [
 	{ label: "Follow", href: "/requests/received", icon: UserPlus },
@@ -33,6 +34,8 @@ export const MobileProfileHeader = ({
 }: MobileProfileHeaderProps) => {
 	const router = useRouter();
 	const pathname = usePathname();
+
+	const { data: followCountData } = usePendingReceivedCount();
 
 	return (
 		<div
@@ -58,7 +61,14 @@ export const MobileProfileHeader = ({
 				{showMenu && (
 					<Drawer>
 						<DrawerTrigger>
-							<Menu />
+							<div className="relative inline-flex">
+								<Menu />
+								{followCountData && followCountData.count !== 0 && (
+									<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
+										{followCountData.count}
+									</span>
+								)}
+							</div>
 						</DrawerTrigger>
 						<DrawerContent className="pb-4">
 							<DrawerHeader>
@@ -78,7 +88,16 @@ export const MobileProfileHeader = ({
 											{ "px-[14px] gap-3.5": href === "/requests/received" }
 										)}
 									>
-										<Icon className="size-7 shrink-0" />
+										<div className="relative inline-flex">
+											<Icon className="size-7 shrink-0" />
+											{href === "/requests/received" &&
+												followCountData &&
+												followCountData.count !== 0 && (
+													<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
+														{followCountData.count}
+													</span>
+												)}
+										</div>
 										<span>{label}</span>
 									</Link>
 								);

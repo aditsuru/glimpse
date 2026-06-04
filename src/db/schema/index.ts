@@ -4,6 +4,7 @@ export * from "./bookmarks";
 export * from "./comment-likes";
 export * from "./comments";
 export * from "./follows";
+export * from "./notifications";
 export * from "./post-likes";
 export * from "./posts";
 export * from "./profiles";
