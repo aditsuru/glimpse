@@ -42,7 +42,7 @@ export const getPostListOutput = z.object({
 
 export const getTrendingFeedOutput = z.object({
 	items: z.array(getPostOutput),
-	nextCursor: z.number().nullable(),
+	nextCursor: z.object({ score: z.number(), id: z.string() }).nullable(),
 });
 
 export const postSchema = {
@@ -109,7 +109,10 @@ export const postSchema = {
 
 	getTrendingFeed: {
 		input: z.object({
-			cursor: z.number().optional(),
+			cursor: z
+				.object({ score: z.number(), id: z.string() })
+				.nullable()
+				.default(null),
 		}),
 		output: getTrendingFeedOutput,
 	},
