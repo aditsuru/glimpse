@@ -3,8 +3,8 @@
 import { Eye, EyeOff, ImageIcon, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { type CarouselImage, ImageCarousel } from "@/components/ImageCarousel";
+import { toast } from "@/components/misc/Toast";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,7 +26,7 @@ import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { useViewerStore } from "@/store/use-viewer-store";
 import { useCreatePost, useGetAttachmentPresignedUrl } from "../post.queries";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// Types
 
 type AttachmentItem = {
 	tempKey: string;
@@ -34,7 +34,7 @@ type AttachmentItem = {
 	mimeType: string;
 };
 
-// ─── Ring Counter ─────────────────────────────────────────────────────────────
+// Ring Counter
 
 const RING_RADIUS = 10;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
@@ -99,7 +99,7 @@ const CharRing = ({ count, max }: { count: number; max: number }) => {
 	);
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// Main Component
 
 interface PostComposerProps {
 	onSuccess?: () => void;
@@ -131,7 +131,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		textareaRef.current?.focus();
 	}, []);
 
-	// ── Derived state ──────────────────────────────────────────────────────────
+	// Derived state
 
 	const attachmentType =
 		attachments.length > 0
@@ -145,7 +145,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 	const isBodyOver = body.length > MAX_POST_BODY_LENGTH;
 	const canSubmit = !isEmpty && !isDisabled && !isBodyOver;
 
-	// ── Auto-grow textarea ─────────────────────────────────────────────────────
+	// Auto-grow textarea
 
 	const growTextarea = useCallback(() => {
 		const el = textareaRef.current;
@@ -154,13 +154,13 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		el.style.height = `${el.scrollHeight}px`;
 	}, []);
 
-	// ── Dialog helper ──────────────────────────────────────────────────────────
+	// Dialog helper
 
 	const { setLocked, setDirty } = usePostComposerStore();
 
 	useEffect(() => {
 		setLocked(isDisabled);
-		return () => setLocked(false); // Cleanup on unmount
+		return () => setLocked(false);
 	}, [isDisabled, setLocked]);
 
 	useEffect(() => {
@@ -168,7 +168,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		setDirty(dirty);
 	}, [body, attachments, setDirty]);
 
-	// ── Upload helper ──────────────────────────────────────────────────────────
+	// Upload helper
 
 	const uploadFile = useCallback(
 		async (file: File): Promise<AttachmentItem | null> => {
@@ -177,7 +177,10 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 					file.type
 				)
 			) {
-				toast.error("File type not allowed.");
+				toast.error(
+					"Unsupported file type",
+					"Please select a different file format and try again."
+				);
 				return null;
 			}
 
@@ -192,14 +195,17 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 				return { tempKey: key, preview, mimeType: file.type };
 			} catch {
 				URL.revokeObjectURL(preview);
-				toast.error("Upload failed, please try again.");
+				toast.error(
+					"Upload failed",
+					"Something went wrong during the upload. Please try again."
+				);
 				return null;
 			}
 		},
 		[getAttachmentPresignedUrl]
 	);
 
-	// ── File validation ────────────────────────────────────────────────────────
+	// File validation
 
 	const validateAndUpload = useCallback(
 		async (files: FileList | File[]) => {
@@ -211,11 +217,17 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 			// Video rules
 			if (isVideo(firstFile.type)) {
 				if (attachmentType === "image") {
-					toast.error("Cannot mix video and images.");
+					toast.error(
+						"Media conflict",
+						"You cannot combine images and videos in a single post."
+					);
 					return;
 				}
 				if (attachments.length > 0 || fileArray.length > 1) {
-					toast.error("Only one video allowed.");
+					toast.error(
+						"Video limit reached",
+						"You can only upload one video per post."
+					);
 					return;
 				}
 			}
@@ -223,12 +235,18 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 			// Image rules
 			if (isImage(firstFile.type)) {
 				if (attachmentType === "video") {
-					toast.error("Cannot mix images and video.");
+					toast.error(
+						"Media conflict",
+						"You cannot combine videos and images in a single post."
+					);
 					return;
 				}
 				const anyVideo = fileArray.some((f) => isVideo(f.type));
 				if (anyVideo) {
-					toast.error("Cannot mix images and video.");
+					toast.error(
+						"Media conflict",
+						"You cannot combine videos and images in a single post."
+					);
 					return;
 				}
 			}
@@ -239,7 +257,8 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 					: MAX_FILE_SIZES.image;
 				if (file.size > limit) {
 					toast.error(
-						`${isVideo(file.type) ? "Video" : "Image"} must be under ${limit / (1024 * 1024)}MB.`
+						"File too large",
+						`The selected ${isVideo(file.type) ? "video" : "image"} exceeds the ${limit / (1024 * 1024)}MB limit.`
 					);
 					return;
 				}
@@ -271,7 +290,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[attachments, attachmentType, uploadFile]
 	);
 
-	// ── File input change ──────────────────────────────────────────────────────
+	// File input change
 
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.stopPropagation();
@@ -281,7 +300,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		await validateAndUpload(files);
 	};
 
-	// ── Drag and drop ──────────────────────────────────────────────────────────
+	// Drag and drop
 
 	const handleDragEnter = useCallback((e: React.DragEvent) => {
 		e.preventDefault();
@@ -315,7 +334,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[validateAndUpload]
 	);
 
-	// ── Paste Support ──────────────────────────────────────────────────────────
+	// Paste Support
 
 	const handlePaste = useCallback(
 		async (e: React.ClipboardEvent) => {
@@ -330,7 +349,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[isDisabled, validateAndUpload]
 	);
 
-	// ── Attachment actions ─────────────────────────────────────────────────────
+	// Attachment actions
 
 	const removeAttachment = (index: number) => {
 		setAttachments((prev) => {
@@ -339,7 +358,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		});
 	};
 
-	// ── Submit ─────────────────────────────────────────────────────────────────
+	// Submit
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -373,7 +392,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 			setAttachments([]);
 			setSpoiler(false);
 			onSuccess?.();
-			toast.success("Post created successfully.");
+			toast.success("Post created", "Your new post is live!");
 			startProgress();
 			router.push(`/p/${postId}`);
 		} catch {
@@ -383,7 +402,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		}
 	};
 
-	// ── Carousel images ────────────────────────────────────────────────────────
+	// Carousel images
 
 	const carouselImages: CarouselImage[] = attachments
 		.filter((a) => isImage(a.mimeType))
@@ -395,7 +414,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 
 	const videoAttachment = attachments.find((a) => isVideo(a.mimeType));
 
-	// ── Render ─────────────────────────────────────────────────────────────────
+	// Render
 
 	return (
 		<div

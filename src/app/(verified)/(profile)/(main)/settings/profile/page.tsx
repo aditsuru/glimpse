@@ -8,12 +8,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import * as z from "zod";
 import { ErrorMessage } from "@/components/layout/ErrorMessage";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { toast } from "@/components/misc/Toast";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -182,7 +182,10 @@ export default function Page() {
 			formData.pronouns !== (profileData?.pronouns ?? "");
 
 		if (!hasProfileChanges && !avatarTempKey && !bannerTempKey) {
-			toast.info("No changes to save.");
+			toast.info(
+				"No changes detected",
+				"You haven't made any modifications to your profile yet."
+			);
 			return;
 		}
 
@@ -217,7 +220,10 @@ export default function Page() {
 			bannerReset();
 
 			router.push(`/${formData.username}`);
-			toast.success("Profile updated successfully!");
+			toast.success(
+				"Profile updated",
+				"Your changes have been saved successfully."
+			);
 		} catch {
 			setError("root", { message: "Something went wrong, please try again" });
 		}

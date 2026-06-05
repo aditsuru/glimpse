@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast } from "@/components/misc/Toast";
 import { Button } from "@/components/ui/button";
 import { FieldSeparator } from "@/components/ui/field";
 import { authClient } from "@/lib/client/auth-client";
@@ -19,7 +19,10 @@ const OAuth = ({
 		});
 
 		if (error) {
-			toast.error("Failed to connect to provider. Please try again.");
+			toast.error(
+				"Connection failed",
+				"We couldn't connect to the provider. Please check your network and try again."
+			);
 		}
 	};
 

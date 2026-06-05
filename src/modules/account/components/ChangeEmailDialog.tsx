@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { toast } from "@/components/misc/Toast";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -129,7 +129,10 @@ export const ChangeEmailDialog = () => {
 		}
 
 		startCooldown();
-		toast.success("Verification link sent to your new email address.");
+		toast.success(
+			"Verification link sent",
+			"Please check your new email address to confirm the change."
+		);
 		resetAll();
 		setOpen(false);
 	};

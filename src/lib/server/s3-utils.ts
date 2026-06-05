@@ -61,7 +61,7 @@ export async function moveFile({
 			})
 		);
 	} catch {
-		// temp/* auto-expires in 24h anyway, not worth failing db transactions
+		// temp/* auto-expires in 24h anyway
 	}
 
 	return { success: true };

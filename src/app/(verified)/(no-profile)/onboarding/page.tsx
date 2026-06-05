@@ -7,10 +7,10 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { toast } from "@/components/misc/Toast";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -118,7 +118,10 @@ export default function Page() {
 				avatarKey: tempKey ?? undefined,
 			});
 			setIsRedirecting(true);
-			toast.success("Profile created successfully!");
+			toast.success(
+				"Profile created",
+				"Your profile is ready! Welcome aboard."
+			);
 			router.push("/?onboarding=complete");
 		} catch (e) {
 			let message = "Something went wrong, please try again";

@@ -2,6 +2,7 @@
 
 import { Bell, Home, PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { usePendingReceivedCount } from "@/modules/follow/follow.queries";
 import { useGetUnreadNotificationCount } from "@/modules/notification/notification.queries";
 import { useProfile } from "@/modules/profile/profile.queries";
@@ -21,6 +22,7 @@ type MobileNavbarProps = {
 
 export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 	const { open: openPostComposer } = usePostComposerStore();
+	const pathname = usePathname();
 
 	const { data } = useProfile({
 		userId,
@@ -66,11 +68,13 @@ export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 					<Avatar className="size-7 shrink-0">
 						<AvatarImage src={data?.avatarUrl ?? "/static/default-pfp.png"} />
 					</Avatar>
-					{followCountData && followCountData.count !== 0 && (
-						<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
-							{followCountData.count}
-						</span>
-					)}
+					{pathname !== `/${data?.username}` &&
+						followCountData &&
+						followCountData.count !== 0 && (
+							<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
+								{followCountData.count}
+							</span>
+						)}
 				</div>
 			</Link>
 		</nav>

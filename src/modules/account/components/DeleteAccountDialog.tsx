@@ -5,9 +5,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { toast } from "@/components/misc/Toast";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -64,7 +64,10 @@ export const DeleteAccountDialog = ({ disabled }: { disabled: boolean }) => {
 			return;
 		}
 
-		toast.success("Account deleted successfully.");
+		toast.info(
+			"Account deleted",
+			"Your account and data have been permanently removed."
+		);
 		router.push("/sign-in");
 	};
 

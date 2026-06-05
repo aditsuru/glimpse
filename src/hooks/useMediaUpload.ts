@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/misc/Toast";
 import { uploadToS3 } from "@/lib/client/upload-utils";
 import {
 	DEFAULT_PFP_URL,
@@ -65,7 +65,10 @@ export const useMediaUpload = ({
 		if (!file) return;
 
 		if (!(allowedMimeTypes as readonly string[]).includes(file.type)) {
-			toast.error("Invalid file type.");
+			toast.error(
+				"Unsupported file type",
+				"Please select a different file format and try again."
+			);
 			return;
 		}
 
@@ -74,7 +77,10 @@ export const useMediaUpload = ({
 			: MAX_FILE_SIZES.image;
 		const sizeLabelMB = sizeLimit / (1024 * 1024);
 		if (file.size > sizeLimit) {
-			toast.error(`File must be under ${sizeLabelMB}MB.`);
+			toast.error(
+				"File too large",
+				`Your file exceeds the ${sizeLabelMB}MB limit.`
+			);
 			return;
 		}
 
@@ -90,7 +96,10 @@ export const useMediaUpload = ({
 			setTempKey(key);
 			setMimeType(file.type);
 		} catch {
-			toast.error("Upload failed, please try again.");
+			toast.error(
+				"Upload failed",
+				"Something went wrong during the upload. Please try again."
+			);
 			reset();
 		} finally {
 			setIsUploading(false);

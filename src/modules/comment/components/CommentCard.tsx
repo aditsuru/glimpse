@@ -6,8 +6,8 @@ import { Ellipsis, MessageCircle, Share } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 import type * as z from "zod";
+import { toast } from "@/components/misc/Toast";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -176,7 +176,10 @@ export const CommentCard = ({
 									navigator.clipboard.writeText(
 										`${config.NEXT_PUBLIC_APP_URL}/p/${data.postId}?highlight=${data.id}`
 									);
-									toast.success("Link copied to clipboard.");
+									toast.success(
+										"Link copied",
+										"The URL has been copied to your clipboard."
+									);
 								}}
 							>
 								<Share className="size-4.5" />
@@ -288,7 +291,10 @@ const DropdownMenuSubmenu = ({
 			onConfirm: () => {
 				deleteComment.mutate({ commentId });
 
-				toast.success("Comment was deleted.");
+				toast.success(
+					"Comment deleted",
+					"Your comment has been permanently removed."
+				);
 			},
 		});
 	};

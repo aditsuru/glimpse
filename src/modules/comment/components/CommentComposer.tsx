@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useCallback, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/misc/Toast";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -59,7 +59,10 @@ export const CommentComposer = ({
 			{ body, postId, parentCommentId },
 			{
 				onSuccess: () => {
-					toast.success("Your reply was posted.");
+					toast.success(
+						"Reply posted",
+						"Your reply is now live in the conversation."
+					);
 					setBody("");
 					if (textareaRef.current) {
 						textareaRef.current.style.height = "auto";
