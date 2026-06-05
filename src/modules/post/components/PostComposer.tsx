@@ -3,8 +3,8 @@
 import { Eye, EyeOff, ImageIcon, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { type CarouselImage, ImageCarousel } from "@/components/ImageCarousel";
+import { toast } from "@/components/misc/Toast";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -177,7 +177,10 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 					file.type
 				)
 			) {
-				toast.error("File type not allowed.");
+				toast.error(
+					"Unsupported file type",
+					"Please select a different file format and try again."
+				);
 				return null;
 			}
 
@@ -192,7 +195,10 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 				return { tempKey: key, preview, mimeType: file.type };
 			} catch {
 				URL.revokeObjectURL(preview);
-				toast.error("Upload failed, please try again.");
+				toast.error(
+					"Upload failed",
+					"Something went wrong during the upload. Please try again."
+				);
 				return null;
 			}
 		},
@@ -211,11 +217,17 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 			// Video rules
 			if (isVideo(firstFile.type)) {
 				if (attachmentType === "image") {
-					toast.error("Cannot mix video and images.");
+					toast.error(
+						"Media conflict",
+						"You cannot combine images and videos in a single post."
+					);
 					return;
 				}
 				if (attachments.length > 0 || fileArray.length > 1) {
-					toast.error("Only one video allowed.");
+					toast.error(
+						"Video limit reached",
+						"You can only upload one video per post."
+					);
 					return;
 				}
 			}
@@ -223,12 +235,18 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 			// Image rules
 			if (isImage(firstFile.type)) {
 				if (attachmentType === "video") {
-					toast.error("Cannot mix images and video.");
+					toast.error(
+						"Media conflict",
+						"You cannot combine videos and images in a single post."
+					);
 					return;
 				}
 				const anyVideo = fileArray.some((f) => isVideo(f.type));
 				if (anyVideo) {
-					toast.error("Cannot mix images and video.");
+					toast.error(
+						"Media conflict",
+						"You cannot combine videos and images in a single post."
+					);
 					return;
 				}
 			}
@@ -239,7 +257,8 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 					: MAX_FILE_SIZES.image;
 				if (file.size > limit) {
 					toast.error(
-						`${isVideo(file.type) ? "Video" : "Image"} must be under ${limit / (1024 * 1024)}MB.`
+						"File too large",
+						`The selected ${isVideo(file.type) ? "video" : "image"} exceeds the ${limit / (1024 * 1024)}MB limit.`
 					);
 					return;
 				}
@@ -373,7 +392,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 			setAttachments([]);
 			setSpoiler(false);
 			onSuccess?.();
-			toast.success("Post created successfully.");
+			toast.success("Post created", "Your new post is live!");
 			startProgress();
 			router.push(`/p/${postId}`);
 		} catch {

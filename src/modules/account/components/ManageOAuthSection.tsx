@@ -3,7 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/misc/Toast";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/client/auth-client";
 import { orpc } from "@/lib/client/orpc-client";
@@ -41,7 +41,10 @@ export const ManageOAuthSection = ({
 		});
 
 		if (error) {
-			toast.error(`Failed to link ${provider}.`);
+			toast.error(
+				`Link failed`,
+				`We couldn't connect your ${provider} account. Please try again.`
+			);
 			setIsLoading(null);
 		}
 	};
@@ -60,9 +63,15 @@ export const ManageOAuthSection = ({
 				});
 
 				if (error) {
-					toast.error(`Failed to unlink ${providerName}.`);
+					toast.error(
+						`Unlink failed`,
+						`We couldn't disconnect your ${providerName} account. Please try again.`
+					);
 				} else {
-					toast.success(`${providerName} account disconnected.`);
+					toast.success(
+						"Account disconnected",
+						`Your ${providerName} account has been successfully unlinked.`
+					);
 					await queryClient.invalidateQueries({
 						queryKey: orpc.account.getSecuritySettings.key(),
 					});

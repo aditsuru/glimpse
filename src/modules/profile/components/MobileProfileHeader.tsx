@@ -3,6 +3,7 @@
 import { Bookmark, ChevronLeft, Menu, Settings, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Drawer,
@@ -35,6 +36,8 @@ export const MobileProfileHeader = ({
 	const router = useRouter();
 	const pathname = usePathname();
 
+	const [isDrawerOpen, setDrawerOpen] = useState(false);
+
 	const { data: followCountData } = usePendingReceivedCount();
 
 	return (
@@ -59,15 +62,17 @@ export const MobileProfileHeader = ({
 					<h1 className="text-xl font-bold">{title}</h1>
 				</div>
 				{showMenu && (
-					<Drawer>
+					<Drawer open={isDrawerOpen} onOpenChange={setDrawerOpen}>
 						<DrawerTrigger>
 							<div className="relative inline-flex">
 								<Menu />
-								{followCountData && followCountData.count !== 0 && (
-									<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
-										{followCountData.count}
-									</span>
-								)}
+								{!isDrawerOpen &&
+									followCountData &&
+									followCountData.count !== 0 && (
+										<span className="absolute -top-1.5 -right-1.5 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold ring-background ring">
+											{followCountData.count}
+										</span>
+									)}
 							</div>
 						</DrawerTrigger>
 						<DrawerContent className="pb-4">

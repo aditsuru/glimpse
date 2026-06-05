@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { toast } from "@/components/misc/Toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,7 +38,10 @@ export default function Page() {
 	useEffect(() => {
 		const errorParam = searchParams.get("error");
 		if (errorParam) {
-			toast.error("Authentication failed. Please try again.");
+			toast.error(
+				"Sign-in failed",
+				"Please check your credentials and try again."
+			);
 
 			router.replace("/sign-in");
 		}

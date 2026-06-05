@@ -5,10 +5,10 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
 import { Loader } from "@/components/misc/Loader";
+import { toast } from "@/components/misc/Toast";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -52,7 +52,10 @@ function ResetPasswordForm() {
 
 	useEffect(() => {
 		if (!token) {
-			toast.error("Invalid or missing reset token.");
+			toast.error(
+				"Link expired or invalid",
+				"This password reset link is no longer valid. Please request a new one."
+			);
 			router.replace("/forgot-password");
 		}
 	}, [token, router]);
@@ -87,7 +90,10 @@ function ResetPasswordForm() {
 		}
 
 		setIsRedirecting(true);
-		toast.success("Password updated successfully! You can now sign in.");
+		toast.success(
+			"Password updated",
+			"Your new password is live. You can now sign in to your account."
+		);
 		router.push("/sign-in");
 	};
 

@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { toast } from "@/components/misc/Toast";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -105,7 +105,7 @@ export const ChangePasswordDialog = ({ email }: { email: string }) => {
 			return;
 		}
 
-		toast.success("Password updated successfully.");
+		toast.success("Password updated", "Your new password is now active.");
 		reset();
 		setOpen(false);
 	};
@@ -119,10 +119,16 @@ export const ChangePasswordDialog = ({ email }: { email: string }) => {
 		setIsSendingReset(false);
 
 		if (error) {
-			toast.error("Failed to send reset email.");
+			toast.error(
+				"Couldn't send email",
+				"Failed to send the reset link. Please try again in a few moments."
+			);
 		} else {
 			startCooldown();
-			toast.success("Password reset link sent to your email.");
+			toast.success(
+				"Reset link sent",
+				"Please check your inbox for the password reset instructions."
+			);
 		}
 	};
 

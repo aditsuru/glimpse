@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { toast } from "@/components/misc/Toast";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -81,7 +81,10 @@ export const SetPasswordDialog = () => {
 	const handleFormSubmit = async (data: z.infer<typeof schema>) => {
 		try {
 			await setPasswordMutation.mutateAsync({ newPassword: data.newPassword });
-			toast.success("Password set successfully.");
+			toast.success(
+				"Password set",
+				"Your new password has been saved. You can now use it to sign in."
+			);
 			reset();
 			setOpen(false);
 		} catch {

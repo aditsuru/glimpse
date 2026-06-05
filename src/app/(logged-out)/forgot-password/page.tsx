@@ -3,9 +3,9 @@
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { toast } from "sonner";
 import * as z from "zod";
 import { AnimatedFieldError } from "@/components/misc/AnimatedFieldError";
+import { toast } from "@/components/misc/Toast";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -60,7 +60,8 @@ export default function Page() {
 
 		startCooldown();
 		toast.success(
-			"If an account exists, a reset link has been sent to your email."
+			"Reset link sent",
+			"If that email matches an account, you'll receive a password reset link shortly."
 		);
 		setIsLoading(false);
 	};

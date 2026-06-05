@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/misc/Toast";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -40,7 +40,10 @@ export default function Page() {
 
 	useEffect(() => {
 		if (searchParams.get("sent") === "true") {
-			toast.success("A verification link has been sent to your email.");
+			toast.success(
+				"Verification sent",
+				"A link has been sent to your email. Please check your inbox to verify your account."
+			);
 			router.replace("/verify-email");
 		}
 	}, [router.replace, searchParams.get]);
@@ -55,10 +58,16 @@ export default function Page() {
 		});
 
 		if (error) {
-			toast.error(error.message || "Failed to resend verification email.");
+			toast.error(
+				"Couldn't send email",
+				error.message || "Something went wrong on our end. Please try again."
+			);
 		} else {
 			startCooldown();
-			toast.success("Verification email sent.");
+			toast.success(
+				"Email resent",
+				"A new verification link is on its way to your inbox."
+			);
 		}
 
 		setIsLoading(false);

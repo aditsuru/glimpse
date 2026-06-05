@@ -5,9 +5,9 @@
 import { ChartLine, Ellipsis, Share } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { toast } from "sonner";
 import type * as z from "zod";
 import { ImageCarousel } from "@/components/ImageCarousel";
+import { toast } from "@/components/misc/Toast";
 import { VerifiedBadge } from "@/components/misc/VerifiedBadge";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -239,7 +239,10 @@ export const PostCard = ({
 						navigator.clipboard.writeText(
 							`${config.NEXT_PUBLIC_APP_URL}/p/${data.id}`
 						);
-						toast.success("Link copied to clipboard.");
+						toast.success(
+							"Link copied",
+							"The URL has been copied to your clipboard."
+						);
 					}}
 				>
 					<Share className="size-4.5" />
@@ -277,7 +280,10 @@ const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
 					startProgress();
 					router.push("/");
 				}
-				toast.success("Post was deleted.");
+				toast.success(
+					"Post deleted",
+					"Your post has been permanently removed."
+				);
 			},
 		});
 	};

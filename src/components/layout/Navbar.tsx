@@ -15,7 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/misc/Toast";
 import { useOnboardingTooltip } from "@/hooks/useOnboardingTooltip";
 import { authClient } from "@/lib/client/auth-client";
 import { cn } from "@/lib/client/utils";
@@ -75,7 +75,8 @@ export const Navbar = ({ userId }: NavbarProps) => {
 	useEffect(() => {
 		if (error)
 			toast.error(
-				"Failed to load profile. Please refresh the page and try again later."
+				"Couldn't load profile",
+				"Please refresh the page or try again in a few moments."
 			);
 	}, [error]);
 
