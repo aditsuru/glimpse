@@ -61,7 +61,7 @@ export default function Page() {
 						value={inputValue}
 						onChange={(e) => {
 							setInputValue(e.target.value);
-							if (e.target.value === "") setSearchQuery(""); // Clear search if input is emptied
+							if (e.target.value === "") setSearchQuery("");
 						}}
 						placeholder="Search profiles..."
 						autoComplete="off"
@@ -77,7 +77,6 @@ export default function Page() {
 
 			<ScrollContainer className="flex-1 overflow-y-auto no-scrollbar relative w-full">
 				<div className="flex flex-col w-full pb-8">
-					{/* --- SEARCH RESULTS VIEW --- */}
 					{isSearching ? (
 						<>
 							{searchProfiles.map((profile) => (

@@ -18,7 +18,6 @@ function extractMeta(html: string, property: string): string | null {
 	return null;
 }
 
-// SSRF guard — block private/internal addresses
 function isPrivateUrl(urlStr: string): boolean {
 	try {
 		const { hostname, protocol } = new URL(urlStr);
@@ -40,27 +39,11 @@ function isPrivateUrl(urlStr: string): boolean {
 	}
 }
 
-// ─────────────────────────────────────────────
-// FIX: YouTube / large-site 2 MB cache error
-//
-// The original code used `next: { revalidate: 3600 }` on the fetch, which
-// tells Next.js to cache the full response body. YouTube pages are ~3 MB of
-// HTML, exceeding the 2 MB limit and producing:
-//   "Failed to set Next.js data cache … items over 2MB can not be cached"
-//
-// All we actually need are the <head> meta tags — the first ~100 KB is more
-// than enough. So we read the response body in streaming chunks and stop as
-// soon as we have enough bytes. The `next` cache directive is removed; SWR
-// on the client (dedupingInterval: 60_000) is sufficient to prevent duplicate
-// calls.
-// ─────────────────────────────────────────────
-const MAX_READ_BYTES = 100_000; // 100 KB — plenty for <head> meta tags
+const MAX_READ_BYTES = 100_000;
 
 async function readPartialBody(res: Response): Promise<string> {
-	// Use the streaming reader so we can stop early and avoid buffering the
-	// entire response in memory (important for 3 MB+ pages like YouTube).
 	const reader = res.body?.getReader();
-	if (!reader) return res.text(); // fallback for environments without streaming
+	if (!reader) return res.text();
 
 	const decoder = new TextDecoder();
 	let result = "";
@@ -74,7 +57,6 @@ async function readPartialBody(res: Response): Promise<string> {
 			bytesRead += value.length;
 		}
 	} finally {
-		// Always cancel the reader to release the network connection.
 		reader.cancel().catch(() => {});
 	}
 
@@ -100,17 +82,12 @@ export async function GET(req: NextRequest) {
 	try {
 		const res = await fetch(url, {
 			headers: { "User-Agent": "Twitterbot/1.0" },
-			// NOTE: `next: { revalidate: 3600 }` removed — it tried to cache the
-			// full response body, which fails for pages > 2 MB (YouTube, etc.).
-			// Client-side SWR deduplication (dedupingInterval: 60_000) is enough.
 		});
 
 		if (!res.ok) {
 			return NextResponse.json({ error: "Fetch failed" }, { status: 502 });
 		}
 
-		// Read only the first 100 KB — all meta tags live in <head> which
-		// appears in the first few KB of any well-formed HTML page.
 		const html = await readPartialBody(res);
 		const hostname = new URL(url).hostname;
 
@@ -137,8 +114,6 @@ export async function GET(req: NextRequest) {
 			{ title, description, image, siteName, url },
 			{
 				headers: {
-					// Cache at the CDN / browser level for 1 hour so repeated page
-					// loads don't hit the route handler every time.
 					"Cache-Control":
 						"public, s-maxage=3600, stale-while-revalidate=86400",
 				},

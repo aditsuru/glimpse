@@ -26,7 +26,7 @@ import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { useViewerStore } from "@/store/use-viewer-store";
 import { useCreatePost, useGetAttachmentPresignedUrl } from "../post.queries";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// Types
 
 type AttachmentItem = {
 	tempKey: string;
@@ -34,7 +34,7 @@ type AttachmentItem = {
 	mimeType: string;
 };
 
-// ─── Ring Counter ─────────────────────────────────────────────────────────────
+// Ring Counter
 
 const RING_RADIUS = 10;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
@@ -99,7 +99,7 @@ const CharRing = ({ count, max }: { count: number; max: number }) => {
 	);
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// Main Component
 
 interface PostComposerProps {
 	onSuccess?: () => void;
@@ -131,7 +131,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		textareaRef.current?.focus();
 	}, []);
 
-	// ── Derived state ──────────────────────────────────────────────────────────
+	// Derived state
 
 	const attachmentType =
 		attachments.length > 0
@@ -145,7 +145,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 	const isBodyOver = body.length > MAX_POST_BODY_LENGTH;
 	const canSubmit = !isEmpty && !isDisabled && !isBodyOver;
 
-	// ── Auto-grow textarea ─────────────────────────────────────────────────────
+	// Auto-grow textarea
 
 	const growTextarea = useCallback(() => {
 		const el = textareaRef.current;
@@ -154,13 +154,13 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		el.style.height = `${el.scrollHeight}px`;
 	}, []);
 
-	// ── Dialog helper ──────────────────────────────────────────────────────────
+	// Dialog helper
 
 	const { setLocked, setDirty } = usePostComposerStore();
 
 	useEffect(() => {
 		setLocked(isDisabled);
-		return () => setLocked(false); // Cleanup on unmount
+		return () => setLocked(false);
 	}, [isDisabled, setLocked]);
 
 	useEffect(() => {
@@ -168,7 +168,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		setDirty(dirty);
 	}, [body, attachments, setDirty]);
 
-	// ── Upload helper ──────────────────────────────────────────────────────────
+	// Upload helper
 
 	const uploadFile = useCallback(
 		async (file: File): Promise<AttachmentItem | null> => {
@@ -205,7 +205,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[getAttachmentPresignedUrl]
 	);
 
-	// ── File validation ────────────────────────────────────────────────────────
+	// File validation
 
 	const validateAndUpload = useCallback(
 		async (files: FileList | File[]) => {
@@ -290,7 +290,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[attachments, attachmentType, uploadFile]
 	);
 
-	// ── File input change ──────────────────────────────────────────────────────
+	// File input change
 
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.stopPropagation();
@@ -300,7 +300,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		await validateAndUpload(files);
 	};
 
-	// ── Drag and drop ──────────────────────────────────────────────────────────
+	// Drag and drop
 
 	const handleDragEnter = useCallback((e: React.DragEvent) => {
 		e.preventDefault();
@@ -334,7 +334,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[validateAndUpload]
 	);
 
-	// ── Paste Support ──────────────────────────────────────────────────────────
+	// Paste Support
 
 	const handlePaste = useCallback(
 		async (e: React.ClipboardEvent) => {
@@ -349,7 +349,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[isDisabled, validateAndUpload]
 	);
 
-	// ── Attachment actions ─────────────────────────────────────────────────────
+	// Attachment actions
 
 	const removeAttachment = (index: number) => {
 		setAttachments((prev) => {
@@ -358,7 +358,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		});
 	};
 
-	// ── Submit ─────────────────────────────────────────────────────────────────
+	// Submit
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -402,7 +402,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		}
 	};
 
-	// ── Carousel images ────────────────────────────────────────────────────────
+	// Carousel images
 
 	const carouselImages: CarouselImage[] = attachments
 		.filter((a) => isImage(a.mimeType))
@@ -414,7 +414,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 
 	const videoAttachment = attachments.find((a) => isVideo(a.mimeType));
 
-	// ── Render ─────────────────────────────────────────────────────────────────
+	// Render
 
 	return (
 		<div

@@ -24,11 +24,7 @@ const CONTENT_H = FRAME_H - INSET_TOP - INSET_BOTTOM; // 825
 export const Billboard = ({ frameSrc, children }: BillboardProps) => {
 	return (
 		<div className="relative w-full">
-			{/* Outer shell — locked to the billboard frame ratio */}
 			<AspectRatio ratio={FRAME_W / FRAME_H}>
-				{/* ── Content slot ─────────────────────────────────────────
-            Positioned absolutely using percentage offsets so it
-            scales perfectly at any rendered size.                  */}
 				<div
 					className="absolute"
 					style={{
@@ -39,16 +35,11 @@ export const Billboard = ({ frameSrc, children }: BillboardProps) => {
 						zIndex: 0,
 					}}
 				>
-					{/* Inner AspectRatio keeps whatever you drop in here
-              (image, video, div…) at the correct 1384 × 825 ratio */}
 					<AspectRatio ratio={CONTENT_W / CONTENT_H} className="h-full w-full">
 						{children}
 					</AspectRatio>
 				</div>
 
-				{/* ── Billboard frame overlay ───────────────────────────────
-            Rendered ABOVE the content so the frame edges & shadows
-            naturally mask/blend with whatever is inside.           */}
 				<Image
 					src={frameSrc}
 					alt="Billboard frame"
@@ -56,7 +47,7 @@ export const Billboard = ({ frameSrc, children }: BillboardProps) => {
 					priority
 					className="pointer-events-none select-none brightness-75"
 					style={{
-						objectFit: "fill", // stretch to fill — frame was designed for this exact ratio
+						objectFit: "fill",
 						zIndex: 10,
 					}}
 				/>
