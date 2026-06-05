@@ -3,12 +3,11 @@ import {
 	HydrationBoundary,
 	QueryClient,
 } from "@tanstack/react-query";
+import { LayoutEffects } from "@/app/(verified)/(profile)/layoutEffects";
 import { ConfirmDialog } from "@/components/layout/ConfirmDialog";
 import { MobileNavbar } from "@/components/layout/MobileNavbar";
 import { Navbar } from "@/components/layout/Navbar";
 import { SecondarySidebar } from "@/components/layout/SecondarySidebar";
-import { MeteorsComponent } from "@/components/misc/MeteorsComponent";
-import { Snowfall } from "@/components/misc/Snowfall";
 import { ViewerInitializer } from "@/components/misc/ViewerInitializer";
 import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
@@ -57,8 +56,7 @@ export default async function Layout({
 				<MobileNavbar userId={user.id} />
 
 				{/* Misc */}
-				<Snowfall />
-				<MeteorsComponent />
+				<LayoutEffects />
 
 				{/* Dialogs */}
 				<ConfirmDialog />
