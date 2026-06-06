@@ -65,12 +65,12 @@ export function useSendFollow({
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
-				queryClient.invalidateQueries({
+				queryClient.resetQueries({ queryKey: orpc.post.getFeed.key() }),
+				queryClient.resetQueries({
 					queryKey: orpc.post.getAllByUser.queryOptions({
 						input: { username: targetUsername },
 					}).queryKey,
 				}),
-				queryClient.invalidateQueries({ queryKey: orpc.post.getFeed.key() }),
 			];
 
 			if (wasAccepted) {
@@ -162,12 +162,12 @@ export function useRemoveFollow({
 					}).queryKey,
 				}),
 				queryClient.invalidateQueries({ queryKey: orpc.profile.search.key() }),
-				queryClient.invalidateQueries({
+				queryClient.resetQueries({ queryKey: orpc.post.getFeed.key() }),
+				queryClient.resetQueries({
 					queryKey: orpc.post.getAllByUser.queryOptions({
 						input: { username: targetUsername },
 					}).queryKey,
 				}),
-				queryClient.invalidateQueries({ queryKey: orpc.post.getFeed.key() }),
 			];
 
 			if (wasAccepted) {

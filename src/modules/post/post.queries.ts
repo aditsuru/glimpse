@@ -27,11 +27,14 @@ export function useCreatePost() {
 		...orpc.post.create.mutationOptions(),
 		onSettled: async () => {
 			await Promise.all([
-				queryClient.invalidateQueries({
+				queryClient.resetQueries({
 					queryKey: getAllByUserKey(username),
 				}),
-				queryClient.invalidateQueries({
+				queryClient.resetQueries({
 					queryKey: orpc.post.getFeed.key(),
+				}),
+				queryClient.resetQueries({
+					queryKey: orpc.post.getTrendingFeed.key(),
 				}),
 			]);
 		},
@@ -50,11 +53,14 @@ export function useDeletePost() {
 		...orpc.post.delete.mutationOptions(),
 		onSettled: async () => {
 			await Promise.all([
-				queryClient.invalidateQueries({
+				queryClient.resetQueries({
 					queryKey: getAllByUserKey(username),
 				}),
-				queryClient.invalidateQueries({
+				queryClient.resetQueries({
 					queryKey: orpc.post.getFeed.key(),
+				}),
+				queryClient.resetQueries({
+					queryKey: orpc.post.getTrendingFeed.key(),
 				}),
 			]);
 		},
