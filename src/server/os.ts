@@ -1,5 +1,7 @@
 import { ORPCError, os } from "@orpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
+import { eq } from "drizzle-orm";
+import { bansTable } from "@/db/schema";
 import { REDIS_KEYS, redis } from "@/lib/server/redis";
 import { config } from "@/lib/shared/config";
 import type { Context } from "./context";
@@ -26,10 +28,33 @@ export const base = os.$context<Context>().use(async ({ context, next }) => {
 
 export const publicProcedure = base;
 
-export const authedProcedure = base.use(({ context, next }) => {
+export const authedProcedure = base.use(async ({ context, next }) => {
 	if (!context.session) {
 		throw new ORPCError("UNAUTHORIZED");
 	}
+
+	const ban = await context.db
+		.select({
+			id: bansTable.id,
+			expiresAt: bansTable.expiresAt,
+			isPermanent: bansTable.isPermanent,
+		})
+		.from(bansTable)
+		.where(eq(bansTable.userId, context.session.user.id))
+		.limit(1)
+		.then((r) => r[0]);
+
+	if (ban) {
+		const isActive =
+			ban.isPermanent || (ban.expiresAt && ban.expiresAt > new Date());
+		if (isActive) {
+			throw new ORPCError("FORBIDDEN", {
+				message: "Your account has been suspended.",
+				data: { reason: "banned" },
+			});
+		}
+	}
+
 	return next({
 		context: {
 			...context,

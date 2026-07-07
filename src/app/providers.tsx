@@ -1,11 +1,27 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ORPCError } from "@orpc/client";
+import {
+	MutationCache,
+	QueryCache,
+	QueryClient,
+	QueryClientProvider,
+} from "@tanstack/react-query";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { config } from "@/lib/shared/config";
+
+const handleBanError = (error: unknown) => {
+	if (
+		error instanceof ORPCError &&
+		error.code === "FORBIDDEN" &&
+		(error.data as { reason?: string })?.reason === "banned"
+	) {
+		window.location.href = "/banned";
+	}
+};
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
 	const [queryClient] = useState(
@@ -27,6 +43,12 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
 						retry: 0,
 					},
 				},
+				queryCache: new QueryCache({
+					onError: handleBanError,
+				}),
+				mutationCache: new MutationCache({
+					onError: handleBanError,
+				}),
 			})
 	);
 	return (

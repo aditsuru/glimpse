@@ -66,9 +66,16 @@ export default function Page() {
 		});
 
 		if (error) {
-			setError("root", {
-				message: error.message ?? "Something went wrong. Please try again.",
-			});
+			if (error.status === 403) {
+				toast.error(
+					"Account suspended",
+					error.message ?? "This account has been suspended."
+				);
+			} else {
+				setError("root", {
+					message: error.message ?? "Something went wrong. Please try again.",
+				});
+			}
 			return;
 		}
 

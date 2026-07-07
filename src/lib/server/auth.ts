@@ -2,13 +2,25 @@
 
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { profilesTable } from "@/db/schema";
+import { bansTable, profilesTable } from "@/db/schema";
 import { sendResetPasswordEmail, sendVerificationEmail } from "@/emails/email";
 import { config } from "@/lib/shared/config";
 import { REDIS_KEYS, redis } from "./redis";
+
+const checkEmailBan = async (email: string | undefined) => {
+	if (!email) return false;
+	const ban = await db
+		.select({ id: bansTable.id })
+		.from(bansTable)
+		.where(eq(bansTable.email, email.toLowerCase()))
+		.limit(1)
+		.then((r) => r[0]);
+	return !!ban;
+};
 
 export const auth = betterAuth({
 	rateLimit: {
@@ -86,6 +98,22 @@ export const auth = betterAuth({
 			enabled: true,
 			maxAge: config.COOKIE_CACHE_AGE,
 		},
+	},
+
+	hooks: {
+		before: createAuthMiddleware(async (ctx) => {
+			if (ctx.path === "/sign-in/email" || ctx.path === "/sign-up/email") {
+				const email = ctx.body?.email;
+
+				const ban = await checkEmailBan(email);
+
+				if (ban) {
+					throw new APIError("FORBIDDEN", {
+						message: "This account has been suspended.",
+					});
+				}
+			}
+		}),
 	},
 
 	plugins: [nextCookies()],
