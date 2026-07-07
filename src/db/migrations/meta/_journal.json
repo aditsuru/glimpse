@@ -64,6 +64,13 @@
 			"when": 1780584381135,
 			"tag": "0008_ordinary_stardust",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1783404307286,
+			"tag": "0009_panoramic_mandroid",
+			"breakpoints": true
 		}
 	]
 }

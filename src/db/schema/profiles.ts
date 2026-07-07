@@ -32,6 +32,9 @@ export const profilesTable = pgTable(
 		avatarKey: text("avatar_key"),
 		bannerKey: text("banner_key"),
 		bannerMimeType: text("banner_mime_type"),
+		role: text("role", { enum: ["user", "admin"] })
+			.notNull()
+			.default("user"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),

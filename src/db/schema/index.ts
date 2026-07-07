@@ -1,5 +1,6 @@
 export * from "./attachments";
 export * from "./auth-schema";
+export * from "./bans";
 export * from "./bookmarks";
 export * from "./comment-likes";
 export * from "./comments";
@@ -8,4 +9,5 @@ export * from "./notifications";
 export * from "./post-likes";
 export * from "./posts";
 export * from "./profiles";
+export * from "./reports";
 export * from "./view-history";
