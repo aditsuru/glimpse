@@ -1,4 +1,4 @@
-import { authedProcedure, base } from "@/server/os";
+import { adminProcedure, authedProcedure, base } from "@/server/os";
 import { commentSchema } from "./comment.schema";
 import { CommentService } from "./comment.service";
 
@@ -55,5 +55,16 @@ export const commentRouter = base.router({
 		.output(commentSchema.getAllCommentsByUser.output)
 		.handler(async ({ input, context }) => {
 			return await context.commentService.getAllCommentsByUser({ ...input });
+		}),
+
+	adminDelete: adminProcedure
+		.input(commentSchema.adminDelete.input)
+		.output(commentSchema.adminDelete.output)
+		.handler(async ({ input, context }) => {
+			const commentService = new CommentService(
+				context.db,
+				context.session.user.id
+			);
+			return await commentService.adminDelete({ ...input });
 		}),
 });

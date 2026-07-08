@@ -32,8 +32,7 @@ export const ReportTargetTypeEnum = pgEnum("report_target_type", [
 
 export const ReportStatusEnum = pgEnum("report_status", [
 	"pending",
-	"reviewed",
-	"actioned",
+	"resolved",
 	"dismissed",
 ]);
 

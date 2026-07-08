@@ -1,4 +1,6 @@
 import { accountRouter } from "@/modules/account/account.route";
+import { adminReportRouter } from "@/modules/admin-report/admin-report.route";
+import { banRouter } from "@/modules/ban/ban.route";
 import { bookmarkRouter } from "@/modules/bookmark/bookmark.route";
 import { commentRouter } from "@/modules/comment/comment.route";
 import { commentLikeRouter } from "@/modules/comment-like/comment-like.route";
@@ -23,6 +25,8 @@ export const router = base.router({
 	notification: notificationRouter,
 	report: reportRouter,
 	dmca: dmcaRouter,
+	ban: banRouter,
+	adminReport: adminReportRouter,
 });
 
 export type Router = typeof router;

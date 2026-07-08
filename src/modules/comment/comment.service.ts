@@ -483,4 +483,31 @@ export class CommentService {
 			};
 		});
 	}
+
+	async adminDelete({
+		commentId,
+	}: z.infer<typeof commentSchema.adminDelete.input>): Promise<
+		z.infer<typeof commentSchema.adminDelete.output>
+	> {
+		const comment = await this.db
+			.select({ userId: commentsTable.userId })
+			.from(commentsTable)
+			.where(eq(commentsTable.id, commentId))
+			.limit(1)
+			.then((r) => r[0]);
+
+		if (!comment) return { success: true };
+
+		await this.db.delete(commentsTable).where(eq(commentsTable.id, commentId));
+
+		void upsertNotification({
+			type: "system",
+			recipientId: comment.userId,
+			body: "One of your comments was removed for violating our community guidelines.",
+		}).catch((e) =>
+			logger.error({ err: e }, "content removal notification failed")
+		);
+
+		return { success: true };
+	}
 }

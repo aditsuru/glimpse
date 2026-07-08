@@ -1,4 +1,4 @@
-import { authedProcedure, base } from "@/server/os";
+import { adminProcedure, authedProcedure, base } from "@/server/os";
 import { postSchema } from "./post.schema";
 import { PostService } from "./post.service";
 
@@ -72,5 +72,13 @@ export const postRouter = base.router({
 		.output(postSchema.getBillboard.output)
 		.handler(async ({ context }) => {
 			return await context.postService.getBillboard();
+		}),
+
+	adminDelete: adminProcedure
+		.input(postSchema.adminDelete.input)
+		.output(postSchema.adminDelete.output)
+		.handler(async ({ input, context }) => {
+			const postService = new PostService(context.db, context.session.user.id);
+			return await postService.adminDelete({ ...input });
 		}),
 });

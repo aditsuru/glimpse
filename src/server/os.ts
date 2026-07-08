@@ -2,6 +2,7 @@ import { ORPCError, os } from "@orpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { eq } from "drizzle-orm";
 import { bansTable } from "@/db/schema";
+import { profilesTable } from "@/db/schema/profiles";
 import { REDIS_KEYS, redis } from "@/lib/server/redis";
 import { config } from "@/lib/shared/config";
 import type { Context } from "./context";
@@ -61,4 +62,19 @@ export const authedProcedure = base.use(async ({ context, next }) => {
 			session: context.session,
 		},
 	});
+});
+
+export const adminProcedure = authedProcedure.use(async ({ context, next }) => {
+	const profile = await context.db
+		.select({ role: profilesTable.role })
+		.from(profilesTable)
+		.where(eq(profilesTable.userId, context.session.user.id))
+		.limit(1)
+		.then((r) => r[0]);
+
+	if (profile?.role !== "admin") {
+		throw new ORPCError("FORBIDDEN", { message: "Admin access required." });
+	}
+
+	return next({ context });
 });

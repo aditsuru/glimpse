@@ -5,9 +5,8 @@ import { customNanoid } from "@/lib/server/helpers";
 
 export const DmcaStatusEnum = pgEnum("dmca_status", [
 	"pending",
-	"reviewed",
-	"actioned",
-	"rejected",
+	"resolved",
+	"dismissed",
 ]);
 
 export const dmcaRequestsTable = pgTable("dmca_requests", {

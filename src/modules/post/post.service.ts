@@ -22,7 +22,8 @@ import { bookmarksTable } from "@/db/schema/bookmarks";
 import { commentsTable } from "@/db/schema/comments";
 import { postLikesTable } from "@/db/schema/post-likes";
 import { viewHistoryTable } from "@/db/schema/view-history";
-import { customNanoid } from "@/lib/server/helpers";
+import { customNanoid, upsertNotification } from "@/lib/server/helpers";
+import { logger } from "@/lib/server/logger";
 import {
 	getPostViews,
 	getPostViewsBatch,
@@ -785,5 +786,32 @@ export class PostService {
 					.publicUrl,
 			})),
 		}));
+	}
+
+	async adminDelete({
+		postId,
+	}: z.infer<typeof postSchema.adminDelete.input>): Promise<
+		z.infer<typeof postSchema.adminDelete.output>
+	> {
+		const post = await this.db
+			.select({ userId: postsTable.userId })
+			.from(postsTable)
+			.where(eq(postsTable.id, postId))
+			.limit(1)
+			.then((r) => r[0]);
+
+		if (!post) return { success: true };
+
+		await this.db.delete(postsTable).where(eq(postsTable.id, postId));
+
+		void upsertNotification({
+			type: "system",
+			recipientId: post.userId,
+			body: "One of your posts was removed for violating our community guidelines.",
+		}).catch((e) =>
+			logger.error({ err: e }, "content removal notification failed")
+		);
+
+		return { success: true };
 	}
 }

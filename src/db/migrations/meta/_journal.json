@@ -71,6 +71,20 @@
 			"when": 1783404307286,
 			"tag": "0009_panoramic_mandroid",
 			"breakpoints": true
+		},
+		{
+			"idx": 10,
+			"version": "7",
+			"when": 1783490815009,
+			"tag": "0010_tired_silver_samurai",
+			"breakpoints": true
+		},
+		{
+			"idx": 11,
+			"version": "7",
+			"when": 1783512715751,
+			"tag": "0011_magenta_zeigeist",
+			"breakpoints": true
 		}
 	]
 }
