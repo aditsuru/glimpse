@@ -1,10 +1,11 @@
 // DO NOT: import "server-only";
 
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
+import type { db as DBType } from "@/db";
 import { db } from "@/db";
 import type { FollowStatusEnumType } from "@/db/schema";
-import { notificationsTable } from "@/db/schema";
+import { notificationsTable, profilesTable } from "@/db/schema";
 
 export type ViewerFollowStatus =
 	| "none"
@@ -159,4 +160,12 @@ export async function upsertNotification(input: NotificationInput) {
 				updatedAt: new Date(),
 			},
 		});
+}
+
+export async function getAdminUserIds(db: typeof DBType): Promise<string[]> {
+	const admins = await db
+		.select({ userId: profilesTable.userId })
+		.from(profilesTable)
+		.where(eq(profilesTable.role, "admin"));
+	return admins.map((a) => a.userId);
 }

@@ -13,6 +13,7 @@ import { orpc } from "@/lib/client/orpc-client";
 import { getRequiredSession } from "@/lib/server/auth-utils";
 import { getServerCaller } from "@/lib/server/orpc-server";
 import { PostComposerDialog } from "@/modules/post/components/PostComposerDialog";
+import { ReportDialog } from "@/modules/report/components/ReportDialog";
 
 export default async function Layout({
 	children,
@@ -61,6 +62,7 @@ export default async function Layout({
 				{/* Dialogs */}
 				<ConfirmDialog />
 				<PostComposerDialog />
+				<ReportDialog />
 			</div>
 		</HydrationBoundary>
 	);

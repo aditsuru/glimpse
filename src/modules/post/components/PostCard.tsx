@@ -39,6 +39,7 @@ import { CommentButton } from "@/modules/comment/components/CommentButton";
 import { PostLikeButton } from "@/modules/post-like/components/PostLikeButton";
 import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
 import { useConfirmDialogStore } from "@/store/use-confirm-dialog-store";
+import { useReportDialogStore } from "@/store/use-report-dialog-store";
 import { useViewerStore } from "@/store/use-viewer-store";
 import { useDeletePost, useMarkPostSeen } from "../post.queries";
 import type { postSchema } from "../post.schema";
@@ -265,6 +266,7 @@ const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
 	const pathname = usePathname();
 
 	const openConfirmDialog = useConfirmDialogStore((state) => state.openDialog);
+	const openReportDialog = useReportDialogStore((state) => state.openDialog);
 
 	const handleDelete = () => {
 		openConfirmDialog({
@@ -288,7 +290,9 @@ const DropdownMenuSubmenu = ({ postId, authorId }: DropdownMenuSubmenu) => {
 		});
 	};
 
-	const handleReport = () => {};
+	const handleReport = () => {
+		openReportDialog({ type: "post", targetId: postId });
+	};
 
 	return (
 		<DropdownMenu>

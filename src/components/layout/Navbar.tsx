@@ -124,6 +124,7 @@ export const Navbar = ({ userId }: NavbarProps) => {
 						width={40}
 						height={40}
 						priority
+						draggable={false}
 					/>
 				</div>
 
