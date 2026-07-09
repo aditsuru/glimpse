@@ -38,12 +38,14 @@ export class ReportService {
 				body,
 			});
 		} catch (error) {
-			if (error instanceof DatabaseError && error.code === "23505") {
+			const cause = error instanceof Error ? error.cause : undefined;
+
+			if (cause instanceof DatabaseError && cause.code === "23505") {
 				throw new ORPCError("CONFLICT", {
 					message: "You've already reported this.",
 				});
 			}
-			if (error instanceof DatabaseError && error.code === "23503") {
+			if (cause instanceof DatabaseError && cause.code === "23503") {
 				throw new ORPCError("NOT_FOUND", { message: "Content not found." });
 			}
 			throw error;

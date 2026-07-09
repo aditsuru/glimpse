@@ -65,6 +65,7 @@ export const PostCard = ({
 
 	const ref = useViewCount<HTMLDivElement>({
 		postId: data.id,
+		enabled: !data.isSeenByViewer,
 		callback: () =>
 			updateViewCount.mutate({
 				postId: data.id,

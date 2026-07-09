@@ -20,7 +20,7 @@ import { bookmarksTable } from "@/db/schema/bookmarks";
 import { commentLikesTable } from "@/db/schema/comment-likes";
 import { commentsTable } from "@/db/schema/comments";
 import { postLikesTable } from "@/db/schema/post-likes";
-import { upsertNotification } from "@/lib/server/helpers";
+import { getSeenPostIdsSet, upsertNotification } from "@/lib/server/helpers";
 import { logger } from "@/lib/server/logger";
 import { incrementTrendingScore } from "@/lib/server/redis-utils";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
@@ -277,7 +277,7 @@ export class CommentService {
 		];
 		const postIds = [...new Set(topLevelComments.map((c) => c.postId))];
 
-		const [rawParentComments, rawPosts] = await Promise.all([
+		const [rawParentComments, rawPosts, seenPostIds] = await Promise.all([
 			parentCommentIds.length > 0
 				? this.db
 						.select(selectColumns)
@@ -351,13 +351,19 @@ export class CommentService {
 						.where(inArray(postsTable.id, postIds))
 						.groupBy(postsTable.id, profilesTable.id)
 				: Promise.resolve([]),
+			getSeenPostIdsSet(this.db, this.userId),
 		]);
 
 		const parentCommentMap = new Map(
 			this.mapComments(rawParentComments).map((c) => [c.id, c])
 		);
-		const postMap = new Map(rawPosts.map((p) => [p.id, p]));
 
+		const postMap = new Map(
+			rawPosts.map((p) => [
+				p.id,
+				{ ...p, isSeenByViewer: seenPostIds.has(p.id) },
+			])
+		);
 		return {
 			items: this.mapUserComments(mapped, parentCommentMap, postMap),
 			nextCursor,

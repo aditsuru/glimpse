@@ -9,6 +9,7 @@ import { attachmentsTable, postsTable, profilesTable } from "@/db/schema";
 import { bookmarksTable } from "@/db/schema/bookmarks";
 import { commentsTable } from "@/db/schema/comments";
 import { postLikesTable } from "@/db/schema/post-likes";
+import { getSeenPostIdsSet } from "@/lib/server/helpers";
 import { getPostViewsBatch } from "@/lib/server/redis-utils";
 import { constructPublicUrl } from "@/lib/server/s3-utils";
 import { config } from "@/lib/shared/config";
@@ -109,13 +110,17 @@ export class BookmarkService {
 		const trimmed = hasNext ? posts.slice(0, -1) : posts;
 		const nextCursor = hasNext ? trimmed.at(-1)!.bookmarkedAt : null;
 
-		const viewsMap = await getPostViewsBatch(trimmed.map((p) => p.id));
+		const [viewsMap, seenPostIds] = await Promise.all([
+			getPostViewsBatch(trimmed.map((p) => p.id)),
+			getSeenPostIdsSet(this.db, this.userId),
+		]);
 
 		const mappedPosts = trimmed.map((post) => {
 			return {
 				...post,
 				isBookmarkedByUser: true,
 				views: post.views + (viewsMap.get(post.id) ?? 0),
+				isSeenByViewer: seenPostIds.has(post.id),
 				author: {
 					...post.author,
 					avatarUrl: post.author.avatarUrl

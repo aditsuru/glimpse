@@ -1,11 +1,16 @@
 // DO NOT: import "server-only";
 
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 import type { db as DBType } from "@/db";
 import { db } from "@/db";
 import type { FollowStatusEnumType } from "@/db/schema";
-import { notificationsTable, profilesTable } from "@/db/schema";
+import {
+	notificationsTable,
+	profilesTable,
+	viewHistoryTable,
+} from "@/db/schema";
+import { getViewHistory, isPostSeen } from "@/lib/server/redis-utils";
 
 export type ViewerFollowStatus =
 	| "none"
@@ -168,4 +173,43 @@ export async function getAdminUserIds(db: typeof DBType): Promise<string[]> {
 		.from(profilesTable)
 		.where(eq(profilesTable.role, "admin"));
 	return admins.map((a) => a.userId);
+}
+
+export async function isPostSeenByUser(
+	db: typeof DBType,
+	userId: string,
+	postId: string
+): Promise<boolean> {
+	const [seenRedis, seenDB] = await Promise.all([
+		isPostSeen(userId, postId),
+		db
+			.select({ postId: viewHistoryTable.postId })
+			.from(viewHistoryTable)
+			.where(
+				and(
+					eq(viewHistoryTable.userId, userId),
+					eq(viewHistoryTable.postId, postId)
+				)
+			)
+			.limit(1)
+			.then((r) => r.length > 0),
+	]);
+
+	return seenRedis || seenDB;
+}
+
+export async function getSeenPostIdsSet(
+	db: typeof DBType,
+	userId: string
+): Promise<Set<string>> {
+	const [seenRedis, seenDB] = await Promise.all([
+		getViewHistory(userId),
+		db
+			.select({ postId: viewHistoryTable.postId })
+			.from(viewHistoryTable)
+			.where(eq(viewHistoryTable.userId, userId))
+			.then((rows) => rows.map((r) => r.postId)),
+	]);
+
+	return new Set<string>([...(seenRedis as string[]), ...seenDB]);
 }
