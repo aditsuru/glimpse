@@ -30,6 +30,7 @@ import { DEFAULT_PFP_URL } from "@/lib/shared/constants";
 import { CommentLikeButton } from "@/modules/comment-like/components/CommentLikeButton";
 import { HoverProfileCard } from "@/modules/profile/components/HoverProfileCard";
 import { useConfirmDialogStore } from "@/store/use-confirm-dialog-store";
+import { useReportDialogStore } from "@/store/use-report-dialog-store";
 import { useViewerStore } from "@/store/use-viewer-store";
 import { useDeleteComment, useGetCommentReplies } from "../comment.queries";
 import type { getCommentOutput } from "../comment.schema";
@@ -280,6 +281,7 @@ const DropdownMenuSubmenu = ({
 	const deleteComment = useDeleteComment({ postId });
 
 	const openConfirmDialog = useConfirmDialogStore((state) => state.openDialog);
+	const openReportDialog = useReportDialogStore((state) => state.openDialog);
 
 	const handleDelete = () => {
 		openConfirmDialog({
@@ -297,6 +299,10 @@ const DropdownMenuSubmenu = ({
 				);
 			},
 		});
+	};
+
+	const handleReport = () => {
+		openReportDialog({ type: "comment", targetId: commentId });
 	};
 
 	return (
@@ -327,7 +333,10 @@ const DropdownMenuSubmenu = ({
 						</DropdownMenuItem>
 					)}
 					{authorId !== userId && (
-						<DropdownMenuItem className="text-destructive hover:text-destructive!">
+						<DropdownMenuItem
+							className="text-destructive hover:text-destructive!"
+							onClick={handleReport}
+						>
 							Report
 						</DropdownMenuItem>
 					)}

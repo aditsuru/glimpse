@@ -3,16 +3,19 @@ import { useEffect, useRef } from "react";
 interface UseViewCountProps {
 	postId: string;
 	callback: (id: string) => void;
+	enabled?: boolean;
 }
 
 export function useViewCount<T extends HTMLElement>({
 	postId,
 	callback,
+	enabled,
 }: UseViewCountProps) {
 	const ref = useRef<T>(null);
 	const isFired = useRef(false);
 
 	useEffect(() => {
+		if (!enabled) return;
 		if (!ref.current) return;
 		const observer = new IntersectionObserver(
 			([entry]) => {
@@ -29,7 +32,7 @@ export function useViewCount<T extends HTMLElement>({
 		observer.observe(ref.current);
 
 		return () => observer.disconnect();
-	}, [callback, postId]);
+	}, [callback, postId, enabled]);
 
 	return ref;
 }

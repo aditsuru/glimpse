@@ -33,6 +33,8 @@ export const getPostOutput = postSelectSchema.extend({
 	isBookmarkedByUser: z.boolean(),
 
 	commentsCount: z.number(),
+
+	isSeenByViewer: z.boolean(),
 });
 
 export const getPostListOutput = z.object({
@@ -119,5 +121,10 @@ export const postSchema = {
 
 	getBillboard: {
 		output: z.array(getPostOutput),
+	},
+
+	adminDelete: {
+		input: z.object({ postId: z.string() }),
+		output: z.object({ success: z.boolean() }),
 	},
 };

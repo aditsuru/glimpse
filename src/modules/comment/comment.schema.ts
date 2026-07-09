@@ -88,4 +88,9 @@ export const commentSchema = {
 		}),
 		output: getCommentListOutput,
 	},
+
+	adminDelete: {
+		input: z.object({ commentId: z.string() }),
+		output: z.object({ success: z.boolean() }),
+	},
 };

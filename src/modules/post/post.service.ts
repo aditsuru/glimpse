@@ -22,7 +22,13 @@ import { bookmarksTable } from "@/db/schema/bookmarks";
 import { commentsTable } from "@/db/schema/comments";
 import { postLikesTable } from "@/db/schema/post-likes";
 import { viewHistoryTable } from "@/db/schema/view-history";
-import { customNanoid } from "@/lib/server/helpers";
+import {
+	customNanoid,
+	getSeenPostIdsSet,
+	isPostSeenByUser,
+	upsertNotification,
+} from "@/lib/server/helpers";
+import { logger } from "@/lib/server/logger";
 import {
 	getPostViews,
 	getPostViewsBatch,
@@ -283,9 +289,12 @@ export class PostService {
 				});
 		}
 
+		const isSeenByViewer = await isPostSeenByUser(this.db, this.userId, postId);
+
 		return {
 			...post,
 			views: post.views + (await getPostViews(postId)),
+			isSeenByViewer,
 			author: {
 				...post.author,
 				avatarUrl: post.author.avatarUrl
@@ -406,12 +415,16 @@ export class PostService {
 		const trimmed = hasNext ? posts.slice(0, -1) : posts;
 		const nextCursor = hasNext ? trimmed.at(-1)!.createdAt : null;
 
-		const viewsMap = await getPostViewsBatch(trimmed.map((p) => p.id));
+		const [viewsMap, seenPostIds] = await Promise.all([
+			getPostViewsBatch(trimmed.map((p) => p.id)),
+			getSeenPostIdsSet(this.db, this.userId),
+		]);
 
 		const mappedPosts = trimmed.map((post) => {
 			return {
 				...post,
 				views: post.views + (viewsMap.get(post.id) ?? 0),
+				isSeenByViewer: seenPostIds.has(post.id),
 				author: {
 					...authorProfile,
 					avatarUrl: authorProfile.avatarUrl
@@ -455,6 +468,7 @@ export class PostService {
 		]);
 
 		const seenPostIds = [...new Set([...seenPostIdsRedis, ...seenPostIdsDB])];
+		const seenPostIdsSet = new Set(seenPostIds);
 
 		const posts = await this.db
 			.select({
@@ -547,6 +561,7 @@ export class PostService {
 			return {
 				...post,
 				views: post.views + (viewsMap.get(post.id) ?? 0),
+				isSeenByViewer: seenPostIdsSet.has(post.id),
 				author: {
 					...post.author,
 					avatarUrl: post.author.avatarUrl
@@ -660,6 +675,7 @@ export class PostService {
 			.map((post) => ({
 				...post!,
 				views: post!.views + (viewsMap.get(post!.id) ?? 0),
+				isSeenByViewer: seenPostIds.has(post!.id),
 				author: {
 					...post!.author,
 					avatarUrl: post!.author.avatarUrl
@@ -765,11 +781,15 @@ export class PostService {
 			.orderBy(desc(scoreSql), sql`md5(${postsTable.id})`)
 			.limit(10);
 
-		const viewsMap = await getPostViewsBatch(posts.map((p) => p.id));
+		const [viewsMap, seenPostIds] = await Promise.all([
+			getPostViewsBatch(posts.map((p) => p.id)),
+			getSeenPostIdsSet(this.db, this.userId),
+		]);
 
 		return posts.map((post) => ({
 			...post,
 			views: post.views + (viewsMap.get(post.id) ?? 0),
+			isSeenByViewer: seenPostIds.has(post.id),
 			author: {
 				...post.author,
 				avatarUrl: post.author.avatarUrl
@@ -785,5 +805,32 @@ export class PostService {
 					.publicUrl,
 			})),
 		}));
+	}
+
+	async adminDelete({
+		postId,
+	}: z.infer<typeof postSchema.adminDelete.input>): Promise<
+		z.infer<typeof postSchema.adminDelete.output>
+	> {
+		const post = await this.db
+			.select({ userId: postsTable.userId })
+			.from(postsTable)
+			.where(eq(postsTable.id, postId))
+			.limit(1)
+			.then((r) => r[0]);
+
+		if (!post) return { success: true };
+
+		await this.db.delete(postsTable).where(eq(postsTable.id, postId));
+
+		void upsertNotification({
+			type: "system",
+			recipientId: post.userId,
+			body: "One of your posts was removed for violating our community guidelines.",
+		}).catch((e) =>
+			logger.error({ err: e }, "content removal notification failed")
+		);
+
+		return { success: true };
 	}
 }

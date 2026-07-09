@@ -126,3 +126,15 @@ export function useGetBillboard() {
 		refetchInterval: 60000 * 15,
 	});
 }
+
+export function useAdminDeletePost() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.post.adminDelete.mutationOptions(),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: orpc.adminReport.getReports.key(),
+			});
+		},
+	});
+}

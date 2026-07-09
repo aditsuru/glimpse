@@ -198,3 +198,15 @@ export function useDeleteComment({
 		},
 	});
 }
+
+export function useAdminDeleteComment() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		...orpc.comment.adminDelete.mutationOptions(),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: orpc.adminReport.getReports.key(),
+			});
+		},
+	});
+}

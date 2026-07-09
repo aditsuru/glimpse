@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 import { cn } from "@/lib/client/utils";
 
-export const FeedHeader = () => {
+interface FeedHeaderProps {
+	onActiveTabClick?: () => void;
+}
+
+export const FeedHeader = ({ onActiveTabClick }: FeedHeaderProps) => {
 	const pathname = usePathname();
 
 	const tabs = [
@@ -22,6 +25,12 @@ export const FeedHeader = () => {
 						<Link
 							key={href}
 							href={href}
+							onClick={(e) => {
+								if (active) {
+									e.preventDefault();
+									onActiveTabClick?.();
+								}
+							}}
 							className={cn(
 								"flex-1 text-center transition-colors hover:bg-accent/40 relative text-base h-14 flex items-center justify-center pt-6 pb-4 font-medium",
 								active ? "font-bold text-foreground" : "text-muted-foreground"

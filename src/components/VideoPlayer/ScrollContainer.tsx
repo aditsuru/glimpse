@@ -11,52 +11,60 @@ interface ScrollContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 	scrollKey?: string;
 }
 
-export function ScrollContainer({
-	children,
-	className,
-	style,
-	scrollKey,
-	onScroll,
-	...props
-}: ScrollContainerProps) {
-	const ref = React.useRef<HTMLDivElement>(null);
-	const [el, setEl] = React.useState<HTMLElement | null>(null);
+export const ScrollContainer = React.forwardRef<
+	HTMLDivElement,
+	ScrollContainerProps
+>(
+	(
+		{ children, className, style, scrollKey, onScroll, ...props },
+		forwardedRef
+	) => {
+		const innerRef = React.useRef<HTMLDivElement>(null);
+		const [el, setEl] = React.useState<HTMLElement | null>(null);
 
-	React.useLayoutEffect(() => {
-		setEl(ref.current);
+		React.useImperativeHandle(
+			forwardedRef,
+			() => innerRef.current as HTMLDivElement
+		);
 
-		if (scrollKey && ref.current) {
-			const saved = sessionStorage.getItem(`scroll-${scrollKey}`);
-			if (saved) {
-				requestAnimationFrame(() => {
-					if (ref.current) ref.current.scrollTop = Number(saved);
-				});
+		React.useLayoutEffect(() => {
+			setEl(innerRef.current);
+
+			if (scrollKey && innerRef.current) {
+				const saved = sessionStorage.getItem(`scroll-${scrollKey}`);
+				if (saved) {
+					requestAnimationFrame(() => {
+						if (innerRef.current) innerRef.current.scrollTop = Number(saved);
+					});
+				}
 			}
-		}
-	}, [scrollKey]);
+		}, [scrollKey]);
 
-	const saveScroll = useDebouncedCallback((top: number) => {
-		if (scrollKey) {
-			sessionStorage.setItem(`scroll-${scrollKey}`, top.toString());
-		}
-	}, 150);
+		const saveScroll = useDebouncedCallback((top: number) => {
+			if (scrollKey) {
+				sessionStorage.setItem(`scroll-${scrollKey}`, top.toString());
+			}
+		}, 150);
 
-	const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-		saveScroll(e.currentTarget.scrollTop);
-		if (onScroll) onScroll(e);
-	};
+		const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+			saveScroll(e.currentTarget.scrollTop);
+			if (onScroll) onScroll(e);
+		};
 
-	return (
-		<ScrollRootContext.Provider value={el}>
-			<div
-				ref={ref}
-				className={className}
-				style={style}
-				onScroll={handleScroll}
-				{...props}
-			>
-				{children}
-			</div>
-		</ScrollRootContext.Provider>
-	);
-}
+		return (
+			<ScrollRootContext.Provider value={el}>
+				<div
+					ref={innerRef}
+					className={className}
+					style={style}
+					onScroll={handleScroll}
+					{...props}
+				>
+					{children}
+				</div>
+			</ScrollRootContext.Provider>
+		);
+	}
+);
+
+ScrollContainer.displayName = "ScrollContainer";

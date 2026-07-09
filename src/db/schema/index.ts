@@ -4,6 +4,7 @@ export * from "./bans";
 export * from "./bookmarks";
 export * from "./comment-likes";
 export * from "./comments";
+export * from "./dmca-requests";
 export * from "./follows";
 export * from "./notifications";
 export * from "./post-likes";

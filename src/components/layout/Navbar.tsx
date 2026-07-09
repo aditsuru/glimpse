@@ -10,6 +10,7 @@ import {
 	Settings,
 	User,
 	UserPlus,
+	UserStar,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -46,6 +47,7 @@ const navItems = [
 	{ label: "Notifications", href: "/notifications", icon: Bell },
 	{ label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
 	{ label: "Profile", href: "/profile", icon: User },
+	{ label: "Admin", href: "/admin/reports", icon: UserStar },
 	{ label: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -124,6 +126,7 @@ export const Navbar = ({ userId }: NavbarProps) => {
 						width={40}
 						height={40}
 						priority
+						draggable={false}
 					/>
 				</div>
 
@@ -212,6 +215,10 @@ export const Navbar = ({ userId }: NavbarProps) => {
 								<span>{label}</span>
 							</Link>
 						);
+					}
+
+					if (href === "/admin/reports" && data?.role !== "admin") {
+						return null;
 					}
 
 					return (
