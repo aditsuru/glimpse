@@ -16,8 +16,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Glimpse",
-	description: "A social media platform.",
+	metadataBase: new URL("https://glimpse.aditsuru.com"),
+	title: {
+		default: "Glimpse",
+		template: "%s · Glimpse",
+	},
+	description:
+		"Share moments, follow people, see what's trending. Glimpse is where it's happening right now.",
+	robots: {
+		index: true,
+		follow: true,
+	},
+	manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({

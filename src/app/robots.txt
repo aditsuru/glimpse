@@ -1,0 +1,27 @@
+import type { MetadataRoute } from "next";
+
+export default function robots(): MetadataRoute.Robots {
+	return {
+		rules: {
+			userAgent: "*",
+			allow: "/",
+			disallow: [
+				"/admin/",
+				"/dev/",
+				"/api/",
+				"/legal/dmca",
+				"/settings/",
+				"/notifications",
+				"/bookmarks",
+				"/requests/",
+				"/following",
+				"/onboarding",
+				"/verify-email",
+				"/forgot-password",
+				"/reset-password",
+				"/banned",
+			],
+		},
+		sitemap: "https://glimpse.aditsuru.com/sitemap.xml",
+	};
+}
