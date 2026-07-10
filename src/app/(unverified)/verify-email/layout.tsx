@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/shared/metadata";
-import { DmcaPanel } from "@/modules/dmca/components/dmca-panel";
 
 export const metadata: Metadata = buildMetadata({
-	title: "Admin · DMCA",
+	title: "Verify Email",
 	noindex: true,
 });
 
-export default function AdminDmcaPage() {
-	return <DmcaPanel />;
+export default function Layout({ children }: { children: React.ReactNode }) {
+	return children;
 }
