@@ -26,15 +26,11 @@ import { usePostComposerStore } from "@/store/use-post-composer-store";
 import { useViewerStore } from "@/store/use-viewer-store";
 import { useCreatePost, useGetAttachmentPresignedUrl } from "../post.queries";
 
-// Types
-
 type AttachmentItem = {
 	tempKey: string;
-	preview: string; // object URL
+	preview: string;
 	mimeType: string;
 };
-
-// Ring Counter
 
 const RING_RADIUS = 10;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
@@ -99,8 +95,6 @@ const CharRing = ({ count, max }: { count: number; max: number }) => {
 	);
 };
 
-// Main Component
-
 interface PostComposerProps {
 	onSuccess?: () => void;
 }
@@ -125,13 +119,11 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 	const [isDragging, setIsDragging] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const dragCounterRef = useRef(0); // tracks nested drag enter/leave
+	const dragCounterRef = useRef(0);
 
 	useEffect(() => {
 		textareaRef.current?.focus();
 	}, []);
-
-	// Derived state
 
 	const attachmentType =
 		attachments.length > 0
@@ -145,16 +137,12 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 	const isBodyOver = body.length > MAX_POST_BODY_LENGTH;
 	const canSubmit = !isEmpty && !isDisabled && !isBodyOver;
 
-	// Auto-grow textarea
-
 	const growTextarea = useCallback(() => {
 		const el = textareaRef.current;
 		if (!el) return;
 		el.style.height = "auto";
 		el.style.height = `${el.scrollHeight}px`;
 	}, []);
-
-	// Dialog helper
 
 	const { setLocked, setDirty } = usePostComposerStore();
 
@@ -167,8 +155,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		const dirty = body.trim().length > 0 || attachments.length > 0;
 		setDirty(dirty);
 	}, [body, attachments, setDirty]);
-
-	// Upload helper
 
 	const uploadFile = useCallback(
 		async (file: File): Promise<AttachmentItem | null> => {
@@ -205,8 +191,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[getAttachmentPresignedUrl]
 	);
 
-	// File validation
-
 	const validateAndUpload = useCallback(
 		async (files: FileList | File[]) => {
 			const fileArray = Array.from(files);
@@ -214,7 +198,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 
 			const firstFile = fileArray[0];
 
-			// Video rules
 			if (isVideo(firstFile.type)) {
 				if (attachmentType === "image") {
 					toast.error(
@@ -232,7 +215,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 				}
 			}
 
-			// Image rules
 			if (isImage(firstFile.type)) {
 				if (attachmentType === "video") {
 					toast.error(
@@ -265,7 +247,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 			}
 
 			const optimistic: AttachmentItem[] = fileArray.map((f) => ({
-				tempKey: "", // placeholder
+				tempKey: "",
 				preview: URL.createObjectURL(f),
 				mimeType: f.type,
 			}));
@@ -274,7 +256,7 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 
 			try {
 				const results = await Promise.all(fileArray.map(uploadFile));
-				// Replace optimistic entries with real keys
+
 				setAttachments((prev) => {
 					const updated = [...prev];
 					const startIdx = prev.length - optimistic.length;
@@ -290,8 +272,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[attachments, attachmentType, uploadFile]
 	);
 
-	// File input change
-
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		e.stopPropagation();
 		const files = Array.from(e.target.files ?? []);
@@ -299,8 +279,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		if (!files || files.length === 0) return;
 		await validateAndUpload(files);
 	};
-
-	// Drag and drop
 
 	const handleDragEnter = useCallback((e: React.DragEvent) => {
 		e.preventDefault();
@@ -334,8 +312,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[validateAndUpload]
 	);
 
-	// Paste Support
-
 	const handlePaste = useCallback(
 		async (e: React.ClipboardEvent) => {
 			if (isDisabled) return;
@@ -349,16 +325,12 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		[isDisabled, validateAndUpload]
 	);
 
-	// Attachment actions
-
 	const removeAttachment = (index: number) => {
 		setAttachments((prev) => {
 			URL.revokeObjectURL(prev[index].preview);
 			return prev.filter((_, i) => i !== index);
 		});
 	};
-
-	// Submit
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -384,7 +356,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 						: undefined,
 			});
 
-			// cleanup
 			setBody("");
 			attachments.forEach((a) => {
 				URL.revokeObjectURL(a.preview);
@@ -402,8 +373,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		}
 	};
 
-	// Carousel images
-
 	const carouselImages: CarouselImage[] = attachments
 		.filter((a) => isImage(a.mimeType))
 		.map((a, i) => ({
@@ -413,8 +382,6 @@ export const PostComposer = ({ onSuccess }: PostComposerProps) => {
 		}));
 
 	const videoAttachment = attachments.find((a) => isVideo(a.mimeType));
-
-	// Render
 
 	return (
 		<div

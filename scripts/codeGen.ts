@@ -21,10 +21,8 @@ const pascal = moduleName.charAt(0).toUpperCase() + moduleName.slice(1);
 const base = path.join("src/modules", moduleName);
 const componentsDir = path.join(base, "components");
 
-// ── Create directories ────────────────────────────────────────────
 fs.mkdirSync(componentsDir, { recursive: true });
 
-// ── File templates ────────────────────────────────────────────────
 const files: Record<string, string> = {
 	[`${fileName}.schema.ts`]: `import * as z from "zod"\n\nexport const ${moduleName}Schema = {}\n`,
 
@@ -37,7 +35,6 @@ const files: Record<string, string> = {
 	[`components/${pascal}.tsx`]: `export default function ${pascal}() {\n  return null\n}\n`,
 };
 
-// ── Write files ───────────────────────────────────────────────────
 for (const [filename, content] of Object.entries(files)) {
 	const filepath = path.join(base, filename);
 

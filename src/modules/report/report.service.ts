@@ -145,7 +145,6 @@ export class ReportService {
 				: Promise.resolve([]),
 		]);
 
-		// Resolve offender userIds: direct user reports + post authors + comment authors
 		const offenderIds = [
 			...new Set([
 				...directTargetUserIds,

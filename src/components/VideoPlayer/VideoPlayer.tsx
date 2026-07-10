@@ -3,34 +3,6 @@
 /** biome-ignore-all lint/a11y/noNoninteractiveTabindex: video player needs focus for keyboard controls */
 "use client";
 
-/**
- * VideoPlayer
- *
- * A fully self-contained video player primitive with global single-active-video
- * coordination, scroll-aware autoplay, spoiler mode, and custom controls.
- *
- * Props:
- *   src          — Video URL
- *   autoPlay     — Autoplay when 60% visible in scroll container (default: false)
- *                  Spoiler mode blocks autoplay until the user reveals the video.
- *   spoiler      — Blurs video and shows reveal overlay (default: false)
- *   aspectRatio  — CSS aspect-ratio number e.g. 16/9. If omitted, fills parent height.
- *   className    — Extra classes on the outermost wrapper
- *
- * Requires (copy to your project):
- *   @/store/use-media-store       ← useMediaStore
- *   @/store/scroll-root-context   ← ScrollRootContext
- *
- * Autoplay mechanics:
- *   - One video plays at a time across the entire app (via zustand activeVideoId).
- *   - IntersectionObserver with ScrollRootContext as root fires at 60% visibility.
- *   - userPaused ref: prevents autoplay reclaiming after manual pause.
- *   - autoplayFailed ref: prevents infinite retry loop when browser blocks autoplay.
- *     Resets on: leaving viewport, manual play click (user gesture unlocks browser).
- *   - Store subscription is imperative (not reactive) to avoid render-cycle lag
- *     when another video claims the slot and this one must pause immediately.
- */
-
 import { Slider } from "@base-ui/react/slider";
 import {
 	Check,
@@ -52,8 +24,6 @@ import * as React from "react";
 import { cn } from "@/lib/client/utils";
 import { useMediaStore } from "@/store/use-media-store";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 const SPEEDS = [0.5, 1, 1.25, 1.5, 2] as const;
 type Speed = (typeof SPEEDS)[number];
 type MenuView = "root" | "speed";
@@ -67,8 +37,6 @@ export interface VideoPlayerProps {
 	autoPlayThreshold?: number;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function formatTime(s: number): string {
 	if (!Number.isFinite(s) || Number.isNaN(s) || s < 0) return "0:00";
 	const m = Math.floor(s / 60);
@@ -76,15 +44,6 @@ function formatTime(s: number): string {
 	return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-/**
- * Provides the scroll container element to VideoPlayer's IntersectionObserver.
- * Without this, IO uses the viewport as root — videos inside overflow containers
- * will autoplay/autopause at the wrong time.
- *
- * Usage: wrap every scrollable container with <ScrollContainer>.
- */
 export const ScrollRootContext = React.createContext<HTMLElement | null>(null);
 
 interface VideoSliderProps {
@@ -108,9 +67,9 @@ function VideoSlider({
 			min={0}
 			max={max}
 			step={step}
-			value={value} // ← plain number
+			value={value}
 			onValueChange={(val) => {
-				onValueChange(Array.isArray(val) ? (val[0] ?? 0) : val); // ← handle both
+				onValueChange(Array.isArray(val) ? (val[0] ?? 0) : val);
 			}}
 		>
 			<Slider.Control className="w-full flex items-center">
@@ -164,7 +123,6 @@ function VolumeControl({
 		isMuted || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
 	return (
-		// group/volume — the slider expands on hover of the whole group
 		<div
 			className="flex items-center gap-1 group/volume"
 			onPointerDown={(e) => e.stopPropagation()}
@@ -181,7 +139,6 @@ function VolumeControl({
 				<Icon size={20} />
 			</button>
 
-			{/* Expands on group hover — width transition via Tailwind */}
 			<div className="overflow-hidden w-0 group-hover/volume:w-18 transition-all duration-200 flex items-center">
 				<VideoSlider
 					value={volume}
@@ -294,8 +251,6 @@ function SettingsMenu({
 	);
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
 export function VideoPlayer({
 	src,
 	autoPlay = false,
@@ -304,43 +259,23 @@ export function VideoPlayer({
 	className = "",
 	autoPlayThreshold = 0.6,
 }: VideoPlayerProps) {
-	// ── Refs (never trigger re-renders) ─────────────────────────────────────────
 	const videoRef = React.useRef<HTMLVideoElement>(null);
 	const containerRef = React.useRef<HTMLDivElement>(null);
 
-	/**
-	 * userPaused: user explicitly hit pause.
-	 * Prevents the slot-freed path in Engine 2 from instantly re-claiming
-	 * the active slot and restarting a video the user intentionally stopped.
-	 * Reset on: leaving viewport, manual play click.
-	 */
 	const userPaused = React.useRef(false);
 
-	/**
-	 * inViewRef: synchronous visibility state for Engine 2's slot-freed path.
-	 * React state would be stale inside the zustand subscription closure.
-	 */
 	const inViewRef = React.useRef(false);
 
-	/**
-	 * autoplayFailed: browser blocked play() (e.g. no user interaction yet).
-	 * Prevents an infinite retry loop:
-	 *   slot freed → try to play → browser blocks → slot freed → ...
-	 * Reset on: leaving viewport (fresh chance next time), manual play (gesture unlocks browser).
-	 */
 	const autoplayFailed = React.useRef(false);
 
-	// ── Store ────────────────────────────────────────────────────────────────────
 	const isMuted = useMediaStore((s) => s.isMuted);
 	const volume = useMediaStore((s) => s.volume);
 	const setMuted = useMediaStore((s) => s.setMuted);
 	const setVolume = useMediaStore((s) => s.setVolume);
 	const setActiveVideoId = useMediaStore((s) => s.setActiveVideoId);
 
-	// ── Scroll root ──────────────────────────────────────────────────────────────
 	const scrollRoot = React.useContext(ScrollRootContext);
 
-	// ── UI state ─────────────────────────────────────────────────────────────────
 	const [playing, setPlaying] = React.useState(false);
 	const [duration, setDuration] = React.useState(0);
 	const [currentTime, setCurrentTime] = React.useState(0);
@@ -352,11 +287,6 @@ export function VideoPlayer({
 	const hideTimer = React.useRef<ReturnType<typeof setTimeout>>(null);
 	const [controlsVisible, setControlsVisible] = React.useState(false);
 
-	/**
-	 * spoilerRevealed: local — not global, not persisted.
-	 * Each VideoPlayer instance manages its own spoiler state independently.
-	 * Initialized to true when spoiler=false (no overlay needed).
-	 */
 	const [spoilerRevealed, setSpoilerRevealed] = React.useState(!spoiler);
 
 	const flashControls = () => {
@@ -373,12 +303,8 @@ export function VideoPlayer({
 
 	const showSpoiler = spoiler && !spoilerRevealed;
 
-	// Video ID
 	const videoId = `${React.useId()}-${src}`;
 
-	// ── On unmount: release active slot ─────────────────────────────────────────
-	// CRITICAL: prevents a destroyed video from permanently holding the global slot,
-	// blocking all other videos from autoplaying after a page transition.
 	React.useEffect(() => {
 		return () => {
 			if (useMediaStore.getState().activeVideoId === videoId) {
@@ -387,8 +313,6 @@ export function VideoPlayer({
 		};
 	}, [videoId]);
 
-	// ── Sync video element with store values ─────────────────────────────────────
-	// Runs whenever the user changes mute/volume from ANY other video instance.
 	React.useEffect(() => {
 		const v = videoRef.current;
 		if (!v) return;
@@ -396,7 +320,6 @@ export function VideoPlayer({
 		v.volume = volume;
 	}, [isMuted, volume]);
 
-	// ── Duration: handle pre-loaded video (readyState already >= 1 on mount) ─────
 	React.useEffect(() => {
 		const v = videoRef.current;
 		if (!v) return;
@@ -405,7 +328,6 @@ export function VideoPlayer({
 		}
 	}, []);
 
-	// ── Reset speed when src changes ─────────────────────────────────────────────
 	// biome-ignore lint/correctness/useExhaustiveDependencies: src is a trigger dep, not used inside
 	React.useEffect(() => {
 		const v = videoRef.current;
@@ -415,20 +337,16 @@ export function VideoPlayer({
 		setCurrentTime(0);
 	}, [src]);
 
-	// ── Fullscreen change listener ────────────────────────────────────────────────
 	React.useEffect(() => {
 		const handler = () => setIsFullscreen(!!document.fullscreenElement);
 		document.addEventListener("fullscreenchange", handler);
 		return () => document.removeEventListener("fullscreenchange", handler);
 	}, []);
 
-	// ── safePlay ─────────────────────────────────────────────────────────────────
-	// Always reads CURRENT store state (not closure) to avoid stale muted/volume.
 	const safePlay = React.useCallback(() => {
 		const v = videoRef.current;
 		if (!v || autoplayFailed.current) return;
 
-		// Read latest store values imperatively — closures would be stale
 		const { isMuted: muted, volume: vol } = useMediaStore.getState();
 		v.muted = muted;
 		v.volume = vol;
@@ -442,7 +360,7 @@ export function VideoPlayer({
 		});
 	}, [videoId]);
 
-	// ── Engine 1: IntersectionObserver ───────────────────────────────────────────
+	// Engine 1: IntersectionObserver
 	// Fires directly in the callback — no state, no render cycle.
 	// Uses scrollRoot from context so it works correctly inside overflow containers
 	// (profile tabs, modal sheets, etc.) without manual wiring.
@@ -457,11 +375,6 @@ export function VideoPlayer({
 				inViewRef.current = entry.isIntersecting;
 
 				if (entry.isIntersecting) {
-					// Only claim the slot if:
-					// - autoPlay is enabled
-					// - spoiler has been revealed (or was never shown)
-					// - nothing else is playing
-					// - user hasn't manually paused this video
 					if (
 						autoPlay &&
 						spoilerRevealed &&
@@ -473,9 +386,6 @@ export function VideoPlayer({
 						safePlay();
 					}
 				} else {
-					// Leaving viewport: clean up completely.
-					// Reset userPaused so next entry starts fresh (scroll back down = re-autoplay)
-					// Reset autoplayFailed so the browser gets another chance next time
 					userPaused.current = false;
 					autoplayFailed.current = false;
 
@@ -486,7 +396,7 @@ export function VideoPlayer({
 				}
 			},
 			{
-				root: scrollRoot, // null = viewport (works fine for top-level scroll)
+				root: scrollRoot,
 				threshold: autoPlayThreshold,
 			}
 		);
@@ -503,7 +413,7 @@ export function VideoPlayer({
 		autoPlayThreshold,
 	]);
 
-	// ── Engine 2: Store subscription ─────────────────────────────────────────────
+	// Engine 2: Store subscription
 	// Imperative reaction to activeVideoId changes.
 	// Does NOT use React state because by the time a re-render fires, the
 	// currently-playing video would have already played for several frames.
@@ -513,42 +423,33 @@ export function VideoPlayer({
 			if (!v) return;
 
 			if (state.activeVideoId === videoId) {
-				// We were explicitly given the slot — play if not already
 				if (!userPaused.current && v.paused) {
 					safePlay();
 				}
 			} else if (
-				// Slot was freed (another video stopped/left view).
-				// Reclaim if: we're in view, autoPlay on, spoiler resolved,
-				// user hasn't paused, and browser hasn't permanently blocked us.
 				state.activeVideoId === null &&
 				inViewRef.current &&
 				autoPlay &&
 				spoilerRevealed &&
 				!userPaused.current &&
-				!autoplayFailed.current && // ← THE LOOP GUARD — without this, failed autoplay → release → re-try → loop
+				!autoplayFailed.current &&
 				!useMediaStore.getState().isPausedGlobally
 			) {
-				// Double-check getState() in case two subscribers fire simultaneously
 				if (!useMediaStore.getState().activeVideoId) {
 					setActiveVideoId(videoId);
 					safePlay();
 				}
 			} else if (!v.paused) {
-				// Someone else claimed the slot — yield immediately
 				v.pause();
 			}
 		});
 	}, [videoId, autoPlay, spoilerRevealed, setActiveVideoId, safePlay]);
-
-	// ── Controls ─────────────────────────────────────────────────────────────────
 
 	const togglePlay = () => {
 		const v = videoRef.current;
 		if (!v) return;
 
 		if (v.paused) {
-			// Manual play: reset both flags — user gesture unlocks browser autoplay block
 			userPaused.current = false;
 			autoplayFailed.current = false;
 			setActiveVideoId(videoId);
@@ -574,18 +475,15 @@ export function VideoPlayer({
 
 	const handleVolumeChange = (val: number) => {
 		setVolume(val);
-		// Auto-mute when dragged to 0, auto-unmute when dragged above 0
 		if (val === 0) setMuted(true);
 		else if (isMuted) setMuted(false);
 	};
 
 	const handleToggleMute = () => {
 		if (isMuted) {
-			// We are UNMUTING — restore volume if it was dragged to zero
 			if (volume === 0) setVolume(0.5);
 			setMuted(false);
 		} else {
-			// We are MUTING — just mute, leave volume alone
 			setMuted(true);
 		}
 	};
@@ -619,8 +517,6 @@ export function VideoPlayer({
 
 	const handleRevealSpoiler = () => {
 		setSpoilerRevealed(true);
-		// After reveal, video behaves as a normal autoPlay video if autoPlay=true.
-		// Engine 1 & 2 will handle the rest since spoilerRevealed is now true.
 	};
 
 	const handleMenuToggle = () => {
@@ -629,8 +525,6 @@ export function VideoPlayer({
 	};
 
 	const showControls = hovering || !playing || menuOpen || controlsVisible;
-
-	// ── Render ────────────────────────────────────────────────────────────────────
 
 	const wrapperStyle: React.CSSProperties = aspectRatio
 		? { aspectRatio: aspectRatio }
@@ -651,10 +545,8 @@ export function VideoPlayer({
 					? undefined
 					: () => {
 							if (!controlsVisible && !hovering) {
-								// First tap — just reveal controls
 								flashControls();
 							} else {
-								// Controls already visible — toggle play and keep them visible
 								flashControls();
 								togglePlay();
 							}
@@ -692,7 +584,6 @@ export function VideoPlayer({
 				setMenuView("root");
 			}}
 		>
-			{/* ── Video element ─────────────────────────────────────────────────────── */}
 			<video
 				ref={videoRef}
 				src={src}
@@ -724,7 +615,6 @@ export function VideoPlayer({
 				}}
 			/>
 
-			{/* ── Spoiler overlay ───────────────────────────────────────────────────── */}
 			{showSpoiler && (
 				<div
 					className="absolute inset-0 z-20 flex items-center justify-center"
@@ -746,17 +636,14 @@ export function VideoPlayer({
 				</div>
 			)}
 
-			{/* ── Controls overlay ──────────────────────────────────────────────────── */}
 			{!showSpoiler && (
 				<div
 					className={`absolute inset-0 flex flex-col justify-end transition-opacity duration-300 pointer-events-none ${
 						showControls ? "opacity-100" : "opacity-0"
 					}`}
 				>
-					{/* Gradient scrim — fades from transparent to dark at the bottom */}
 					<div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/15 to-transparent" />
 
-					{/* Spoiler re-hide button — top left, only when spoiler prop is true */}
 					{spoiler && spoilerRevealed && !isFullscreen && (
 						<button
 							type="button"
@@ -777,7 +664,6 @@ export function VideoPlayer({
 						</button>
 					)}
 
-					{/* Control bar — re-enable pointer events here only */}
 					<div
 						className="relative z-10 px-3 pb-2.5 pt-10 flex flex-col gap-1.5 pointer-events-auto"
 						onClick={(e) => e.stopPropagation()}

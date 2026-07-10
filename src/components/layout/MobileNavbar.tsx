@@ -44,7 +44,7 @@ export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 				if (href === "/notifications")
 					return (
 						<Link key={href} href={href}>
-							<div className="relative inline-flex">
+							<div className="relative inline-flex translate-y-1">
 								<Icon className="stroke-[2.5px]" />
 								{unreadNotificationCount &&
 									unreadNotificationCount.count !== 0 && (
@@ -64,7 +64,7 @@ export const MobileNavbar = ({ userId }: MobileNavbarProps) => {
 			})}
 
 			<Link href={`/${data?.username}`}>
-				<div className="relative inline-flex">
+				<div className="relative inline-flex translate-y-1">
 					<Avatar className="size-7 shrink-0">
 						<AvatarImage src={data?.avatarUrl ?? "/static/default-pfp.png"} />
 					</Avatar>

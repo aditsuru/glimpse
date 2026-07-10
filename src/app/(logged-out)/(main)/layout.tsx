@@ -17,9 +17,28 @@ async function AuthLayout({
 					</div>
 				</FieldGroup>
 				<FieldDescription className="px-4 text-center mt-4!">
-					By clicking continue, you agree to our{" "}
-					<Link href="#">Terms of Service</Link> and{" "}
-					<Link href="#">Privacy Policy</Link>.
+					By signing up, you agree to our{" "}
+					<Link
+						href="/legal/tos"
+						className="hover:underline underline-offset-4"
+					>
+						Terms of Service
+					</Link>
+					,{" "}
+					<Link
+						href="/legal/privacy"
+						className="hover:underline underline-offset-4"
+					>
+						Privacy Policy
+					</Link>
+					, and{" "}
+					<Link
+						href="/legal/guidelines"
+						className="hover:underline underline-offset-4"
+					>
+						Community Guidelines
+					</Link>
+					.
 				</FieldDescription>
 			</div>
 		</div>

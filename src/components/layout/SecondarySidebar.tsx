@@ -1,5 +1,6 @@
 "use client";
 
+import { Footer } from "@/components/layout/Footer";
 import { BILLBOARD_FRAME, TRANSITION_MEDIA } from "@/lib/shared/static-files";
 import { useGetBillboard } from "@/modules/post/post.queries";
 import { useSettingsStore } from "@/store/use-settings-store";
@@ -14,7 +15,7 @@ export const SecondarySidebar = () => {
 	const { data: posts, isLoading } = useGetBillboard();
 
 	return (
-		<aside className="w-full h-full px-20">
+		<aside className="w-full h-full px-20 flex flex-col">
 			{isBillboardEnabled && (
 				<Billboard frameSrc={BILLBOARD_FRAME}>
 					{!isLoading && posts && (
@@ -22,6 +23,9 @@ export const SecondarySidebar = () => {
 					)}
 				</Billboard>
 			)}
+			<div className="mt-auto">
+				<Footer />
+			</div>
 		</aside>
 	);
 };

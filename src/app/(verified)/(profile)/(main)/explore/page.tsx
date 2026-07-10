@@ -25,7 +25,6 @@ export default function Page() {
 
 	const { userId } = useViewerStore();
 
-	// Search Query
 	const {
 		data: searchData,
 		fetchNextPage,
@@ -34,7 +33,6 @@ export default function Page() {
 		isFetching,
 	} = useSearchProfiles(searchQuery);
 
-	// Suggestions Query (Only runs when NOT searching)
 	const { data: suggestionsData, isLoading: isSuggestionsLoading } =
 		useGetSuggestions(searchQuery.length === 0);
 
