@@ -46,19 +46,19 @@ export const reportsTable = pgTable(
 
 		reporterId: text("reporter_id")
 			.notNull()
-			.references(() => user.id, { onDelete: "cascade" }),
+			.references(() => user.id, { onDelete: "set null" }),
 
 		targetType: ReportTargetTypeEnum("target_type").notNull(),
 
 		targetPostId: text("target_post_id").references(() => postsTable.id, {
-			onDelete: "cascade",
+			onDelete: "set null",
 		}),
 		targetCommentId: text("target_comment_id").references(
 			() => commentsTable.id,
-			{ onDelete: "cascade" }
+			{ onDelete: "set null" }
 		),
 		targetUserId: text("target_user_id").references(() => user.id, {
-			onDelete: "cascade",
+			onDelete: "set null",
 		}),
 
 		reason: ReportReasonEnum("reason").notNull(),
