@@ -128,13 +128,5 @@ export function useGetBillboard() {
 }
 
 export function useAdminDeletePost() {
-	const queryClient = useQueryClient();
-	return useMutation({
-		...orpc.post.adminDelete.mutationOptions(),
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: orpc.adminReport.getReports.key(),
-			});
-		},
-	});
+	return useMutation(orpc.post.adminDelete.mutationOptions());
 }
