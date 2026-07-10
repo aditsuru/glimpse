@@ -19,7 +19,7 @@ import { cn } from "@/lib/client/utils";
 export interface CarouselImage {
 	src: string;
 	alt?: string;
-	unoptimized?: boolean; // pass true for GIFs
+	unoptimized?: boolean;
 }
 
 interface CarouselControlsProps {

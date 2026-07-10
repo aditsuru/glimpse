@@ -21,7 +21,7 @@ export const adminReportSchema = {
 					targetType: z.enum(["post", "comment", "user"]),
 					targetPostId: z.string().nullable(),
 					targetCommentId: z.string().nullable(),
-					targetUser: actorSchema.nullable(), // resolved offender profile
+					targetUser: actorSchema.nullable(),
 					reason: z.string(),
 					body: z.string().nullable(),
 					status: z.enum(["pending", "resolved", "dismissed"]),

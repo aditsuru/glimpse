@@ -2,9 +2,7 @@ import Image from "next/image";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface BillboardProps {
-	/** The billboard frame image src (acts as an overlay on top of content) */
 	frameSrc: string;
-	/** Any content — <img>, <video>, or whatever you want displayed inside the frame */
 	children: React.ReactNode;
 }
 
@@ -12,7 +10,7 @@ interface BillboardProps {
 const FRAME_W = 1474;
 const FRAME_H = 1080;
 
-// Content insets (in original px)
+// Content insets
 const INSET_TOP = 207;
 const INSET_BOTTOM = 48;
 const INSET_SIDE = 45;

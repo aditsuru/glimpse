@@ -25,7 +25,6 @@ export const TrendingFeedPage = () => {
 	const ref = useInfiniteScroll(fetchNextPage, isFetchingNextPage);
 	const posts = data?.pages.flatMap((post) => post.items) ?? [];
 
-	// True only during a background refresh — not initial load, not pagination
 	const isRefreshing = isFetching && !isLoading && !isFetchingNextPage;
 
 	const handleRefresh = () => {
