@@ -50,7 +50,7 @@ export const FeedPage = () => {
 							transition={{ duration: 0.2 }}
 							className="overflow-hidden flex justify-center"
 						>
-							<div className="py-3">
+							<div className="py-4 pt-6">
 								<Loader />
 							</div>
 						</motion.div>

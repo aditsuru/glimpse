@@ -105,10 +105,13 @@ export const PostCard = ({
 				<div className="flex-1 min-w-0">
 					<div className="text-lg font-semibold flex justify-between gap-1 items-center -mt-1">
 						<div
-							className={cn("flex", {
-								"flex-col": profileRow,
-								"gap-1 items-center": !profileRow,
-							})}
+							className={cn(
+								"flex max-sm:flex-col max-sm:items-start max-sm:gap-0",
+								{
+									"flex-col": profileRow,
+									"gap-1 items-center": !profileRow,
+								}
+							)}
 							onClick={(e) => e.stopPropagation()}
 							onKeyDown={(e) => e.stopPropagation()}
 						>
