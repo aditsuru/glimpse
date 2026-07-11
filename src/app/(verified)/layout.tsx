@@ -19,7 +19,7 @@ export default async function AuthGuard({
 	const ban = await db
 		.select({ id: bansTable.id })
 		.from(bansTable)
-		.where(eq(bansTable.email, session.user.email))
+		.where(eq(bansTable.email, session.user.email.toLowerCase()))
 		.limit(1)
 		.then((i) => i[0]);
 
