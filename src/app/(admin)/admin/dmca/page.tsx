@@ -1,11 +1,4 @@
-import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/shared/metadata";
 import { DmcaPanel } from "@/modules/dmca/components/dmca-panel";
-
-export const metadata: Metadata = buildMetadata({
-	title: "Admin · DMCA",
-	noindex: true,
-});
 
 export default function AdminDmcaPage() {
 	return <DmcaPanel />;

@@ -1,11 +1,4 @@
 import { ShieldAlert } from "lucide-react";
-import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/shared/metadata";
-
-export const metadata: Metadata = buildMetadata({
-	title: "Account Suspended",
-	noindex: true,
-});
 
 export default function BannedPage() {
 	return (

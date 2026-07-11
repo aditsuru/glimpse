@@ -1,12 +1,5 @@
-import type { Metadata } from "next";
-import { buildMetadata } from "@/lib/shared/metadata";
 import { FollowHeader } from "../FollowHeader";
 import { FollowingPage } from "./FollowingPage";
-
-export const metadata: Metadata = buildMetadata({
-	title: "Following",
-	noindex: true,
-});
 
 export default async function Page({
 	params,
