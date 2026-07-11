@@ -114,6 +114,7 @@ export const Navbar = ({ userId }: NavbarProps) => {
 						className="object-cover"
 						unoptimized
 						priority
+						draggable={false}
 					/>
 				</div>
 			)}
