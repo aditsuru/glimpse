@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/performance/noImgElement: Image is not needed */
 "use client";
 
 import {
@@ -121,12 +122,11 @@ export const Navbar = ({ userId }: NavbarProps) => {
 			<div className="xl:col-start-2 flex flex-col justify-start gap-4 pt-8 pb-8">
 				{/* Logo */}
 				<div className="mb-2 px-3">
-					<Image
+					<img
 						src="/static/logo.png"
 						alt="Logo"
 						width={40}
 						height={40}
-						priority
 						draggable={false}
 					/>
 				</div>
