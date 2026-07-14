@@ -252,6 +252,7 @@ const ActorName = ({ actor }: ActorNameProps) => {
 			<HoverCard>
 				<HoverCardTrigger
 					delay={300}
+					onClick={(e) => e.stopPropagation()}
 					render={
 						<Link href={`/${actor.username}`}>
 							<span className="hover:underline hover:underline-offset-4">
