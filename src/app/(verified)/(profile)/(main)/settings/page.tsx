@@ -177,7 +177,10 @@ export default function Page() {
 					<div className="flex flex-col gap-4">
 						<h2 className="text-xl font-semibold">Account</h2>
 
-						<Field orientation="horizontal" className="w-full">
+						<Field
+							orientation="horizontal"
+							className="w-full max-sm:flex max-sm:gap-4 max-sm:flex-col"
+						>
 							<FieldContent>
 								<FieldLabel className="flex items-center gap-2 text-lg">
 									<User className="size-5" />
