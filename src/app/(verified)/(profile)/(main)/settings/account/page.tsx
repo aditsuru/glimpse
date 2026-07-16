@@ -28,7 +28,7 @@ export default function AccountSettingsPage() {
 	return (
 		<main className="flex flex-col w-full h-full overflow-hidden">
 			<PageHeader title="Account Settings" className="shrink-0" />
-			<ScrollContainer className="flex-1 overflow-y-auto no-scrollbar relative w-full px-12 py-8">
+			<ScrollContainer className="flex-1 overflow-y-auto no-scrollbar relative w-full px-4 md:px-12 py-8">
 				<div className="flex flex-col gap-8 max-w-2xl">
 					{/* Account Information Section */}
 					<div className="flex flex-col gap-4">

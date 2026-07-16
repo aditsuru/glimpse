@@ -334,7 +334,7 @@ export default function Page() {
 
 			<form
 				onSubmit={handleSubmit(handleFormSubmit)}
-				className={cn("w-full mt-[90px] px-12", {
+				className={cn("w-full mt-[90px] px-4 md:px-12 pb-4", {
 					"text-muted-foreground/60": formState.isSubmitting,
 				})}
 			>

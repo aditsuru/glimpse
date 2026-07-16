@@ -55,7 +55,7 @@ export default function Page() {
 	return (
 		<main className="w-full h-full overflow-y-auto no-scrollbar">
 			<PageHeader title="Settings" />
-			<section className="flex flex-col gap-6 py-8 px-12">
+			<section className="flex flex-col gap-6 py-8 px-4 md:px-12">
 				{/* Profile */}
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-4">
