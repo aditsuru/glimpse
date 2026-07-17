@@ -12,13 +12,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { startProgress } from "@/lib/client/helpers";
 import { useCreateReport } from "@/modules/report/report.queries";
@@ -54,8 +49,7 @@ export const ReportDialog = () => {
 		reset();
 	};
 
-	const handleReasonChange = (value: string | null) => {
-		if (!value) return;
+	const handleReasonChange = (value: string) => {
 		setReason(value);
 	};
 
@@ -94,6 +88,10 @@ export const ReportDialog = () => {
 	const isValid =
 		reason === "copyright" || (reason !== "" && body.trim().length >= 10);
 
+	const reasons = REPORT_REASONS.filter(
+		(r) => !(r === "copyright" && dialog.target?.type === "comment")
+	);
+
 	return (
 		<Dialog
 			open={dialog.isOpen}
@@ -108,24 +106,20 @@ export const ReportDialog = () => {
 				</DialogHeader>
 
 				<div className="flex flex-col gap-4">
-					<Select
-						modal={false}
+					<RadioGroup
 						value={reason}
 						onValueChange={handleReasonChange}
+						className="gap-3"
 					>
-						<SelectTrigger className="w-full">
-							<SelectValue placeholder="Select a reason" />
-						</SelectTrigger>
-						<SelectContent>
-							{REPORT_REASONS.filter(
-								(r) => !(r === "copyright" && dialog.target?.type === "comment")
-							).map((r) => (
-								<SelectItem key={r} value={r}>
+						{reasons.map((r) => (
+							<div key={r} className="flex items-center gap-2">
+								<RadioGroupItem value={r} id={r} />
+								<Label htmlFor={r} className="font-normal">
 									{REASON_LABELS[r]}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+								</Label>
+							</div>
+						))}
+					</RadioGroup>
 
 					{reason && reason !== "copyright" && (
 						<div className="flex flex-col gap-1.5">
