@@ -108,7 +108,11 @@ export const ReportDialog = () => {
 				</DialogHeader>
 
 				<div className="flex flex-col gap-4">
-					<Select value={reason} onValueChange={handleReasonChange}>
+					<Select
+						modal={false}
+						value={reason}
+						onValueChange={handleReasonChange}
+					>
 						<SelectTrigger className="w-full">
 							<SelectValue placeholder="Select a reason" />
 						</SelectTrigger>
